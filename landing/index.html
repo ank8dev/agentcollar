@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#f0f6e7" />
     <title>AgentCollar — Let agents work. Keep the keys.</title>
     <meta name="description" content="A secure gateway that gives AI agents short-lived, task-scoped access instead of passwords." />
@@ -333,9 +333,9 @@
 
     <!-- Pull-past-the-end surprise: a spinning AC medallion fixed at the bottom of the screen
          BEHIND the page. The page covers it completely; it only shows in the gap when you
-         pull the page up past its end (the browser's rubber-band overscroll). -->
+         pull the page up past its end (our own limited rubber band, see pull.js). -->
     <div class="overscroll-medallion" aria-hidden="true">
-      <img src="./brand/logo/agentcollar-mark-white.svg" alt="" width="44" height="44" />
+      <img src="./brand/logo/agentcollar-mark-white.svg" alt="" width="84" height="84" />
     </div>
 
     <script type="module" src="./main.js"></script>

@@ -47,6 +47,8 @@
    toolbar and any overscroll show the right color. */
 html {
   overflow-x: hidden; /* no sideways panning on phones */
+  overscroll-behavior: none; /* the browser's own rubber band is replaced by pull.js (limited) */
+  touch-action: pan-y; /* fingers can only scroll vertically: no pinch-zoom */
   background: var(--ink); /* the canvas = the footer's night sky (Safari 26+ tints its bars from it) */
 }
 
@@ -103,6 +105,7 @@ h3,
    ============================================================ */
 .page {
   position: relative;
+  z-index: 1; /* above the overscroll medallion */
   background: var(--bg); /* the paper surface (the canvas behind it is night) */
   max-width: calc(var(--frame) * 1px);
   margin-inline: auto;
@@ -118,6 +121,8 @@ h3,
    tall at the frame edges; on narrow screens the band is as wide as the page, so this only
    shows on screens wider than the 1512-px frame). */
 .footer-band {
+  position: relative;
+  z-index: 1; /* above the overscroll medallion */
   /* paper down to about the dome's edge height, then night (the dome is ~200 footer px) */
   --dome: min(205px, calc((100svh - 200px) * 0.133));
   background: linear-gradient(to bottom, var(--paper) var(--dome), var(--ink) var(--dome));
@@ -380,22 +385,21 @@ h3,
 }
 
 
-/* Behind the page (z-index -1, painted under the body's night background), fixed to the
-   bottom of the screen: only visible in the rubber-band gap when the page is pulled up
-   past its end. */
+/* Behind the page (the page and footer band sit on z-index 1 above it), fixed to the
+   bottom of the screen: only visible in the gap when the page is pulled up past its end. */
 .overscroll-medallion {
   position: fixed;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 28px);
-  z-index: -1;
+  bottom: calc(env(safe-area-inset-bottom) + 38px); /* centred in the 160-px pull gap */
+  z-index: 0; /* above the body's background, below the page layers (z-index 1) */
   translate: -50% 0;
   pointer-events: none;
 }
 
 .overscroll-medallion img {
   display: block;
-  width: 44px;
-  height: 44px;
+  width: 84px;
+  height: 84px;
   animation: medallion-spin 1.6s linear infinite;
 }
 

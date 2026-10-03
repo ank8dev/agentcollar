@@ -9,6 +9,7 @@ import * as manifesto from './sections/manifesto.js';
 import * as trust from './sections/trust.js';
 import * as footer from './sections/footer.js';
 import { initTweaks } from './tweaks.js';
+import { initPull } from './pull.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -73,6 +74,14 @@ if (!reducedMotion) {
     );
   });
 }
+
+// No pinch-zoom (iOS Safari ignores user-scalable=no; its own gesture events still fire).
+for (const type of ['gesturestart', 'gesturechange']) {
+  document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+}
+
+// Limited pull-up at the very bottom that reveals the spinning medallion (touch screens)
+initPull({ gsap });
 
 // Font tweaks panel: dev server or ?tweaks only.
 initTweaks({ ScrollTrigger });
