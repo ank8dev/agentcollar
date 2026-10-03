@@ -4,7 +4,7 @@
 import { existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
-import { askInTerminal, decide } from "./approval.ts";
+import { askInTerminal, decide, oneLine } from "./approval.ts";
 import { check, type CheckCode } from "./check.ts";
 import { createDraft, listInbox, sendEmail } from "./gmail-fake.ts";
 import { mandates, requestMandate, type Mandate } from "./mandate.ts";
@@ -49,8 +49,28 @@ function sendJson(res: ServerResponse, status: number, body: object): void {
   res.end(JSON.stringify(body));
 }
 
+// Web pages open in your browser can also send requests to 127.0.0.1.
+// Our agents are programs, not web pages, so we refuse anything that looks like a browser:
+// - Host must be our own address. A site using "DNS rebinding" (its domain suddenly
+//   pointing at 127.0.0.1) still sends ITS domain in Host, so it is stopped here.
+// - Browsers add an Origin header to requests from web pages; programs like agent.ts do not.
+const allowedHosts = new Set([`127.0.0.1:${PORT}`, `localhost:${PORT}`]);
+
+function refuseBrowsers(req: IncomingMessage): void {
+  if (!allowedHosts.has(req.headers.host ?? "")) {
+    throw new HttpError(403, "unexpected Host header");
+  }
+  if (req.headers.origin !== undefined) {
+    throw new HttpError(403, "requests from web pages are not allowed");
+  }
+}
+
 // Reads the request body as JSON. Max 10 KB, so nobody can fill our memory.
+// Requiring the JSON content-type also stops the "simple" requests a web page can send silently.
 async function readJson(req: IncomingMessage): Promise<Record<string, unknown>> {
+  if (!(req.headers["content-type"] ?? "").startsWith("application/json")) {
+    throw new HttpError(415, "content-type must be application/json");
+  }
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
@@ -133,9 +153,17 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   // does nothing until a human approves (202 = "accepted, not done yet").
   if (method === "POST" && path === "/mandates") {
     const body = await readJson(req);
+    // Actions must look exactly like "app.verb" (lowercase, no spaces, no line breaks),
+    // so what the human sees in the approval message is exactly what gets enforced.
     const actions = body.allowedActions;
-    if (!Array.isArray(actions) || actions.length === 0 || !actions.every((a) => typeof a === "string")) {
-      throw new HttpError(400, `"allowedActions" must be a non-empty list of strings`);
+    const actionFormat = /^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$/;
+    if (
+      !Array.isArray(actions) ||
+      actions.length === 0 ||
+      actions.length > 20 ||
+      !actions.every((a) => typeof a === "string" && actionFormat.test(a))
+    ) {
+      throw new HttpError(400, `"allowedActions" must be 1-20 actions like "gmail.read"`);
     }
     const mandate = requestMandate(
       requireString(body, "agent"),
@@ -154,7 +182,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
     } else {
       askInTerminal(mandate);
     }
-    console.log(`Mandate ${mandate.id} requested by ${mandate.agent}, waiting for approval`);
+    console.log(`Mandate ${mandate.id} requested by ${oneLine(mandate.agent, 64)}, waiting for approval`);
     return sendJson(res, 202, { token: mandate.token, ...publicView(mandate) });
   }
 
@@ -197,6 +225,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
 const server = createServer(async (req, res) => {
   try {
+    refuseBrowsers(req);
     await route(req, res);
   } catch (error) {
     if (error instanceof HttpError) {

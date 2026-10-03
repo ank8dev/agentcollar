@@ -18,15 +18,33 @@ export function decide(id: string, decision: Decision, by: string): Mandate | un
   return mandate;
 }
 
+// Text written by the agent (its name, the task) is shown to the human, so a bad agent
+// could try to fake lines like "Действия: gmail.read" with line breaks, or hide text with
+// invisible / right-to-left characters. We squash it into one short, plain line.
+export function oneLine(text: string, max: number): string {
+  const plain = text
+    .replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, " ") // line breaks, control chars
+    .replace(/[\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g, "") // invisible, direction tricks
+    .replace(/\s+/g, " ")
+    .trim();
+  return plain.length > max ? plain.slice(0, max) + "…" : plain;
+}
+
 // Human-readable summary, used in the terminal and in Telegram.
+// The facts the broker enforces come FIRST; the agent's own words come last, in quotes.
 export function describe(mandate: Mandate): string {
-  return [
-    `Агент: ${mandate.agent}`,
-    `Задача: ${mandate.task}`,
+  const lines: string[] = [];
+  if (mandate.allowedActions.some((action) => action.endsWith(".send"))) {
+    lines.push("⚠️ Агент просит право ОТПРАВЛЯТЬ от твоего имени");
+  }
+  lines.push(
     `Действия: ${mandate.allowedActions.join(", ")}`,
     `Срок: ${mandate.expiresInSeconds} с после одобрения, лимит ${mandate.limit}`,
     `id: ${mandate.id}`,
-  ].join("\n");
+    `Агент: ${oneLine(mandate.agent, 64)}`,
+    `Задача (слова агента): «${oneLine(mandate.task, 200)}»`,
+  );
+  return lines.join("\n");
 }
 
 // Terminal channel. Questions are asked one at a time: if two agents ask at once,
