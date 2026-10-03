@@ -1,1 +1,53 @@
-/* Section: manifesto — see specs/manifesto.md */
+/* Section: manifesto — see specs/manifesto.md
+   The blob, band and text look the same in both themes (paper text on raspberry),
+   so nothing here switches with the theme; only the page background around it changes. */
+
+.manifesto {
+  /* Contrast fix: paper text on the brand raspberry #BD4F6C is only 4.23:1.
+     This slightly deeper raspberry gives 4.60:1 (rule: 4.5) and looks the same. */
+  --raspberry-text-safe: #b44b67;
+
+  /* Marker band under the last line. Figma's ≈ #A86848 (sand over raspberry)
+     gives only 4.02:1 with paper text; this darker tone gives 4.83:1. */
+  --manifesto-band: #985c40;
+}
+
+.manifesto__blob {
+  aspect-ratio: 1653 / 791;
+  overflow: visible;
+  fill: var(--raspberry-text-safe);
+}
+
+.manifesto__band {
+  height: calc(65 * var(--u));
+  overflow: visible;
+  fill: var(--manifesto-band);
+  transform-origin: left center;
+}
+
+/* Five lines centered on the frame center (x 756); first line box starts at y 3280 */
+.manifesto__text {
+  position: absolute;
+  top: calc((3280 - 3200) * var(--u));
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap; /* only the <br>s break lines, like in Figma */
+  color: var(--paper); /* on the blob in BOTH themes */
+  font-size: calc(78 * var(--u));
+  font-weight: 400;
+  line-height: calc(105 * var(--u));
+}
+
+.manifesto__line {
+  display: inline-block;
+}
+
+.manifesto__text em {
+  font-style: italic;
+}
+
+.manifesto__text strong {
+  font-weight: 700;
+}
