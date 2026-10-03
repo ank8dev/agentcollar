@@ -118,9 +118,8 @@ h3,
    tall at the frame edges; on narrow screens the band is as wide as the page, so this only
    shows on screens wider than the 1512-px frame). */
 .footer-band {
-  /* paper down to about the dome's edge height, then night (the dome is ~200 footer px) */
-  --dome: min(205px, calc((100svh - 200px) * 0.133));
-  background: linear-gradient(to bottom, var(--paper) var(--dome), var(--ink) var(--dome));
+  /* paper down to the dome's edge height (~210 px at full desktop size), then night */
+  background: linear-gradient(to bottom, var(--paper) 210px, var(--ink) 210px);
 }
 
 /* breathing room between the last section (cards) and the footer's night sky

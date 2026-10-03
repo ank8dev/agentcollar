@@ -57,10 +57,11 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
   // gsap.matchMedia reverts everything below (tweens, inline styles, data-motion) when the
   // width crosses 768 px, then builds it again for the other layout.
   const mm = gsap.matchMedia();
-  mm.add({ phone: '(max-width: 767.98px)', desktop: '(min-width: 768px)' }, () => {
-    // footer.css adds a sticky phase (the content box holds at the screen bottom) on all
-    // screens, so the whole flight is seen and the finished button stays on screen.
-    footer.dataset.motion = 'sticky';
+  mm.add({ phone: '(max-width: 767.98px)', desktop: '(min-width: 768px)' }, ({ conditions }) => {
+    const phone = conditions.phone;
+    // Phones: footer.css adds a sticky phase (the content box holds at the screen bottom).
+    // Desktop keeps the full-width Figma footer and the original scroll-through flight.
+    if (phone) footer.dataset.motion = 'sticky';
 
     // One Figma px in screen px for the footer's content (bigger on phones, see footer.css)
     const u = () => content.offsetWidth / FIGMA_W;
@@ -94,16 +95,26 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
 
     // 3. CTA: flight, then the outline.
     const footerDocTop = () => footer.getBoundingClientRect().top + window.scrollY;
-    // The whole flight happens while the content box is stuck to the screen bottom. It
-    // sticks when its bottom reaches the screen bottom and stays for the extra height
-    // (--stick); the flight uses the first 85% of that, then a short hold on the button.
-    const stickStart = () => footerDocTop() + content.offsetHeight - window.innerHeight;
-    const stickLength = () => footer.offsetHeight - content.offsetHeight;
-    const flightStart = () => stickStart();
-    const flightEnd = () => {
-      const end = Math.min(stickStart() + 0.85 * stickLength(), ScrollTrigger.maxScroll(window));
-      return Math.max(end, flightStart() + 160);
-    };
+    let flightStart;
+    let flightEnd;
+    if (phone) {
+      // Phones: the whole flight happens while the content box is stuck to the screen bottom.
+      // It sticks when its bottom reaches the screen bottom and stays for the extra height
+      // (--stick); the flight uses the first 85% of that, then a short hold on the button.
+      const stickStart = () => footerDocTop() + content.offsetHeight - window.innerHeight;
+      const stickLength = () => footer.offsetHeight - content.offsetHeight;
+      flightStart = () => stickStart();
+      flightEnd = () => {
+        const end = Math.min(stickStart() + 0.85 * stickLength(), ScrollTrigger.maxScroll(window));
+        return Math.max(end, flightStart() + 160);
+      };
+    } else {
+      // Desktop: the footer is cut to one screen (footer.css), so the flight runs while it
+      // scrolls in — from its top at 70% of the screen down to the page end, where the
+      // finished button sits between the tag and the Earth.
+      flightStart = () => footerDocTop() - 0.7 * window.innerHeight;
+      flightEnd = () => Math.max(ScrollTrigger.maxScroll(window), flightStart() + 160);
+    }
 
     const tl = gsap.timeline({
       defaults: { ease: 'power1.inOut', duration: 1 },

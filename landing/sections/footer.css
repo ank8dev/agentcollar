@@ -231,116 +231,132 @@
    flash by at the very end of the page. On phones the footer gets its own, ~1.75× bigger
    unit --fu (capped so the whole footer still fits one screen), centred on the page: the
    sides of the Figma frame fall off-screen (.page clips them). */
-/* ---------- Footer scale + sticky phase (all screens) ---------- */
-.site-footer.stage {
-  /* (doubled selector: .stage in styles.css is imported after this file and sets height) */
-  --fk: 1; /* zoom vs the page scale (phones: 1.75) */
-  --fu: min(calc(100cqw / var(--frame) * var(--fk)), calc((100svh - 200px) / 1542)); /* the whole footer (tag → badges) always fits on one screen */
-  --stick: 0px;
-  --below: 0px; /* phones: extra Earth under the browser's bottom toolbar */
-  height: calc(1542 * var(--fu) + var(--below) + var(--stick));
+/* ---------- Desktop: full-width Figma footer, cut to the screen height ----------
+   At the page end the tag, the button and the top of the full-width Earth must all be on
+   screen. So the footer is only as tall as needed (tag → bottom = one screen minus the
+   header); the Earth keeps its full size and width, only its top cap shows. The tag sits
+   100 Figma px lower than in Figma so the three fit together. */
+@media (min-width: 768px) {
+  .site-footer.stage {
+    height: min(calc(1542 * var(--u)), calc(145 * var(--u) + 100vh - 96px));
+  }
+  .site-footer .site-footer__tag {
+    top: calc((5365 - var(--top)) * var(--u));
+  }
 }
 
-.site-footer .site-footer__sticky,
-.site-footer .site-footer__sticky *,
-.site-footer .site-footer__sky {
-  --u: var(--fu);
-}
+/* ---------- Footer scale + sticky phase (PHONES ONLY; desktop keeps the full-width Figma footer) ---------- */
+@media (max-width: 767.98px) {
+  .site-footer.stage {
+    /* (doubled selector: .stage in styles.css is imported after this file and sets height) */
+    --fk: 1; /* zoom vs the page scale (phones: 1.75) */
+    --fu: min(calc(100cqw / var(--frame) * var(--fk)), calc((100svh - 200px) / 1542)); /* the whole footer (tag → badges) always fits on one screen */
+    --stick: 0px;
+    --below: 0px; /* phones: extra Earth under the browser's bottom toolbar */
+    height: calc(1542 * var(--fu) + var(--below) + var(--stick));
+  }
 
-/* the content box: the whole Figma frame width at the footer scale, centred */
-.site-footer__sticky {
-  width: calc(1512 * var(--fu));
-  height: calc(1542 * var(--fu) + var(--below));
-  margin-left: calc(50% - 756 * var(--fu));
-  overflow: visible clip; /* the Earth never shows below the box; sideways the page/band clip it */
-  /* An explicit night background: Safari 26+ tints its bottom bar from fixed/sticky elements
-     at the screen edge — without a color it guessed one from the Earth (a sandy strip). */
-  background-color: var(--ink);
-  /* …cut to the sky's dome (the 6 px dip hides under the sky's own wobbly edge), so the
-     paper above the dome stays paper while the footer slides in */
-  clip-path: polygon(
-    -60% calc(192 * var(--fu)),
-    -6.61% calc(192 * var(--fu)),
-    -3.97% calc(158 * var(--fu)),
-    -1.32% calc(135 * var(--fu)),
-    1.32% calc(118 * var(--fu)),
-    3.97% calc(105 * var(--fu)),
-    6.61% calc(94 * var(--fu)),
-    9.26% calc(85 * var(--fu)),
-    11.90% calc(79 * var(--fu)),
-    14.55% calc(73 * var(--fu)),
-    17.20% calc(68 * var(--fu)),
-    19.84% calc(64 * var(--fu)),
-    22.49% calc(61 * var(--fu)),
-    25.13% calc(57 * var(--fu)),
-    27.78% calc(52 * var(--fu)),
-    30.42% calc(48 * var(--fu)),
-    33.07% calc(45 * var(--fu)),
-    35.71% calc(41 * var(--fu)),
-    38.36% calc(36 * var(--fu)),
-    41.01% calc(32 * var(--fu)),
-    43.65% calc(27 * var(--fu)),
-    46.30% calc(23 * var(--fu)),
-    48.94% calc(19 * var(--fu)),
-    51.59% calc(14 * var(--fu)),
-    54.23% calc(11 * var(--fu)),
-    56.88% calc(8 * var(--fu)),
-    59.52% calc(8 * var(--fu)),
-    62.17% calc(8 * var(--fu)),
-    64.81% calc(8 * var(--fu)),
-    67.46% calc(11 * var(--fu)),
-    70.11% calc(14 * var(--fu)),
-    72.75% calc(19 * var(--fu)),
-    75.40% calc(25 * var(--fu)),
-    78.04% calc(33 * var(--fu)),
-    80.69% calc(41 * var(--fu)),
-    83.33% calc(52 * var(--fu)),
-    85.98% calc(63 * var(--fu)),
-    88.62% calc(77 * var(--fu)),
-    91.27% calc(92 * var(--fu)),
-    93.92% calc(110 * var(--fu)),
-    96.56% calc(133 * var(--fu)),
-    99.21% calc(165 * var(--fu)),
-    101.85% calc(213 * var(--fu)),
-    160% calc(213 * var(--fu)),
-    160% 100%,
-    -60% 100%
-  );
-}
+  .site-footer .site-footer__sticky,
+  .site-footer .site-footer__sticky *,
+  .site-footer .site-footer__sky {
+    --u: var(--fu);
+  }
 
-/* the night sky: at least as wide as the footer (stretched when the footer is scaled down) */
-.site-footer .site-footer__sky {
-  --sky-w: max(calc(1640 * var(--fu)), calc(100% + 40px));
-  width: var(--sky-w);
-  height: calc(1542 * var(--fu) + var(--below));
-  left: calc(50% - var(--sky-w) / 2);
-}
+  /* the content box: the whole Figma frame width at the footer scale, centred */
+  .site-footer__sticky {
+    width: calc(1512 * var(--fu));
+    height: calc(1542 * var(--fu) + var(--below));
+    margin-left: calc(50% - 756 * var(--fu));
+    overflow: visible clip; /* the Earth never shows below the box; sideways the page/band clip it */
+    /* An explicit night background: Safari 26+ tints its bottom bar from fixed/sticky elements
+       at the screen edge — without a color it guessed one from the Earth (a sandy strip). */
+    background-color: var(--ink);
+    /* …cut to the sky's dome (the 6 px dip hides under the sky's own wobbly edge), so the
+       paper above the dome stays paper while the footer slides in */
+    clip-path: polygon(
+      -60% calc(192 * var(--fu)),
+      -6.61% calc(192 * var(--fu)),
+      -3.97% calc(158 * var(--fu)),
+      -1.32% calc(135 * var(--fu)),
+      1.32% calc(118 * var(--fu)),
+      3.97% calc(105 * var(--fu)),
+      6.61% calc(94 * var(--fu)),
+      9.26% calc(85 * var(--fu)),
+      11.90% calc(79 * var(--fu)),
+      14.55% calc(73 * var(--fu)),
+      17.20% calc(68 * var(--fu)),
+      19.84% calc(64 * var(--fu)),
+      22.49% calc(61 * var(--fu)),
+      25.13% calc(57 * var(--fu)),
+      27.78% calc(52 * var(--fu)),
+      30.42% calc(48 * var(--fu)),
+      33.07% calc(45 * var(--fu)),
+      35.71% calc(41 * var(--fu)),
+      38.36% calc(36 * var(--fu)),
+      41.01% calc(32 * var(--fu)),
+      43.65% calc(27 * var(--fu)),
+      46.30% calc(23 * var(--fu)),
+      48.94% calc(19 * var(--fu)),
+      51.59% calc(14 * var(--fu)),
+      54.23% calc(11 * var(--fu)),
+      56.88% calc(8 * var(--fu)),
+      59.52% calc(8 * var(--fu)),
+      62.17% calc(8 * var(--fu)),
+      64.81% calc(8 * var(--fu)),
+      67.46% calc(11 * var(--fu)),
+      70.11% calc(14 * var(--fu)),
+      72.75% calc(19 * var(--fu)),
+      75.40% calc(25 * var(--fu)),
+      78.04% calc(33 * var(--fu)),
+      80.69% calc(41 * var(--fu)),
+      83.33% calc(52 * var(--fu)),
+      85.98% calc(63 * var(--fu)),
+      88.62% calc(77 * var(--fu)),
+      91.27% calc(92 * var(--fu)),
+      93.92% calc(110 * var(--fu)),
+      96.56% calc(133 * var(--fu)),
+      99.21% calc(165 * var(--fu)),
+      101.85% calc(213 * var(--fu)),
+      160% calc(213 * var(--fu)),
+      160% 100%,
+      -60% 100%
+    );
+  }
 
-/* badges stay above the bottom toolbar */
-.site-footer .site-footer__line {
-  bottom: calc(30 * var(--fu) + var(--below));
-}
+  /* the night sky: at least as wide as the footer (stretched when the footer is scaled down) */
+  .site-footer .site-footer__sky {
+    --sky-w: max(calc(1640 * var(--fu)), calc(100% + 40px));
+    width: var(--sky-w);
+    height: calc(1542 * var(--fu) + var(--below));
+    left: calc(50% - var(--sky-w) / 2);
+  }
 
-/* With motion (footer.js sets data-motion): the footer gets --stick of extra height and
-   the content box sticks to the screen bottom (position: sticky, jitter-free with Lenis)
-   while that extra height scrolls by. The night sky's dome scrolls away above it; the
-   .footer-band behind it is dark, so the sky simply continues. footer.js runs the CTA
-   flight inside this sticky phase, and the phase ends exactly at the page end. */
-.site-footer[data-motion] {
-  --stick: 140vh;
-}
+  /* badges stay above the bottom toolbar */
+  .site-footer .site-footer__line {
+    bottom: calc(30 * var(--fu) + var(--below));
+  }
 
-/* an empty block of --stick above the content box: room for it to slide up into
-   (a margin would not do — a sticky box's margins must stay inside its parent) */
-.site-footer[data-motion]::before {
-  content: '';
-  display: block;
-  height: var(--stick);
-}
+  /* With motion (footer.js sets data-motion): the footer gets --stick of extra height and
+     the content box sticks to the screen bottom (position: sticky, jitter-free with Lenis)
+     while that extra height scrolls by. The night sky's dome scrolls away above it; the
+     .footer-band behind it is dark, so the sky simply continues. footer.js runs the CTA
+     flight inside this sticky phase, and the phase ends exactly at the page end. */
+  .site-footer[data-motion] {
+    --stick: 140vh;
+  }
 
-.site-footer[data-motion] .site-footer__sticky {
-  position: sticky;
-  bottom: 0;
+  /* an empty block of --stick above the content box: room for it to slide up into
+     (a margin would not do — a sticky box's margins must stay inside its parent) */
+  .site-footer[data-motion]::before {
+    content: '';
+    display: block;
+    height: var(--stick);
+  }
+
+  .site-footer[data-motion] .site-footer__sticky {
+    position: sticky;
+    bottom: 0;
+  }
 }
 
 /* ---------- Phones: bigger footer, Earth under the toolbar, own star spots ---------- */
