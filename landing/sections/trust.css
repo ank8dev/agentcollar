@@ -140,7 +140,7 @@
   left: calc(var(--x) * var(--u)); /* deck position */
   translate: calc(var(--dx, 0) * var(--u)) 0; /* phase 1: distance to the row position */
   rotate: calc(var(--tilt, 0) * 1deg);
-  will-change: translate, rotate;
+  will-change: transform;
 }
 
 /* ---------- 3. Phones: the same deck → row effect, with big cards ---------- */

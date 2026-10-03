@@ -51,8 +51,8 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     const deckX = phone ? PHONE_DECK_X : DECK_X;
     const rowX = phone ? PHONE_ROW_X : ROW_X;
     const shift = phone ? PHONE_SHIFT : SHIFT;
-    gsap.set(list, { '--shift': 0 });
-    gsap.set(cards, { '--dx': 0, '--tilt': 0, '--x': (i) => deckX[i] });
+    gsap.set(cards, { '--x': (i) => deckX[i], force3D: true });
+    gsap.set(list, { force3D: true });
 
     // The cards' sticky box and its CSS `top` (px) — the spread starts when it sticks.
     const sticky = section.querySelector('.trust__sticky');
@@ -73,14 +73,19 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
 
     if (import.meta.env.DEV) window.__trustTL = tl; // dev only: inspect frame by frame
 
+    // Moves use plain transforms (x / rotation, GPU-composited) instead of CSS variables,
+    // so the browser doesn't recalculate styles every frame (that made the cards shake on
+    // iPhones). Figma units → px: one card is 590 Figma px wide.
+    const px = () => cards[0].offsetWidth / CARD_W;
+
     // 1. deck → row, with a small fan rotation on the way
     cards.forEach((card, i) => {
-      tl.to(card, { '--dx': rowX[i] - deckX[i], duration: 1, ease: 'power1.inOut' }, 0)
-        .to(card, { '--tilt': TILT[i], duration: 0.5, ease: 'sine.out' }, 0)
-        .to(card, { '--tilt': 0, duration: 0.5, ease: 'sine.in' }, 0.5);
+      tl.to(card, { x: () => (rowX[i] - deckX[i]) * px(), duration: 1, ease: 'power1.inOut' }, 0)
+        .to(card, { rotation: TILT[i], duration: 0.5, ease: 'sine.out' }, 0)
+        .to(card, { rotation: 0, duration: 0.5, ease: 'sine.in' }, 0.5);
     });
     // 2. short hold, then the whole row slides left so card 4 is fully visible
-    tl.to(list, { '--shift': shift, duration: phone ? 2 : 1.1, ease: 'power1.inOut' }, 1.15);
+    tl.to(list, { x: () => shift * px(), duration: phone ? 2 : 1.1, ease: 'power1.inOut' }, 1.15);
     tl.to({}, { duration: 0.15 }); // brief hold before the section scrolls on
 
     return () => {

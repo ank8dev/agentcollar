@@ -12,6 +12,9 @@ import { initTweaks } from './tweaks.js';
 import { initPull } from './pull.js';
 
 gsap.registerPlugin(ScrollTrigger);
+// Phones: the browser's toolbars hide/show while scrolling, which fires "resize". Without
+// this, every such resize re-measures all scroll animations and the sticky cards jump.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 // Sections check this themselves: with reduced motion they show the final state, no animation.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
