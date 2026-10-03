@@ -20,6 +20,13 @@
   stroke-width: 24;
 }
 
+/* Everything but the sky. Desktop: a plain full-size box (children keep the footer's
+   coordinates). Phones: see the bottom of this file. */
+.site-footer__sticky {
+  position: relative;
+  height: 100%;
+}
+
 .site-footer__tag {
   z-index: 1; /* behind the horizon group: the flying star lands ON the medallion */
   pointer-events: none;
@@ -214,5 +221,59 @@
 @media (prefers-reduced-motion: reduce) {
   .site-footer__badge {
     transition: none;
+  }
+}
+
+/* ---------- Phones: bigger footer + a sticky phase for the CTA flight ---------- */
+/* At the page scale (--u ≈ 0.25 px) the tag, button and Earth are tiny, and the flight would
+   flash by at the very end of the page. On phones the footer gets its own, ~1.75× bigger
+   unit --fu (capped so the whole footer still fits one screen), centred on the page: the
+   sides of the Figma frame fall off-screen (.page clips them). */
+@media (max-width: 767.98px) {
+  .site-footer.stage {
+    /* (doubled selector: .stage in styles.css is imported after this file and sets height) */
+    --fu: min(calc(100cqw / var(--frame) * 1.75), calc(100svh / 1600));
+    --stick: 0px;
+    height: calc(1542 * var(--fu) + var(--stick));
+  }
+
+  .site-footer .site-footer__sticky,
+  .site-footer .site-footer__sticky *,
+  .site-footer .site-footer__sky {
+    --u: var(--fu);
+  }
+
+  /* the content box: the whole Figma frame width at the phone scale, centred */
+  .site-footer__sticky {
+    width: calc(1512 * var(--fu));
+    height: calc(1542 * var(--fu));
+    margin-left: calc(50% - 756 * var(--fu));
+    overflow: clip; /* the Earth's lower part never shows below the content box */
+  }
+
+  .site-footer .site-footer__sky {
+    left: calc(50% - (756 + 100) * var(--fu));
+  }
+
+  /* With motion (footer.js sets data-motion): the footer gets --stick of extra height and
+     the content box sticks to the screen bottom (position: sticky, jitter-free with Lenis)
+     while that extra height scrolls by. The night sky's dome scrolls away above it; the
+     .footer-band behind it is dark, so the sky simply continues. footer.js runs the CTA
+     flight inside this sticky phase, and the phase ends exactly at the page end. */
+  .site-footer[data-motion] {
+    --stick: 140vh;
+  }
+
+  /* an empty block of --stick above the content box: room for it to slide up into
+     (a margin would not do — a sticky box's margins must stay inside its parent) */
+  .site-footer[data-motion]::before {
+    content: '';
+    display: block;
+    height: var(--stick);
+  }
+
+  .site-footer[data-motion] .site-footer__sticky {
+    position: sticky;
+    bottom: 0;
   }
 }

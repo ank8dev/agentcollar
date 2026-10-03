@@ -251,64 +251,68 @@
             />
           </svg>
 
-          <!-- AC tag: the footer is dark, so always the white one. Drawn above the CTA star (the star ends "under the tag"). -->
-          <!-- Sky-colored disc behind the tag's round plate: its letters are see-through, and the star sits behind it in the end state -->
-          <img class="pos site-footer__tag" style="--x: 559; --y: 5265; --w: 371" src="./brand/logo/agentcollar-tag-white.png" alt="" />
+          <!-- Everything but the sky. Desktop: a plain full-size box. Phones: a bigger scale (own --u)
+               and, with motion, it sticks to the screen bottom while the CTA flies (footer.css/js). -->
+          <div class="site-footer__sticky">
+            <!-- AC tag: the footer is dark, so always the white one. Drawn above the CTA star (the star ends "under the tag"). -->
+            <!-- Sky-colored disc behind the tag's round plate: its letters are see-through, and the star sits behind it in the end state -->
+            <img class="pos site-footer__tag" style="--x: 559; --y: 5265; --w: 371" src="./brand/logo/agentcollar-tag-white.png" alt="" />
 
-          <!-- Stars (some twinkle, see footer.js) -->
-          <span class="pos star site-footer__twinkle" style="--x: 441; --y: 5520; --w: 73; --star-color: var(--sand)" aria-hidden="true"></span>
-          <span class="pos star site-footer__twinkle" style="--x: 1162; --y: 5482; --w: 66; --star-color: var(--mist)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 1250; --y: 5640; --w: 37; --star-color: var(--star)" aria-hidden="true"></span>
-          <span class="pos star site-footer__twinkle" style="--x: 136; --y: 5809; --w: 39; --star-color: var(--sand)" aria-hidden="true"></span>
-          <span class="pos star site-footer__twinkle" style="--x: 1328; --y: 6043; --w: 55; --star-color: var(--mist)" aria-hidden="true"></span>
+            <!-- Stars (some twinkle, see footer.js) -->
+            <span class="pos star site-footer__twinkle" style="--x: 441; --y: 5520; --w: 73; --star-color: var(--sand)" aria-hidden="true"></span>
+            <span class="pos star site-footer__twinkle" style="--x: 1162; --y: 5482; --w: 66; --star-color: var(--mist)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 1250; --y: 5640; --w: 37; --star-color: var(--star)" aria-hidden="true"></span>
+            <span class="pos star site-footer__twinkle" style="--x: 136; --y: 5809; --w: 39; --star-color: var(--sand)" aria-hidden="true"></span>
+            <span class="pos star site-footer__twinkle" style="--x: 1328; --y: 6043; --w: 55; --star-color: var(--mist)" aria-hidden="true"></span>
 
-          <!-- The horizon: Earth + the CTA that rises from it. Moves together (slow parallax). -->
-          <div class="site-footer__horizon">
-            <!--
-              CTA: ONE link = star + ONE label + a hand-drawn outline. End state (CSS default) is a
-              button under the tag: star on the left, straight label on the right, white marker
-              outline around both. footer.js starts the star big on the Earth's top with the label
-              curved along the horizon, flies the star up to the button's left, straightens the
-              label (path morph), then "draws" the outline (stroke-dashoffset). Scrubbed by scroll.
-              Link box = the button: x 376..1136, y 5735..5885 (Figma page px).
-            -->
-            <a class="pos footer-cta" style="--x: 376; --y: 5735; --w: 760" href="https://github.com/ank8dev/agentcollar" aria-label="Star AgentCollar on GitHub">
-              <svg class="footer-cta__outline" viewBox="0 0 760 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <path
-                  class="footer-cta__outline-path"
-                  pathLength="1000"
-                  d="M34 14 C200 4 560 6 724 13 C752 15 757 42 755 78 C753 114 749 139 720 142 C540 151 222 148 42 141 C15 139 6 113 7 77 C8 42 12 16 50 11 C112 4 168 6 214 9"
-                />
-              </svg>
-              <span class="footer-cta__starbox">
-                <span class="star footer-cta__star" aria-hidden="true"></span>
-              </span>
-              <svg class="footer-cta__label" viewBox="0 5200 1512 1542" aria-hidden="true" focusable="false">
-                <!-- end state: straight baseline y 5832 from x 566 to 1106. Start (footer.js): arc along the Earth -->
-                <path id="cta-path" class="footer-cta__path" fill="none" d="M566 5832 Q836 5832 1106 5832" />
-                <text><textPath href="#cta-path" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
-              </svg>
-            </a>
-
-            <!-- Earth: its disc is the circle centre (772, 6928), radius 882 (glow around it is in the PNG) -->
-            <img class="pos site-footer__earth" style="--x: -156.5; --y: 6003.7; --w: 1886.7" src="./brand/pictures/agentcollar-earth.png" alt="" />
-          </div>
-
-          <!-- Footer line: a small hand-drawn cloud drifting over the Earth -->
-          <!-- Footer line: three small round badges (GitHub repo, X, the author) + a tiny copyright -->
-          <div class="site-footer__line">
-            <nav class="site-footer__badges" aria-label="Links">
-              <a class="site-footer__badge" href="https://github.com/ank8dev/agentcollar" aria-label="AgentCollar on GitHub">
-                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg>
+            <!-- The horizon: Earth + the CTA that rises from it. Moves together (slow parallax). -->
+            <div class="site-footer__horizon">
+              <!--
+                CTA: ONE link = star + ONE label + a hand-drawn outline. End state (CSS default) is a
+                button under the tag: star on the left, straight label on the right, white marker
+                outline around both. footer.js starts the star big on the Earth's top with the label
+                curved along the horizon, flies the star up to the button's left, straightens the
+                label (path morph), then "draws" the outline (stroke-dashoffset). Scrubbed by scroll.
+                Link box = the button: x 376..1136, y 5735..5885 (Figma page px).
+              -->
+              <a class="pos footer-cta" style="--x: 376; --y: 5735; --w: 760" href="https://github.com/ank8dev/agentcollar" aria-label="Star AgentCollar on GitHub">
+                <svg class="footer-cta__outline" viewBox="0 0 760 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                  <path
+                    class="footer-cta__outline-path"
+                    pathLength="1000"
+                    d="M34 14 C200 4 560 6 724 13 C752 15 757 42 755 78 C753 114 749 139 720 142 C540 151 222 148 42 141 C15 139 6 113 7 77 C8 42 12 16 50 11 C112 4 168 6 214 9"
+                  />
+                </svg>
+                <span class="footer-cta__starbox">
+                  <span class="star footer-cta__star" aria-hidden="true"></span>
+                </span>
+                <svg class="footer-cta__label" viewBox="0 5200 1512 1542" aria-hidden="true" focusable="false">
+                  <!-- end state: straight baseline y 5832 from x 566 to 1106. Start (footer.js): arc along the Earth -->
+                  <path id="cta-path" class="footer-cta__path" fill="none" d="M566 5832 Q836 5832 1106 5832" />
+                  <text><textPath href="#cta-path" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
+                </svg>
               </a>
-              <a class="site-footer__badge" href="https://x.com/ank8dev" aria-label="ank8dev on X">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-              </a>
-              <a class="site-footer__badge site-footer__badge--me" href="https://github.com/ank8dev" aria-label="Made by ank8dev (GitHub profile)">
-                <img src="./images/ank-avatar.png" alt="" width="32" height="32" />
-              </a>
-            </nav>
-            <p class="site-footer__copy">© 2026 AgentCollar</p>
+
+              <!-- Earth: its disc is the circle centre (772, 6928), radius 882 (glow around it is in the PNG) -->
+              <img class="pos site-footer__earth" style="--x: -156.5; --y: 6003.7; --w: 1886.7" src="./brand/pictures/agentcollar-earth.png" alt="" />
+            </div>
+
+            <!-- Footer line: a small hand-drawn cloud drifting over the Earth -->
+            <!-- Footer line: three small round badges (GitHub repo, X, the author) + a tiny copyright -->
+            <div class="site-footer__line">
+              <nav class="site-footer__badges" aria-label="Links">
+                <a class="site-footer__badge" href="https://github.com/ank8dev/agentcollar" aria-label="AgentCollar on GitHub">
+                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg>
+                </a>
+                <a class="site-footer__badge" href="https://x.com/ank8dev" aria-label="ank8dev on X">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                </a>
+                <a class="site-footer__badge site-footer__badge--me" href="https://github.com/ank8dev" aria-label="Made by ank8dev (GitHub profile)">
+                  <img src="./images/ank-avatar.png" alt="" width="32" height="32" />
+                </a>
+              </nav>
+              <p class="site-footer__copy">© 2026 AgentCollar</p>
+            </div>
           </div>
         </footer>
       </div>
