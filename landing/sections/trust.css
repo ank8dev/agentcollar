@@ -15,11 +15,11 @@
 /* ---------- Heading ---------- */
 .trust__heading {
   position: absolute;
-  top: calc((4060 - var(--top)) * var(--u));
+  top: calc((4052 - var(--top)) * var(--u));
   left: 0;
   right: 0;
   text-align: center;
-  font-size: calc(60 * var(--u));
+  font-size: calc(64 * var(--u));
   font-weight: 500;
   line-height: calc(87 * var(--u));
   color: var(--text);
