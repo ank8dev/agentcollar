@@ -46,15 +46,19 @@ export function init({ gsap, reducedMotion }) {
   const marker = section.querySelector('.manifesto__marker');
   const words = text ? splitWords(text) : [];
   if (!words.length) return;
+  const phone = window.matchMedia('(max-width: 767.98px)').matches;
 
   const tl = gsap.timeline({
     defaults: { ease: 'power1.out' },
-    scrollTrigger: {
-      trigger: text,
-      start: 'top 85%', // first word starts clearing when the text enters the screen
-      end: 'bottom 40%', // all clear a bit above the middle of the screen
-      scrub: 0.8, // follows the scroll with a short, soft catch-up
-    },
+    scrollTrigger: phone
+      ? // Phones: the text is held on screen (sticky); words clear over the whole hold
+        { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.8 }
+      : {
+          trigger: text,
+          start: 'top 85%', // first word starts clearing when the text enters the screen
+          end: 'bottom 40%', // all clear a bit above the middle of the screen
+          scrub: 0.8, // follows the scroll with a short, soft catch-up
+        },
   });
 
   // Words: blurred (but visible) → sharp, one after another
@@ -65,7 +69,7 @@ export function init({ gsap, reducedMotion }) {
   );
 
   // Marker stroke after the last word
-  if (marker) {
+  if (marker && !phone) {
     tl.fromTo(
       marker,
       { clipPath: 'inset(0 100% 0 0)' },

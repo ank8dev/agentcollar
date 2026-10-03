@@ -59,3 +59,71 @@
 .manifesto__text strong {
   font-weight: 700;
 }
+
+/* Desktop: the wrapper is the same box as the section */
+.manifesto__pin {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- Phones: big type, held on screen while the words clear up ---------- */
+@media (max-width: 767.98px) {
+  .manifesto.stage {
+    height: 240svh; /* the extra scroll is the reading time */
+  }
+
+  .manifesto__pin {
+    position: sticky;
+    inset: auto;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    place-items: center;
+  }
+
+  /* the blob stretches behind the text block */
+  .manifesto .manifesto__blob {
+    left: -14vw;
+    top: 14svh;
+    width: 128vw;
+    height: 72svh;
+    aspect-ratio: auto;
+  }
+
+  .manifesto__text {
+    position: relative;
+    top: auto;
+    padding: 0 8vw;
+    white-space: normal;
+    font-size: 8.2vw;
+    line-height: 1.32;
+  }
+
+  .manifesto__text br {
+    display: none; /* lines wrap naturally on a phone */
+  }
+
+  .manifesto__line {
+    display: block;
+    margin-bottom: 0.25em;
+  }
+
+  /* the Figma stroke follows the last line instead of its desktop position */
+  .manifesto .manifesto__marker {
+    display: none;
+  }
+  .manifesto__text strong {
+    position: relative;
+    isolation: isolate; /* the stroke (::before, z -1) stays behind the text but above the blob */
+    display: inline-block;
+    padding: 0.05em 0.25em 0.1em;
+  }
+  .manifesto__text strong::before {
+    content: '';
+    position: absolute;
+    inset: 0.3em -0.15em 0;
+    z-index: -1;
+    background: #a96851;
+    mask: url('../brand/pictures/agentcollar-marker-manifesto.png') center / 100% 100% no-repeat;
+  }
+}

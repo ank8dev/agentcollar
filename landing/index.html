@@ -53,48 +53,51 @@
       <main>
         <!-- ============ 1. HERO ============ -->
         <section class="hero stage" style="--top: 0; --h: 1060" aria-labelledby="hero-title">
-          <img class="pos" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
+          <!-- One wrapper for the whole hero: on phones it is scaled up and centred (styles.css) -->
+          <div class="hero__inner">
+            <img class="pos" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
 
-          <!-- Sand marker: ONE dense, uneven marker scribble (no image). hero.js draws it from start
-               to end (stroke-dashoffset), so the animation IS the drawing. The #crayon filter
-               roughens its edges like a real marker. -->
-          <svg class="pos hero__marker" style="--x: 365; --y: 268; --w: 822" viewBox="0 0 974 415" aria-hidden="true" focusable="false">
-            <path
-              class="hero__stroke"
-              pathLength="1000"
-              d="M58 250 C60 254 58 299 70 274 C82 250 109 115 124 115 C138 116 135 277 149 276 C163 275 186 112 200 110 C213 108 206 265 223 265 C240 264 281 106 293 107 C305 108 275 267 289 270 C303 274 352 121 368 126 C385 131 366 300 378 299 C390 299 422 129 434 123 C446 117 430 267 443 266 C456 266 488 118 504 121 C520 125 513 288 528 286 C543 285 575 115 588 112 C601 109 584 271 600 270 C616 269 657 106 675 107 C692 109 678 277 695 279 C713 282 755 120 769 121 C782 121 756 283 771 284 C786 284 833 141 851 124 C869 106 865 178 868 190"
-              fill="none"
-              stroke="#f2d7a6"
-              stroke-width="62"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              filter="url(#crayon)"
-            />
-          </svg>
-
-          <h1 class="hero__title" id="hero-title">Let agents work.<br />Keep the keys.</h1>
-
-          <!-- Illustration + the colored marker fills behind it -->
-          <div class="pos hero__art" style="--x: 463; --y: 542; --w: 604">
-            <svg class="hero__fills" viewBox="0 0 604 604" aria-hidden="true" focusable="false">
-              <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
-                <path transform="translate(98 66)" stroke="#878783" stroke-width="26" d="M24 21 L35 70 L63 13 L68 70 L90 13" />
-                <path transform="translate(386 87)" stroke="var(--mist-light)" stroke-width="28" d="M21 15 L27 84 L56 21 L64 84 L101 14 L108 84" />
-                <path transform="translate(28 199)" stroke="var(--mist)" stroke-width="28" d="M21 14 L26 79 L66 20 L66 87 L94 14 L112 87 L138 14" />
-                <path transform="translate(431 243)" stroke="var(--rose)" stroke-width="30" d="M34 20 L48 85 L79 15 L80 85 L120 15" />
-                <path transform="translate(42 360)" stroke="var(--rose)" stroke-width="26" d="M26 19 L34 49 L59 18 L73 54 L91 13" />
-                <path transform="translate(432 467)" stroke="#b4694a" stroke-width="30" d="M35 25 L36 100 L103 15 L97 108 L144 22 L138 99" />
-              </g>
+            <!-- Sand marker: ONE dense, uneven marker scribble (no image). hero.js draws it from start
+                 to end (stroke-dashoffset), so the animation IS the drawing. The #crayon filter
+                 roughens its edges like a real marker. -->
+            <svg class="pos hero__marker" style="--x: 365; --y: 268; --w: 822" viewBox="0 0 974 415" aria-hidden="true" focusable="false">
+              <path
+                class="hero__stroke"
+                pathLength="1000"
+                d="M58 250 C60 254 58 299 70 274 C82 250 109 115 124 115 C138 116 135 277 149 276 C163 275 186 112 200 110 C213 108 206 265 223 265 C240 264 281 106 293 107 C305 108 275 267 289 270 C303 274 352 121 368 126 C385 131 366 300 378 299 C390 299 422 129 434 123 C446 117 430 267 443 266 C456 266 488 118 504 121 C520 125 513 288 528 286 C543 285 575 115 588 112 C601 109 584 271 600 270 C616 269 657 106 675 107 C692 109 678 277 695 279 C713 282 755 120 769 121 C782 121 756 283 771 284 C786 284 833 141 851 124 C869 106 865 178 868 190"
+                fill="none"
+                stroke="#f2d7a6"
+                stroke-width="62"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                filter="url(#crayon)"
+              />
             </svg>
-            <img src="./brand/pictures/agentcollar-hero-dark-ink.png" alt="An AI agent wearing a collar shakes hands with a person, surrounded by the tools it works with: files, code, charts, a checklist and messages." />
-          </div>
 
-          <span class="pos star" style="--x: 316; --y: 179; --w: 61; --r: -6deg; --star-color: var(--star)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 1248; --y: 368; --w: 68; --r: 8deg; --star-color: var(--sand)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 154; --y: 493; --w: 57; --r: 12deg; --star-color: var(--mist)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 212; --y: 884; --w: 37; --r: -10deg; --star-color: var(--star)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 1278; --y: 874; --w: 101; --r: 4deg; --star-color: var(--sand)" aria-hidden="true"></span>
-          <span class="pos star" style="--x: 539; --y: 1043; --w: 68; --r: -4deg; --star-color: var(--mist)" aria-hidden="true"></span>
+            <h1 class="hero__title" id="hero-title">Let agents work.<br />Keep the keys.</h1>
+
+            <!-- Illustration + the colored marker fills behind it -->
+            <div class="pos hero__art" style="--x: 463; --y: 542; --w: 604">
+              <svg class="hero__fills" viewBox="0 0 604 604" aria-hidden="true" focusable="false">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
+                  <path transform="translate(98 66)" stroke="#878783" stroke-width="26" d="M24 21 L35 70 L63 13 L68 70 L90 13" />
+                  <path transform="translate(386 87)" stroke="var(--mist-light)" stroke-width="28" d="M21 15 L27 84 L56 21 L64 84 L101 14 L108 84" />
+                  <path transform="translate(28 199)" stroke="var(--mist)" stroke-width="28" d="M21 14 L26 79 L66 20 L66 87 L94 14 L112 87 L138 14" />
+                  <path transform="translate(431 243)" stroke="var(--rose)" stroke-width="30" d="M34 20 L48 85 L79 15 L80 85 L120 15" />
+                  <path transform="translate(42 360)" stroke="var(--rose)" stroke-width="26" d="M26 19 L34 49 L59 18 L73 54 L91 13" />
+                  <path transform="translate(432 467)" stroke="#b4694a" stroke-width="30" d="M35 25 L36 100 L103 15 L97 108 L144 22 L138 99" />
+                </g>
+              </svg>
+              <img src="./brand/pictures/agentcollar-hero-dark-ink.png" alt="An AI agent wearing a collar shakes hands with a person, surrounded by the tools it works with: files, code, charts, a checklist and messages." />
+            </div>
+
+            <span class="pos star" style="--x: 316; --y: 179; --w: 61; --r: -6deg; --star-color: var(--star)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 1248; --y: 368; --w: 68; --r: 8deg; --star-color: var(--sand)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 154; --y: 493; --w: 57; --r: 12deg; --star-color: var(--mist)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 212; --y: 884; --w: 37; --r: -10deg; --star-color: var(--star)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 1278; --y: 874; --w: 101; --r: 4deg; --star-color: var(--sand)" aria-hidden="true"></span>
+            <span class="pos star" style="--x: 539; --y: 1043; --w: 68; --r: -4deg; --star-color: var(--mist)" aria-hidden="true"></span>
+          </div>
         </section>
 
         <!-- ============ 2. HOW IT WORKS (spec: specs/steps.md) ============ -->
@@ -178,21 +181,24 @@
 
         <!-- ============ 3. MANIFESTO (spec: specs/manifesto.md) ============ -->
         <section class="manifesto stage" style="--top: 3200; --h: 800" aria-label="Manifesto">
-          <!-- Raspberry blob: wider than the frame, .page clips the ends -->
-          <svg class="pos manifesto__blob" style="--x: -87; --y: 3201; --w: 1653" viewBox="0 0 1653 791" aria-hidden="true" focusable="false">
-            <path d="M0 382 C-13 316 -11 228 30 174 C70 120 173 83 241 58 C310 32 383 28 441 19 C499 11 544 10 588 7 C632 3 667 1 703 0 C740 -1 773 0 807 1 C842 2 875 2 911 4 C947 7 983 10 1024 16 C1065 22 1108 28 1158 41 C1208 54 1266 67 1325 94 C1384 122 1459 155 1514 205 C1568 256 1648 331 1653 396 C1659 461 1600 544 1548 595 C1495 646 1401 676 1338 703 C1274 730 1217 743 1165 756 C1113 769 1069 775 1026 781 C983 786 945 788 908 789 C870 791 836 792 801 791 C765 790 731 789 694 786 C657 783 620 780 577 774 C535 767 489 762 439 747 C389 733 332 717 277 687 C222 657 155 620 109 569 C62 518 13 448 0 382 Z" />
-          </svg>
+          <!-- Wrapper: plain box on desktop; on phones it sticks to the screen while the words clear up -->
+          <div class="manifesto__pin">
+            <!-- Raspberry blob: wider than the frame, .page clips the ends -->
+            <svg class="pos manifesto__blob" style="--x: -87; --y: 3201; --w: 1653" viewBox="0 0 1653 791" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path d="M0 382 C-13 316 -11 228 30 174 C70 120 173 83 241 58 C310 32 383 28 441 19 C499 11 544 10 588 7 C632 3 667 1 703 0 C740 -1 773 0 807 1 C842 2 875 2 911 4 C947 7 983 10 1024 16 C1065 22 1108 28 1158 41 C1208 54 1266 67 1325 94 C1384 122 1459 155 1514 205 C1568 256 1648 331 1653 396 C1659 461 1600 544 1548 595 C1495 646 1401 676 1338 703 C1274 730 1217 743 1165 756 C1113 769 1069 775 1026 781 C983 786 945 788 908 789 C870 791 836 792 801 791 C765 790 731 789 694 786 C657 783 620 780 577 774 C535 767 489 762 439 747 C389 733 332 717 277 687 C222 657 155 620 109 569 C62 518 13 448 0 382 Z" />
+            </svg>
 
-          <!-- Marker stroke behind the last line: the exact Figma shape, used as a stencil -->
-          <span class="pos marker manifesto__marker" style="--x: 88; --y: 3706; --w: 1230" aria-hidden="true"></span>
+            <!-- Marker stroke behind the last line: the exact Figma shape, used as a stencil -->
+            <span class="pos marker manifesto__marker" style="--x: 88; --y: 3706; --w: 1230" aria-hidden="true"></span>
 
-          <p class="manifesto__text">
-            <span class="manifesto__line">Agents are coming.</span><br />
-            <span class="manifesto__line">They'll read your mail.</span><br />
-            <span class="manifesto__line">They'll run your business.</span><br />
-            <span class="manifesto__line">They'll work while you sleep.</span><br />
-            <span class="manifesto__line"><em><strong>Just not without a collar.</strong></em></span>
-          </p>
+            <p class="manifesto__text">
+              <span class="manifesto__line">Agents are coming.</span><br />
+              <span class="manifesto__line">They'll read your mail.</span><br />
+              <span class="manifesto__line">They'll run your business.</span><br />
+              <span class="manifesto__line">They'll work while you sleep.</span><br />
+              <span class="manifesto__line"><em><strong>Just not without a collar.</strong></em></span>
+            </p>
+          </div>
         </section>
 
         <!-- ============ 4. TRUST (spec: specs/trust.md) ============ -->

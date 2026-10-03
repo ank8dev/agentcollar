@@ -19,7 +19,7 @@ const SHIFT = FRAME - EDGE - (ROW_X[3] + CARD_W); // −1190
 // card 4 sits centred too — every card passes through the middle of the screen.
 const PHONE_SCALE = 2.1;
 const PHONE_C = (FRAME / PHONE_SCALE - CARD_W) / 2; // left x of a centred card
-const PHONE_DECK_X = [-24, -8, 8, 24].map((d) => PHONE_C + d);
+const PHONE_DECK_X = [-42, -28, -14, 0].map((d) => PHONE_C + d); // top card exactly centred
 const PHONE_ROW_X = [0, 1, 2, 3].map((i) => PHONE_C + i * (CARD_W + 40));
 const PHONE_SHIFT = -(PHONE_ROW_X[3] - PHONE_C);
 

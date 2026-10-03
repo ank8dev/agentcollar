@@ -244,6 +244,32 @@ h3,
   overflow: visible;
 }
 
+/* Desktop: the wrapper is the same box as the hero, so nothing moves */
+.hero__inner {
+  position: absolute;
+  inset: 0;
+}
+
+/* Phones: the hero fills the screen and its content is scaled up ×1.9 and centred
+   below the header (the desktop layout scaled to a phone would be tiny). */
+@media (max-width: 767.98px) {
+  .hero.stage {
+    --hero-k: 1.9;
+    --hero-content: calc(1048 * var(--u) * var(--hero-k)); /* collar top → drawing bottom */
+    height: max(100svh, 560px);
+    overflow: clip;
+  }
+  .hero__inner {
+    inset: 0 0 auto;
+    height: calc(1060 * var(--u));
+    transform-origin: 50% 0;
+    transform: translateY(
+        calc(48px + (max(100svh, 560px) - 48px - var(--hero-content)) / 2 - 98 * var(--u) * var(--hero-k))
+      )
+      scale(var(--hero-k));
+  }
+}
+
 /* Before the intro runs (html.intro is set in <head>): marker line not drawn yet,
    headline hidden. hero.js animates them in and removes the class. */
 .intro .hero__stroke {

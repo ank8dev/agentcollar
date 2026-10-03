@@ -159,17 +159,17 @@
   }
 
   .trust[data-mobile-cards='fan'][data-motion] .trust__sticky {
-    --head: 112px; /* heading at a readable phone size (≈ 5 lines) */
-    --gap: 14px;
+    --head: 178px; /* heading at a real phone size (≈ 6 lines) */
+    --gap: 16px;
     --cards-h: calc(655 * 100cqw / var(--frame) * var(--phone-scale));
     top: max(52px, calc(50vh - (var(--head) + var(--gap) + var(--cards-h)) / 2));
     height: calc(var(--head) + var(--gap) + var(--cards-h));
   }
 
   .trust[data-mobile-cards='fan'][data-motion] .trust__heading {
-    font-size: 15px;
-    line-height: 21px;
-    padding-inline: 16px;
+    font-size: 21px;
+    line-height: 28px;
+    padding-inline: 18px;
   }
 }
 
