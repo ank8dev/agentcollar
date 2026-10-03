@@ -80,3 +80,90 @@
 .steps .star {
   z-index: 5;
 }
+
+/* ---------- Phones: the three steps in a column ---------- */
+/* The Figma layout scaled to a phone would make the text ~12 px, so on phones the section is
+   a normal-flow grid instead. Rows: gap, text 1, drawing 1, gap, text 2, drawing 2, gap, …
+   Each blob is absolutely placed in the grid area of its step (text + drawing rows) and
+   stretched to it (preserveAspectRatio="none"); blobs 1 and 3 bleed off the left edge,
+   blob 2 off the right. The leash is hidden. Stars sit in the gap rows. */
+@media (max-width: 767.98px) {
+  .steps.stage {
+    --gap: 72px;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 40px auto auto var(--gap) auto auto var(--gap) auto auto 56px;
+    height: auto;
+  }
+
+  .steps__list {
+    display: contents;
+  }
+
+  /* --- blobs: fill their step's grid area, bleeding off one side --- */
+  .steps .steps__blob {
+    position: absolute;
+    top: 0;
+    left: -20%;
+    width: 112%;
+    height: 100%;
+  }
+  .steps .steps__blob:nth-of-type(1) { grid-row: 2 / 4; }
+  .steps .steps__blob:nth-of-type(2) { grid-row: 5 / 7; left: 8%; }
+  .steps .steps__blob:nth-of-type(3) { grid-row: 8 / 10; }
+
+  /* --- text --- */
+  .steps .steps__step {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: auto;
+    padding: 64px 22% 4px 24px;
+    font-size: 18px;
+  }
+  .steps .steps__step--right {
+    padding: 64px 24px 4px 22%;
+  }
+  .steps .steps__step:nth-child(1) { grid-row: 2; }
+  .steps .steps__step:nth-child(2) { grid-row: 5; }
+  .steps .steps__step:nth-child(3) { grid-row: 8; }
+
+  .steps__title {
+    font-size: 27px;
+    line-height: 1.25;
+    margin-bottom: 0.3em;
+  }
+
+  .steps__body {
+    line-height: 1.45;
+  }
+
+  /* --- drawings: below the text, inside the visible part of the blob --- */
+  .steps .steps__art {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 62%;
+    margin: 4px 0 40px 12%;
+    justify-self: start;
+  }
+  .steps .steps__art:nth-of-type(1) { grid-row: 3; }
+  .steps .steps__art:nth-of-type(2) { grid-row: 6; justify-self: end; margin-inline: 0 12%; }
+  .steps .steps__art:nth-of-type(3) { grid-row: 9; margin-left: 10%; }
+
+  .steps .steps__leash {
+    display: none;
+  }
+
+  /* --- stars: in the gaps between the blobs, fully on screen --- */
+  .steps .star {
+    width: 46px;
+    top: calc(50% - 23px);
+  }
+  /* (an absolutely placed grid item needs both lines, or its end is the section's edge) */
+  .steps .star:nth-of-type(1) { grid-row: 1 / 2; top: -6px; left: auto; right: 10%; }
+  .steps .star:nth-of-type(2) { grid-row: 4 / 5; left: auto; right: 14%; }
+  .steps .star:nth-of-type(3) { grid-row: 7 / 8; left: 12%; }
+  .steps .star:nth-of-type(4) { grid-row: 10 / 11; left: auto; right: 18%; }
+}
