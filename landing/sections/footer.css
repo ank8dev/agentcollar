@@ -226,7 +226,7 @@
 @media (max-width: 767.98px) {
   .site-footer.stage {
     /* (doubled selector: .stage in styles.css is imported after this file and sets height) */
-    --fu: min(calc(100cqw / var(--frame) * 1.75), calc(100svh / 1600));
+    --fu: min(calc(100cqw / var(--frame) * 1.75), calc((100svh - 200px) / 1542)); /* the whole footer (tag → badges) fits under the header */
     --stick: 0px;
     --below: 120px; /* extra Earth under the browser's bottom toolbar */
     height: calc(1542 * var(--fu) + var(--below) + var(--stick));
@@ -255,9 +255,10 @@
     bottom: calc(30 * var(--fu) + var(--below));
   }
 
-  /* stars: pull them toward the centre so they land on the (narrow) phone screen */
+  /* stars: their own phone spots (--mx/--my in index.html), spread around the tag and button */
   .site-footer .star.pos {
-    left: calc((756 + (var(--x) - 756) * 0.55) * var(--u));
+    left: calc(var(--mx, var(--x)) * var(--u));
+    top: calc((var(--my, var(--y)) - var(--top, 0)) * var(--u));
   }
 
   /* With motion (footer.js sets data-motion): the footer gets --stick of extra height and

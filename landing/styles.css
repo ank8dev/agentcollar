@@ -376,3 +376,18 @@ h3,
   width: 100%;
   height: 100%;
 }
+
+/* Bottom-edge strip that Safari 26+ samples for its bottom toolbar tint (see index.html) */
+.edge-tint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 40;
+  background: var(--paper);
+  pointer-events: none;
+}
+.edge-tint--night {
+  background: var(--ink);
+}

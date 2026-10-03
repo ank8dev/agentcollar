@@ -42,6 +42,17 @@ if (header && footerBand) {
   });
 }
 
+// Bottom-edge strip (Safari's bottom toolbar tint): night as soon as the footer reaches it.
+const edgeTint = document.querySelector('.edge-tint');
+if (edgeTint && footerBand) {
+  ScrollTrigger.create({
+    trigger: footerBand,
+    start: 'top bottom',
+    onEnter: () => edgeTint.classList.add('edge-tint--night'),
+    onLeaveBack: () => edgeTint.classList.remove('edge-tint--night'),
+  });
+}
+
 // Browser toolbar color (Safari/Chrome on phones): paper, and night sky once the footer
 // fills the screen, so the bars blend into the space scene instead of showing a yellow strip.
 const themeMeta = document.querySelector('meta[name="theme-color"]');
