@@ -6,7 +6,10 @@
     <meta name="theme-color" content="#f0f6e7" />
     <title>AgentCollar — Let agents work. Keep the keys.</title>
     <meta name="description" content="A secure gateway that gives AI agents short-lived, task-scoped access instead of passwords." />
-    <link rel="icon" href="./brand/logo/agentcollar-mark-black.svg" />
+    <!-- Favicon = the AC medallion (no ring, no collar) -->
+    <link rel="icon" href="./brand/logo/agentcollar-mark-black.svg" type="image/svg+xml" />
+    <link rel="icon" href="./favicon-64.png" sizes="64x64" type="image/png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 
     <!-- Special Elite (headings, typewriter) + Courier Prime (text). Intel One Mono kept for the dev font panel. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -327,9 +330,13 @@
       </div>
     </div>
 
-    <!-- Invisible strip on the bottom edge: Safari 26+ tints its bottom toolbar from fixed
-         elements there. main.js switches it from paper to night over the footer. -->
-    <div class="edge-tint" aria-hidden="true"></div>
+
+    <!-- Pull-past-the-end surprise: a spinning AC medallion fixed at the bottom of the screen
+         BEHIND the page. The page covers it completely; it only shows in the gap when you
+         pull the page up past its end (the browser's rubber-band overscroll). -->
+    <div class="overscroll-medallion" aria-hidden="true">
+      <img src="./brand/logo/agentcollar-mark-white.svg" alt="" width="44" height="44" />
+    </div>
 
     <script type="module" src="./main.js"></script>
   </body>

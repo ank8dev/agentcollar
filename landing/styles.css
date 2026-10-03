@@ -41,12 +41,12 @@
   box-sizing: border-box;
 }
 
-/* No sideways panning on phones; no rubber-band "white" when pulling past the ends.
+/* Pulling past the ends (rubber-band) is allowed: below the footer a spinning medallion
+   waits behind the page (.overscroll-medallion).
    Behind the page: paper above (hero), night sky below (footer) — the browser's bottom
    toolbar and any overscroll show the right color. */
 html {
-  overflow-x: hidden;
-  overscroll-behavior: none;
+  overflow-x: hidden; /* no sideways panning on phones */
   background: var(--ink); /* the canvas = the footer's night sky (Safari 26+ tints its bars from it) */
 }
 
@@ -379,17 +379,34 @@ h3,
   height: 100%;
 }
 
-/* Bottom-edge strip that Safari 26+ samples for its bottom toolbar tint (see index.html) */
-.edge-tint {
+
+/* Behind the page (z-index -1, painted under the body's night background), fixed to the
+   bottom of the screen: only visible in the rubber-band gap when the page is pulled up
+   past its end. */
+.overscroll-medallion {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  z-index: 40;
-  background: var(--paper);
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 28px);
+  z-index: -1;
+  translate: -50% 0;
   pointer-events: none;
 }
-.edge-tint--night {
-  background: var(--ink);
+
+.overscroll-medallion img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  animation: medallion-spin 1.6s linear infinite;
+}
+
+@keyframes medallion-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overscroll-medallion img {
+    animation: none;
+  }
 }
