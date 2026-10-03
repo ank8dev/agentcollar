@@ -216,6 +216,53 @@
 
       <!-- ============ 5. FOOTER (spec: specs/footer.md) ============ -->
       <footer class="site-footer stage" style="--top: 5200; --h: 1542">
+        <!-- Night sky with a domed, hand-drawn top edge (points measured in Figma every 40px) -->
+        <svg class="pos site-footer__sky" style="--x: -100; --y: 5200; --w: 1640" viewBox="-100 0 1640 1542" aria-hidden="true" focusable="false">
+          <path
+            filter="url(#crayon)"
+            d="M-100 1542 L-100 186 L-60 152 L-20 129 L20 112 L60 99 L100 88 L140 79 L180 73 L220 67 L260 62 L300 58 L340 55 L380 51 L420 46 L460 42 L500 39 L540 35 L580 30 L620 26 L660 21 L700 17 L740 13 L780 8 L820 5 L860 2 L900 2 L940 2 L980 2 L1020 5 L1060 8 L1100 13 L1140 19 L1180 27 L1220 35 L1260 46 L1300 57 L1340 71 L1380 86 L1420 104 L1460 127 L1500 159 L1540 207 L1540 1542 Z"
+          />
+        </svg>
+
+        <!-- AC tag: the footer is dark in both themes, so always the white one. Drawn above the CTA star (the star ends "under the tag"). -->
+        <!-- Sky-colored disc behind the tag's round plate: its letters are see-through, and the star sits behind it in the end state -->
+        <span class="pos site-footer__tag-backing" style="--x: 658; --y: 5539; --w: 172" aria-hidden="true"></span>
+        <img class="pos site-footer__tag" style="--x: 559; --y: 5375; --w: 371" src="./brand/logo/agentcollar-tag-white.png" alt="" />
+
+        <!-- Stars (some twinkle, see footer.js) -->
+        <span class="pos star site-footer__twinkle" style="--x: 441; --y: 5520; --w: 73" aria-hidden="true"></span>
+        <span class="pos star site-footer__twinkle" style="--x: 1162; --y: 5482; --w: 66" aria-hidden="true"></span>
+        <span class="pos star" style="--x: 960; --y: 5731; --w: 37" aria-hidden="true"></span>
+        <span class="pos star site-footer__twinkle" style="--x: 136; --y: 5809; --w: 39" aria-hidden="true"></span>
+        <span class="pos star site-footer__twinkle" style="--x: 1328; --y: 6043; --w: 55" aria-hidden="true"></span>
+
+        <!-- The horizon: Earth + the CTA that rises from it. Moves together (slow parallax). -->
+        <div class="site-footer__horizon">
+          <!--
+            CTA. The link box is the END state (star under the tag, label on a rose pill).
+            footer.js starts it small on the Earth's top and flies it up while you scroll.
+          -->
+          <a class="pos footer-cta" style="--x: 405; --y: 5537; --w: 680" href="https://github.com/ank8dev/agentcollar">
+            <span class="star footer-cta__star" aria-hidden="true"></span>
+            <svg class="footer-cta__pill" viewBox="0 0 680 120" aria-hidden="true" focusable="false">
+              <path filter="url(#crayon)" d="M58 14 C200 6 480 8 624 16 C664 20 672 44 670 62 C668 84 656 104 616 106 C470 114 210 112 62 104 C24 102 10 84 10 60 C10 36 22 16 58 14 Z" />
+            </svg>
+            <span class="footer-cta__label">Star on GitHub</span>
+          </a>
+
+          <!-- Earth: its disc is the circle centre (772, 6928), radius 882 (glow around it is in the PNG) -->
+          <img class="pos site-footer__earth" style="--x: -156.5; --y: 6003.7; --w: 1886.7" src="./brand/pictures/agentcollar-earth.png" alt="" />
+
+          <!-- Start-state label, curved along the horizon (arc concentric with the Earth). Decorative copy of the link text. -->
+          <svg class="pos footer-cta__curved" style="--x: 0; --y: 5200; --w: 1512" viewBox="0 0 1512 1542" aria-hidden="true" focusable="false">
+            <path id="footer-cta-arc" fill="none" d="M325.5 954.6 A893 893 0 0 1 1218.5 954.6" />
+            <text><textPath href="#footer-cta-arc" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
+          </svg>
+        </div>
+
+        <p class="site-footer__line">
+          © 2026 AgentCollar · <a href="https://github.com/ank8dev/agentcollar">GitHub</a>
+        </p>
       </footer>
     </div>
 

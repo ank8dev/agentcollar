@@ -1,1 +1,184 @@
-/* Section: footer — see specs/footer.md */
+/* Section: footer — see specs/footer.md
+   Everything in here sits on the night sky, which is dark in BOTH themes:
+   light-ink assets and paper text always. */
+
+.site-footer {
+  /* The Earth image is much taller than the footer: only its top cap shows. */
+  overflow: clip;
+  color: var(--paper);
+  --sky: var(--ink);
+}
+
+/* Dark theme: the page is ink too, so the sky gets a slightly lighter night edge. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .site-footer {
+    --sky: var(--night-edge);
+  }
+}
+:root[data-theme='dark'] .site-footer {
+  --sky: var(--night-edge);
+}
+
+.site-footer__sky {
+  fill: var(--sky);
+}
+
+.site-footer__sky path {
+  /* the wobble would pull the bottom/side edges in; only the top edge is ever visible */
+  stroke: var(--sky);
+  stroke-width: 24;
+}
+
+/* The tag hangs in front of the CTA star's top tip in the end state */
+.site-footer__tag-backing {
+  z-index: 1;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sky);
+}
+
+.site-footer__tag {
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ---------- Horizon group (Earth + CTA): moves with a slow parallax ---------- */
+.site-footer__horizon {
+  position: absolute;
+  inset: 0;
+  isolation: isolate; /* same layering with or without GSAP transforms */
+  pointer-events: none;
+}
+
+.site-footer__earth {
+  /* rotate around the disc centre, not the PNG's centre (PNG has an uneven glow) */
+  transform-origin: 49.2% 47.5%;
+  max-width: none; /* wider than the page on purpose (base img rule caps at 100%) */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- Curved start-state label ---------- */
+.footer-cta__curved {
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0; /* end state is the default; footer.js shows it at the start of the flight */
+}
+
+.footer-cta__curved text {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 62px; /* SVG user units = Figma px */
+  letter-spacing: 3px;
+  fill: var(--paper);
+  /* ink halo: keeps paper text ≥ 4.5:1 where it crosses the star or the light Earth */
+  stroke: var(--ink);
+  stroke-width: 9px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/* ---------- The CTA: a real link ---------- */
+.site-footer .footer-cta {
+  /* (doubled selector: .pos in styles.css is imported after this file and sets height: auto)
+     box = end state: star (489..1001) plus the label pill that is wider than the star */
+  height: calc(493.4 * var(--u));
+  display: block;
+  pointer-events: auto;
+  color: var(--ink);
+  text-decoration: none;
+  border-radius: calc(40 * var(--u));
+  -webkit-tap-highlight-color: transparent;
+}
+
+.footer-cta__star {
+  position: absolute;
+  top: 0;
+  left: calc(84 * var(--u));
+  width: calc(512 * var(--u));
+  --star-color: var(--star);
+  transition:
+    rotate 0.3s ease,
+    scale 0.3s ease;
+}
+
+/* Hand-drawn rose pill behind the label: makes it read as a button and keeps ink text on a light fill */
+.footer-cta__pill {
+  position: absolute;
+  left: 0;
+  top: calc((5750 - 5537) * var(--u));
+  width: 100%;
+  height: auto;
+  fill: var(--star);
+  overflow: visible;
+  transition: fill 0.2s ease;
+}
+
+.footer-cta__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* label centred on y ≈ 5802 (page) */
+  top: calc((5802 - 5537) * var(--u));
+  translate: 0 -50%;
+  text-align: center;
+  font-style: italic;
+  font-size: calc(72 * var(--u));
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.footer-cta:hover .footer-cta__pill,
+.footer-cta:focus-visible .footer-cta__pill {
+  fill: var(--rose);
+}
+.footer-cta:hover .footer-cta__star,
+.footer-cta:focus-visible .footer-cta__star {
+  --star-color: var(--rose);
+  rotate: -8deg;
+  scale: 1.04;
+}
+.footer-cta:hover .footer-cta__label {
+  text-decoration: underline;
+  text-decoration-thickness: max(calc(4 * var(--u)), 1px);
+  text-underline-offset: 0.15em;
+}
+
+.footer-cta:focus-visible .footer-cta__pill,
+.footer-cta:focus-visible .footer-cta__label {
+  opacity: 1 !important; /* keyboard focus mid-flight: show the button label right away (beats GSAP's inline opacity) */
+}
+
+.footer-cta:focus-visible {
+  outline: max(calc(6 * var(--u)), 3px) solid var(--paper);
+  outline-offset: max(calc(10 * var(--u)), 4px);
+  z-index: 3; /* above the Earth even mid-flight */
+}
+
+/* ---------- Footer line ---------- */
+.site-footer__line {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24 * var(--u));
+  translate: -50% 0;
+  z-index: 2;
+  padding: max(calc(8 * var(--u)), 4px) max(calc(20 * var(--u)), 10px);
+  border-radius: 999px;
+  background: var(--sky); /* solid backing strip over the light Earth */
+  color: var(--paper);
+  font-size: max(calc(20 * var(--u)), 12px);
+  white-space: nowrap;
+}
+
+.site-footer__line a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.site-footer__line a:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
