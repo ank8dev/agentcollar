@@ -21,18 +21,6 @@
   height: 100%;
 }
 
-.site-footer__cord {
-  height: calc(250 * var(--u));
-  overflow: visible;
-  pointer-events: none;
-}
-
-@media (max-width: 767.98px) {
-  .site-footer__cord {
-    display: none;
-  }
-}
-
 .site-footer__tag {
   z-index: 1; /* behind the horizon group: the flying star lands ON the medallion */
   pointer-events: none;
@@ -252,30 +240,47 @@
    unit --fu (capped so the whole footer still fits one screen), centred on the page: the
    sides of the Figma frame fall off-screen (.page clips them). */
 /* ---------- Desktop: full-width Figma footer, cut to the screen height ----------
-   The medallion hangs on its cord from above; right under it a compact "Star on GitHub"
-   button; below, a much bigger Earth whose curve spans the whole screen width. The footer
-   is only as tall as needed, so at the page end the cord, medallion, button and the
+   A smaller medallion; right under it a compact "Star on GitHub" button; below, a much
+   bigger Earth whose curve spans the whole screen width. The footer is only as tall as
+   needed, so at the page end the medallion, button and the
    Earth's cap are all on screen. */
 @media (min-width: 768px) {
   .site-footer.stage {
-    height: clamp(calc(950 * var(--u)), calc(90 * var(--u) + 100vh), calc(1542 * var(--u)));
+    --fh: clamp(calc(950 * var(--u)), calc(90 * var(--u) + 100vh), calc(1542 * var(--u)));
+    --stick: 0px;
+    height: calc(var(--fh) + var(--stick));
   }
+  /* with motion: the footer holds still (sticky) for --stick of scrolling while the star
+     flies up and the button draws itself — so the whole animation is seen */
+  .site-footer[data-motion] {
+    --stick: 110vh;
+  }
+  .site-footer[data-motion]::before {
+    content: '';
+    display: block;
+    height: var(--stick);
+  }
+  .site-footer[data-motion] .site-footer__sticky {
+    position: sticky;
+    bottom: 0;
+    height: var(--fh);
+  }
+
+  /* smaller medallion */
   .site-footer .site-footer__tag {
-    top: calc((5365 - var(--top)) * var(--u));
+    left: calc(599.5 * var(--u));
+    top: calc((5380 - var(--top)) * var(--u));
+    width: calc(290 * var(--u));
   }
-  .site-footer .site-footer__cord {
-    top: calc((5160 - var(--top)) * var(--u));
-    height: calc(250 * var(--u));
-  }
-  /* compact button right under the medallion (0.72 of the phone button) */
+  /* compact button right under the medallion (0.6 of the phone button) */
   .site-footer .footer-cta {
-    --x: 483;
-    --y: 5705;
-    --w: 547;
-    --lh: 108;
-    --sx: 504.6;
-    --sy: 5712.2;
-    --sw: 93.6;
+    --x: 528;
+    --y: 5655;
+    --w: 456;
+    --lh: 90;
+    --sx: 546;
+    --sy: 5661;
+    --sw: 78;
   }
   /* Earth ×1.36: disc radius 1200, top of the disc at y 5921, centred on x 772 */
   .site-footer .site-footer__earth {

@@ -449,6 +449,12 @@ html.preloading body {
 .preloader__word {
   font-family: var(--font-display);
   font-style: italic;
+  padding: 0.1em 0.25em; /* italic overhang stays inside the box (no leftover marks in Safari) */
   font-size: clamp(30px, 5vw, 64px);
   white-space: pre;
+}
+
+/* header icon hidden while the preloader's medallion flies to it */
+.site-header__mark.is-waiting {
+  visibility: hidden;
 }

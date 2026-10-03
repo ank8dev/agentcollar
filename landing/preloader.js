@@ -21,11 +21,14 @@ export function runPreloader({ gsap }) {
   }
 
   const medallion = el.querySelector('.preloader__medallion');
+  // the header icon stays hidden until the flying medallion lands on it (no double image)
+  const headerMark = document.querySelector('.site-header__mark');
+  headerMark?.classList.add('is-waiting');
   const word = el.querySelector('.preloader__word');
   const target = document.querySelector('.site-header__mark img:not(.site-header__mark-night)');
 
   // split the word into letters, all hidden; they take no space until typed
-  const text = word.textContent;
+  const text = word.dataset.word || 'AgentCollar';
   word.textContent = '';
   const letters = [...text].map((ch) => {
     const span = document.createElement('span');
@@ -52,6 +55,7 @@ export function runPreloader({ gsap }) {
 
         const tl = gsap.timeline({
           onComplete: () => {
+            headerMark?.classList.remove('is-waiting');
             el.remove();
             root.classList.remove('preloading');
             done();
@@ -67,6 +71,8 @@ export function runPreloader({ gsap }) {
         // hold the full name, then un-type: last letter first
         tl.addLabel('untype', `type+=${letters.length * 0.07 + 0.5}`);
         [...letters].reverse().forEach((l, i) => tl.set(l, { display: 'none' }, `untype+=${i * 0.045}`));
+        // then drop the (now empty) word box entirely, so Safari repaints it clean
+        tl.set(word, { display: 'none' }, `untype+=${letters.length * 0.045}`);
 
         // the medallion flies into the header icon while the screen fades away
         tl.addLabel('fly', `untype+=${letters.length * 0.045 + 0.1}`);
@@ -97,8 +103,11 @@ export function runPreloader({ gsap }) {
           'fly',
         );
         tl.to(el, { backgroundColor: 'rgba(240, 246, 231, 0)', duration: 0.6, ease: 'power1.in' }, 'fly+=0.3');
-        // it has landed exactly on the header icon: swap to the real one
-        tl.to(medallion, { opacity: 0, duration: 0.1 }, '>');
+        // landed exactly on the header icon: swap to the real one in the same frame
+        tl.add(() => {
+          headerMark?.classList.remove('is-waiting');
+          medallion.style.visibility = 'hidden';
+        }, 'fly+=0.8');
       }),
   );
 }
