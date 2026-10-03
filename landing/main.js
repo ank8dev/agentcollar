@@ -19,10 +19,13 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 // Sections check this themselves: with reduced motion they show the final state, no animation.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Smooth scrolling (Lenis). It still uses the browser's real scroll position, so
-// position: sticky and ScrollTrigger keep working; GSAP's ticker drives it so both
-// update in the same frame.
-if (!reducedMotion) {
+// Smooth scrolling (Lenis) — for mouse wheels / trackpads only. It still uses the browser's
+// real scroll position, so position: sticky and ScrollTrigger keep working; GSAP's ticker
+// drives it so both update in the same frame. On touch screens it is NOT started: its
+// touch listeners make iOS run every scroll through JavaScript, and sticky blocks (the
+// trust heading + cards) then shake. Native touch scrolling is smooth already.
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (!reducedMotion && finePointer) {
   const lenis = new Lenis({ lerp: 0.1 });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
