@@ -25,13 +25,6 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 // touch listeners make iOS run every scroll through JavaScript, and sticky blocks (the
 // trust heading + cards) then shake. Native touch scrolling is smooth already.
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-if (!reducedMotion && !finePointer) {
-  // Touch screens: GSAP drives the scrolling itself, in sync with the animations. Otherwise
-  // iOS scrolls on its own thread while GSAP moves the cards on the main thread, and Safari
-  // re-positions the sticky trust block from stale scroll data — it visibly shakes.
-  ScrollTrigger.normalizeScroll(true);
-}
-
 if (!reducedMotion && finePointer) {
   const lenis = new Lenis({ lerp: 0.1 });
   lenis.on('scroll', ScrollTrigger.update);

@@ -54,6 +54,19 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     gsap.set(cards, { '--x': (i) => deckX[i], force3D: true });
     gsap.set(list, { force3D: true });
 
+    // Preferred: CSS scroll-driven animation (trust.css). The browser runs it on the same
+    // fast thread as the scrolling itself, so the sticky block can't shake (on iPhones a
+    // JS-driven version jittered). JS only hands over the target numbers once.
+    if (CSS.supports('animation-timeline: view()')) {
+      gsap.set(cards, { '--dx-end': (i) => rowX[i] - deckX[i], '--tilt-mid': (i) => TILT[i] });
+      gsap.set(list, { '--shift-end': shift });
+      section.dataset.scrollAnim = 'css';
+      return () => {
+        delete section.dataset.motion;
+        delete section.dataset.scrollAnim;
+      };
+    }
+
     // The cards' sticky box and its CSS `top` (px) — the spread starts when it sticks.
     const sticky = section.querySelector('.trust__sticky');
     const stickyTop = () => parseFloat(getComputedStyle(sticky).top) || 0;

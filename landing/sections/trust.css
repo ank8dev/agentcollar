@@ -143,6 +143,93 @@
   will-change: transform;
 }
 
+/* ---------- 2b. Scroll-driven version (CSS, used when the browser supports it) ----------
+   The section's own scroll progress (view-timeline) drives the cards directly — no JS per
+   frame, so the motion stays glued to the scroll even on iPhones. trust.js sets the target
+   numbers once: --dx-end / --tilt-mid per card, --shift-end on the list. Timings match the
+   old GSAP timeline: spread, short hold, slide the row left, short hold. */
+.trust[data-motion] {
+  view-timeline: --trust-scroll block;
+}
+
+.trust[data-scroll-anim='css'] .trust-card {
+  animation: trust-spread linear both;
+  animation-timeline: --trust-scroll;
+  animation-range: contain 0% contain 100%;
+}
+
+.trust[data-scroll-anim='css'] .trust-cards {
+  animation: trust-shift linear both;
+  animation-timeline: --trust-scroll;
+  animation-range: contain 0% contain 100%;
+}
+
+@keyframes trust-spread {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+    animation-timing-function: ease-in-out;
+  }
+  20.8% {
+    rotate: calc(var(--tilt-mid) * 1deg);
+  }
+  41.7%,
+  100% {
+    translate: calc(var(--dx-end) * var(--u)) 0;
+    rotate: 0deg;
+  }
+}
+
+@keyframes trust-shift {
+  0%,
+  47.9% {
+    translate: 0 0;
+    animation-timing-function: ease-in-out;
+  }
+  93.8%,
+  100% {
+    translate: calc(var(--shift-end) * var(--u)) 0;
+  }
+}
+
+/* phones: longer row slide (cards pass the centre one by one) */
+@keyframes trust-spread-phone {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+    animation-timing-function: ease-in-out;
+  }
+  15.2% {
+    rotate: calc(var(--tilt-mid) * 1deg);
+  }
+  30.3%,
+  100% {
+    translate: calc(var(--dx-end) * var(--u)) 0;
+    rotate: 0deg;
+  }
+}
+
+@keyframes trust-shift-phone {
+  0%,
+  34.8% {
+    translate: 0 0;
+    animation-timing-function: ease-in-out;
+  }
+  95.5%,
+  100% {
+    translate: calc(var(--shift-end) * var(--u)) 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .trust[data-scroll-anim='css'] .trust-card {
+    animation-name: trust-spread-phone;
+  }
+  .trust[data-scroll-anim='css'] .trust-cards {
+    animation-name: trust-shift-phone;
+  }
+}
+
 /* ---------- 3. Phones: the same deck → row effect, with big cards ---------- */
 /* On phones the page scale (--u ≈ 0.25) would make cards 140 px wide with 9 px text, so the
    cards get their own, 2.1× bigger scale. trust.js uses phone positions to match. */
