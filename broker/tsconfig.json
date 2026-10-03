@@ -9,6 +9,8 @@
     "strict": true,
     // tsx runs the code; tsc only checks types and writes no files
     "noEmit": true,
+    // Lets us write `import ... from "./mandate.ts"` (allowed because tsc writes no files)
+    "allowImportingTsExtensions": true,
     "types": ["node"]
   },
   "include": ["src"]
