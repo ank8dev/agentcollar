@@ -1,38 +1,11 @@
 // Section: manifesto — see specs/manifesto.md
 // Export init(); main.js calls it once.
 //
-// Motion (plays once when the blob scrolls into view):
-//  1. the raspberry blob pops in like jelly (elastic overshoot, squash-and-stretch,
-//     rotation wobble, a subtle wobble of its outline);
-//  2. the words pop in one by one (scale + little tilt + bounce);
-//  3. the marker stroke under the last line draws itself left → right.
+// Motion: the raspberry blob is always there (no animation). The words are blurry
+// and faint at first and come into focus one by one AS YOU SCROLL (scrubbed, so
+// scrolling back blurs them again). After the last word the marker stroke under
+// "Just not without a collar." draws itself left → right, also tied to the scroll.
 // Reduced motion: do nothing, the HTML/CSS already show the final state.
-
-// Hand-made-looking variant of the blob path (same commands and number of points).
-function wobblePath(d, amount, phase) {
-  const nums = d.match(/-?\d*\.?\d+/g).map(Number);
-  const xs = nums.filter((_, i) => i % 2 === 0);
-  const ys = nums.filter((_, i) => i % 2 === 1);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-  const cx = (minX + maxX) / 2;
-  const cy = (minY + maxY) / 2;
-  const rx = (maxX - minX) / 2;
-  const ry = (maxY - minY) / 2;
-
-  const out = [];
-  for (let i = 0; i < nums.length; i += 2) {
-    const x = nums[i];
-    const y = nums[i + 1];
-    const a = Math.atan2((y - cy) / ry, (x - cx) / rx);
-    const f = amount * (Math.sin(3 * a + phase) + 0.5 * Math.sin(5 * a + 2 * phase));
-    out.push((x + (x - cx) * f).toFixed(1), (y + (y - cy) * f).toFixed(1));
-  }
-  let k = 0;
-  return d.replace(/-?\d*\.?\d+/g, () => out[k++]);
-}
 
 // Wrap every word of `root` in <span class="manifesto__word">, keeping the spaces,
 // <br>s and <em>/<strong> exactly where they are. The words stay inside the original
@@ -69,63 +42,35 @@ export function init({ gsap, reducedMotion }) {
   const section = document.querySelector('.manifesto');
   if (!section) return;
 
-  const path = section.querySelector('.manifesto__blob path');
   const text = section.querySelector('.manifesto__text');
   const marker = section.querySelector('.manifesto__marker');
   const words = text ? splitWords(text) : [];
+  if (!words.length) return;
 
   const tl = gsap.timeline({
+    defaults: { ease: 'power1.out' },
     scrollTrigger: {
-      trigger: section,
-      start: 'top 75%', // when the top of the blob is a quarter up the screen
-      once: true,
+      trigger: text,
+      start: 'top 85%', // first word starts clearing when the text enters the screen
+      end: 'bottom 40%', // all clear a bit above the middle of the screen
+      scrub: 0.8, // follows the scroll with a short, soft catch-up
     },
   });
 
-  // 1. Blob pop
-  if (path) {
-    const d = path.getAttribute('d');
-    const wobbleA = wobblePath(d, 0.035, 0.9);
-    const wobbleB = wobblePath(d, -0.03, 2.4);
-    gsap.set(path, { transformOrigin: '50% 50%' });
-    tl.fromTo(path, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: 'none' }, 0)
-      .fromTo(path, { scaleX: 0.3 }, { scaleX: 1, duration: 1.1, ease: 'elastic.out(1, 0.45)' }, 0)
-      .fromTo(path, { scaleY: 0.22 }, { scaleY: 1, duration: 1.2, ease: 'elastic.out(1, 0.55)' }, 0.06)
-      .fromTo(path, { rotation: -5 }, { rotation: 0, duration: 1.2, ease: 'elastic.out(1.1, 0.4)' }, 0)
-      .fromTo(path, { attr: { d: wobbleA } }, { attr: { d: wobbleB }, duration: 0.3, ease: 'sine.inOut' }, 0)
-      .to(path, { attr: { d }, duration: 0.9, ease: 'elastic.out(1, 0.35)' }, 0.3);
-  }
+  // Words: faint + blurred → sharp, one after another
+  tl.fromTo(
+    words,
+    { opacity: 0.12, filter: 'blur(10px)', y: 8 },
+    { opacity: 1, filter: 'blur(0px)', y: 0, duration: 1, stagger: 0.35 },
+  );
 
-  // 2. Words pop one by one
-  if (words.length) {
-    tl.fromTo(
-      words,
-      {
-        autoAlpha: 0,
-        scale: 0,
-        y: -24,
-        rotation: () => gsap.utils.random(-14, 14),
-      },
-      {
-        autoAlpha: 1,
-        scale: 1,
-        y: 0,
-        rotation: 0,
-        duration: 0.55,
-        ease: 'back.out(2.4)',
-        stagger: 0.075,
-      },
-      0.45,
-    );
-  }
-
-  // 3. Marker stroke draws left → right after the last word
+  // Marker stroke after the last word
   if (marker) {
     tl.fromTo(
       marker,
       { clipPath: 'inset(0 100% 0 0)' },
-      { clipPath: 'inset(0 0% 0 0)', duration: 0.6, ease: 'power2.inOut' },
-      '-=0.15',
+      { clipPath: 'inset(0 0% 0 0)', duration: 2, ease: 'power1.inOut' },
+      '-=0.3',
     );
   }
 }

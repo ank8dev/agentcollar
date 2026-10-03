@@ -98,24 +98,18 @@
   pointer-events: auto; /* the glyphs are part of the link */
 }
 
-/* Hover: a small cartoony wiggle of the star */
+/* Hover: the star gently grows and warms up (smooth, no wiggle) */
+.footer-cta__star {
+  transition: scale 0.35s ease-out, background-color 0.35s ease-out;
+}
 .footer-cta:hover .footer-cta__star {
   --star-color: var(--rose);
-  animation: footer-cta-wiggle 0.6s ease-in-out;
   scale: 1.05;
 }
 
-@keyframes footer-cta-wiggle {
-  0% { rotate: 0deg; }
-  20% { rotate: -9deg; }
-  45% { rotate: 7deg; }
-  70% { rotate: -4deg; }
-  100% { rotate: 0deg; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .footer-cta:hover .footer-cta__star {
-    animation: none;
+  .footer-cta__star {
+    transition: none;
   }
 }
 
