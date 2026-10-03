@@ -1,1 +1,147 @@
-/* Section: trust — see specs/trust.md */
+/* Section: trust — see specs/trust.md
+   Three layouts of the same four cards:
+   1. default        → static 2×2 grid (no JS, or prefers-reduced-motion)
+   2. [data-motion]  → cards placed as a deck; trust.js scrubs them into a row
+   3. carousel       → phones with data-mobile-cards="carousel": swipe row with scroll-snap
+   --cu = one Figma pixel *of a card*. Normally the same as --u; the carousel makes cards
+   80vw wide, so there --cu grows and the card text grows with it. */
+
+.trust.stage {
+  --cu: var(--u);
+  /* static 2×2 grid: cards top 4473, two rows of 655 + 60 gap, 72 below → 1915 */
+  height: calc(1915 * var(--u));
+}
+
+/* ---------- Heading ---------- */
+.trust__heading {
+  position: absolute;
+  top: calc((4060 - var(--top)) * var(--u));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: calc(60 * var(--u));
+  font-weight: 500;
+  line-height: calc(87 * var(--u));
+  color: var(--text);
+}
+
+.trust__heading h2,
+.trust__heading p {
+  max-width: 36ch; /* gives the Figma line breaks */
+  margin-inline: auto;
+  font: inherit;
+}
+
+/* ---------- Cards ---------- */
+.trust-cards {
+  position: absolute;
+  top: calc((4473 - var(--top)) * var(--u));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, calc(590 * var(--u)));
+  justify-content: center;
+  gap: calc(60 * var(--u));
+}
+
+.trust-card {
+  position: relative;
+  width: calc(590 * var(--cu));
+  height: calc(655 * var(--cu));
+  border-radius: calc(56 * var(--cu));
+  background: var(--card);
+  color: var(--ink); /* ink on every card color, both themes (contrast rule) */
+  text-align: center;
+}
+
+.trust-card--sage { --card: var(--sage); }
+.trust-card--rose { --card: var(--rose); }
+.trust-card--mist { --card: var(--mist-light); }
+.trust-card--sand { --card: var(--sand); }
+
+.trust-card h3 {
+  margin: 0;
+  padding-top: calc(41 * var(--cu)); /* 41 + 80/2 → line centre 81 below the top */
+  font-size: calc(64 * var(--cu));
+  font-weight: 400;
+  line-height: calc(80 * var(--cu));
+  white-space: nowrap; /* "Revoke anytime." stays on one line */
+}
+
+.trust-card p {
+  max-width: 18ch;
+  margin: calc(3 * var(--cu)) auto 0; /* first line top 124 → centre 151 */
+  font-size: calc(40 * var(--cu));
+  line-height: calc(54 * var(--cu));
+}
+
+/* Placeholder until the hand-drawn icons arrive: swap in an <img> per data-icon. */
+.trust-card__icon {
+  position: absolute;
+  top: calc(280 * var(--cu));
+  left: 50%;
+  width: calc(300 * var(--cu));
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border: max(calc(4 * var(--cu)), 1px) dashed var(--ink);
+  border-radius: calc(24 * var(--cu));
+  display: grid;
+  place-items: center;
+  font-size: calc(24 * var(--cu));
+}
+
+.trust-card__icon::after {
+  content: attr(data-icon);
+}
+
+/* ---------- 2. Animated: deck → row (trust.js sets data-motion) ---------- */
+.trust[data-motion] {
+  height: calc(var(--h) * var(--u));
+}
+
+.trust[data-motion] .trust-cards {
+  inset: 0;
+  display: block;
+  translate: calc(var(--shift, 0) * var(--u)) 0; /* phase 2: the whole row slides left */
+}
+
+.trust[data-motion] .trust-card {
+  position: absolute;
+  top: calc((4473 - var(--top)) * var(--u));
+  left: calc(var(--x) * var(--u)); /* deck position */
+  translate: calc(var(--dx, 0) * var(--u)) 0; /* phase 1: distance to the row position */
+  rotate: calc(var(--tilt, 0) * 1deg);
+  will-change: translate, rotate;
+}
+
+/* ---------- 3. Phones: carousel variant ---------- */
+@media (max-width: 767.98px) {
+  .trust[data-mobile-cards='carousel'] {
+    --cu: calc(80cqw / 590); /* cards ≈ 80vw wide */
+    height: calc(473 * var(--u) + 655 * var(--cu) + 72 * var(--u) + 24px);
+  }
+
+  .trust[data-mobile-cards='carousel'] .trust-cards {
+    display: flex;
+    justify-content: flex-start; /* centred overflow would hide card 1 off the left edge */
+    gap: 4cqw;
+    padding: 0 10cqw 16px; /* first and last card can sit in the middle */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .trust[data-mobile-cards='carousel'] .trust-card {
+    flex: none;
+    scroll-snap-align: center;
+  }
+
+  .trust[data-mobile-cards='carousel'] .trust-cards:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 4px;
+  }
+}
