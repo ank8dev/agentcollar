@@ -262,10 +262,19 @@ h3,
 /* Phones: the hero fills the screen and its content is scaled up ×1.9 and centred
    below the header (the desktop layout scaled to a phone would be tiny). */
 @media (max-width: 767.98px) {
-  /* a slightly bigger header on phones */
+  /* a slightly bigger header on phones: mark + wordmark on the left, star link on the right */
   .site-header {
     --header-h: 60px;
     padding: 0 16px;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 10px;
+  }
+  .site-header__wordmark {
+    order: 1; /* right after the mark */
+    justify-self: start;
+  }
+  .site-header__star {
+    order: 2;
   }
   .site-header__mark img {
     width: 34px;
@@ -274,7 +283,7 @@ h3,
     font-size: 17px;
   }
   .site-header__wordmark {
-    font-size: 19px;
+    font-size: 18px;
   }
 
   /* hero stars: pulled toward the centre (the scaled hero would push them off-screen),

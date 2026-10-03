@@ -162,6 +162,7 @@
     --head: 214px; /* heading at a real phone size (≈ 6 lines of 25 px) */
     --gap: 16px;
     --cards-h: calc(655 * 100cqw / var(--frame) * var(--phone-scale));
+    margin-top: 40px; /* plain spacing after the manifesto (desktop uses Figma y) */
     top: max(52px, calc(50vh - (var(--head) + var(--gap) + var(--cards-h)) / 2));
     height: calc(var(--head) + var(--gap) + var(--cards-h));
   }
