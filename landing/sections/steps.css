@@ -1,1 +1,96 @@
-/* Section: steps — see specs/steps.md */
+/* Section: steps — see specs/steps.md
+   Z-order (back → front): blobs → marker fills → drawings → text → leash → stars */
+
+/* ---------- Blobs ---------- */
+.steps__blob {
+  z-index: 1;
+  overflow: visible; /* a few path points go slightly below 0 */
+  fill: var(--sage);
+}
+
+/* ---------- Drawings + marker fills (same pattern as .hero__art) ---------- */
+.steps__art {
+  z-index: 2;
+  aspect-ratio: 1;
+}
+
+.steps__art > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Step text (always ink: it sits on sage) ---------- */
+.steps__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ".steps" prefix: this file is imported before the shared .pos rule,
+   so the extra class is needed to override .pos width/left. */
+.steps .steps__step {
+  z-index: 3;
+  /* width in characters of the body font, so lines break as in Figma */
+  width: calc(var(--ch) * 1ch);
+  font-size: max(calc(48 * var(--u)), 12px);
+  color: var(--ink);
+}
+
+/* Step 2 is right-aligned against x = 1464 */
+.steps .steps__step--right {
+  left: auto;
+  right: calc((var(--frame) - var(--right)) * var(--u));
+  text-align: right;
+}
+
+.steps__title {
+  margin: 0;
+  font-size: max(calc(56 * var(--u)), 13px);
+  font-style: italic;
+  font-weight: 700;
+  line-height: calc(74 / 56);
+}
+
+.steps__body {
+  margin: 0;
+  font-size: inherit;
+  line-height: calc(66 / 48);
+}
+
+/* Dark theme: parts of the text stick out past the blob edge (step 1 title
+   over the blob's top dip, step 2 lines past blob 2's left edge). Ink on the
+   ink page would be invisible there, so each glyph gets a sage halo: the text
+   always reads as ink on sage (7.9:1). Invisible where it already sits on sage. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .steps .steps__step {
+    text-shadow: var(--steps-halo);
+  }
+}
+:root[data-theme='dark'] .steps .steps__step {
+  text-shadow: var(--steps-halo);
+}
+
+.steps {
+  --steps-halo:
+    0 0 calc(3 * var(--u)) var(--sage), 0 0 calc(6 * var(--u)) var(--sage),
+    0 0 calc(10 * var(--u)) var(--sage), 0 0 calc(14 * var(--u)) var(--sage),
+    0 0 calc(18 * var(--u)) var(--sage), 0 0 calc(22 * var(--u)) var(--sage);
+}
+
+/* ---------- Leash ---------- */
+.steps__leash {
+  z-index: 4;
+  aspect-ratio: 398 / 1482;
+  pointer-events: none;
+}
+
+.steps__leash > img {
+  width: 100%;
+}
+
+/* ---------- Stars ---------- */
+.steps .star {
+  z-index: 5;
+}

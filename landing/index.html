@@ -76,6 +76,84 @@
         <!-- ============ 2. HOW IT WORKS (spec: specs/steps.md) ============ -->
         <section class="steps stage" style="--top: 1060; --h: 2140" aria-labelledby="steps-title">
           <h2 class="visually-hidden" id="steps-title">How it works</h2>
+
+          <!-- Back layer: three sage blobs (left / right / left) -->
+          <svg class="pos steps__blob" style="--x: -222; --y: 1068; --w: 949" width="949" height="888" viewBox="0 0 949 888" aria-hidden="true" focusable="false">
+            <path d="M58 469 C61 433 56 402 54 363 C52 325 38 277 46 237 C53 196 73 153 98 118 C123 84 159 51 196 32 C234 12 281 -3 324 0 C366 3 413 28 449 49 C486 69 513 105 542 125 C571 145 594 156 625 168 C656 180 682 188 726 197 C770 205 859 195 891 220 C923 246 908 307 918 350 C927 393 944 433 949 477 C953 520 961 571 945 611 C929 650 885 683 853 712 C820 740 785 764 750 782 C715 800 678 810 643 821 C608 831 575 835 541 842 C508 849 477 859 442 865 C407 872 373 877 332 881 C292 885 244 895 200 888 C157 882 103 869 70 842 C36 814 6 768 0 724 C-6 680 27 621 37 578 C46 535 55 505 58 469 Z" />
+          </svg>
+          <svg class="pos steps__blob" style="--x: 849; --y: 1512; --w: 932" width="932" height="852" viewBox="0 0 932 852" aria-hidden="true" focusable="false">
+            <path d="M0 399 C-2 359 4 316 14 276 C24 237 38 196 59 160 C79 124 104 87 135 61 C166 36 207 15 246 5 C284 -5 329 -1 367 0 C405 1 439 6 474 9 C510 12 542 15 578 18 C614 21 652 21 691 29 C730 37 780 44 813 67 C846 90 874 129 891 165 C908 202 910 248 916 288 C922 328 925 367 927 407 C930 448 938 490 932 531 C926 572 917 620 892 651 C867 683 820 703 783 721 C747 739 707 746 672 759 C638 773 608 787 574 802 C540 817 505 842 467 851 C429 859 383 863 346 852 C310 841 276 810 245 786 C215 762 189 734 163 706 C136 679 110 652 86 621 C63 589 38 556 24 519 C10 482 2 439 0 399 Z" />
+          </svg>
+          <svg class="pos steps__blob" style="--x: -115; --y: 2032; --w: 968" width="968" height="818" viewBox="0 0 968 818" aria-hidden="true" focusable="false">
+            <path d="M0 398 C-2 358 -3 316 5 277 C13 238 29 199 49 163 C68 128 90 88 122 64 C154 41 200 29 239 22 C278 16 320 24 356 25 C393 25 422 29 457 25 C492 21 527 3 565 0 C603 -3 653 -9 686 7 C720 22 745 62 768 93 C790 124 801 161 822 193 C843 225 870 252 894 288 C918 323 969 367 968 406 C967 445 911 486 888 522 C864 558 847 588 827 622 C807 655 795 696 768 721 C741 747 699 758 664 774 C630 789 596 808 561 815 C525 822 487 820 450 818 C414 816 377 814 342 806 C307 797 273 781 239 765 C206 750 168 735 138 711 C109 688 85 655 64 622 C43 589 25 552 15 515 C4 478 2 437 0 398 Z" />
+          </svg>
+
+          <!-- Step drawings + the colored marker fills behind them (same technique as .hero__art) -->
+          <div class="pos steps__art" style="--x: 125; --y: 1487; --w: 460">
+            <svg class="steps__fills" viewBox="0 0 606 606" aria-hidden="true" focusable="false">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
+                <!-- speech bubble -->
+                <path transform="translate(197 90)" stroke="var(--rose)" stroke-width="28" d="M20 18 L28 84 L58 14 L66 86 L98 16 L106 84 L140 18 L146 86 L174 20 L172 80" />
+                <!-- the person: hair, back, arm (brown crayon) -->
+                <path transform="translate(49 347)" stroke="#a56d50" stroke-width="30" d="M22 20 L132 30 L18 56 L136 70 L20 98 L134 108 L22 138 L130 148 L24 176 L128 196" />
+                <path transform="translate(175 477)" stroke="#a56d50" stroke-width="28" d="M18 18 L26 76 L54 14 L62 78 L96 18 L104 72" />
+                <path transform="translate(101 499)" stroke="#a56d50" stroke-width="26" d="M16 18 L22 86 L48 14 L56 84" />
+              </g>
+            </svg>
+            <img class="ink-on-light" src="./brand/pictures/agentcollar-step-1-task-dark-ink.png" alt="A person at a laptop gives a task to an AI agent wearing a collar." />
+            <img class="ink-on-dark" src="./brand/pictures/agentcollar-step-1-task-light-ink.png" alt="A person at a laptop gives a task to an AI agent wearing a collar." />
+          </div>
+          <div class="pos steps__art" style="--x: 986; --y: 1882; --w: 460">
+            <svg class="steps__fills" viewBox="0 0 606 606" aria-hidden="true" focusable="false">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
+                <!-- list panel (darker mist blue) -->
+                <path transform="translate(94 84)" stroke="#7d95aa" stroke-width="30" d="M20 22 L138 30 L18 60 L140 68 L20 100 L136 110 L22 140 L138 150 L20 180 L140 190 L22 216 L136 236" />
+                <!-- approve button -->
+                <path transform="translate(160 393)" stroke="var(--rose)" stroke-width="28" d="M20 18 L28 78 L60 14 L66 80 L100 16 L108 78 L142 18 L148 80 L182 16 L188 78 L222 20 L232 76" />
+              </g>
+            </svg>
+            <img class="ink-on-light" src="./brand/pictures/agentcollar-step-2-approve-dark-ink.png" alt="The agent asks for access to files, web, data and code; a person approves with one tap." />
+            <img class="ink-on-dark" src="./brand/pictures/agentcollar-step-2-approve-light-ink.png" alt="The agent asks for access to files, web, data and code; a person approves with one tap." />
+          </div>
+          <div class="pos steps__art" style="--x: 87; --y: 2412; --w: 460">
+            <svg class="steps__fills" viewBox="0 0 606 606" aria-hidden="true" focusable="false">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
+                <!-- the sun (small scribble inside) -->
+                <path transform="translate(208 57)" stroke="#cca756" stroke-width="26" d="M18 20 L26 88 L42 18 L50 90 L64 22 L62 86" />
+                <!-- Send button area -->
+                <path transform="translate(212 429)" stroke="var(--rose)" stroke-width="28" d="M20 18 L28 74 L58 14 L66 78 L98 16 L106 76 L138 18 L146 78 L176 16 L182 74 L200 22" />
+              </g>
+            </svg>
+            <img class="ink-on-light" src="./brand/pictures/agentcollar-step-3-results-dark-ink.png" alt="In the morning the agent shows a finished checklist; a Send button waits for your click." />
+            <img class="ink-on-dark" src="./brand/pictures/agentcollar-step-3-results-light-ink.png" alt="In the morning the agent shows a finished checklist; a Send button waits for your click." />
+          </div>
+
+          <!-- Step text -->
+          <ol class="steps__list">
+            <li class="pos steps__step" style="--x: 97; --y: 1208; --ch: 18">
+              <h3 class="steps__title">1.Give a task.</h3>
+              <p class="steps__body">Tell your agent what to do before you go to bed.</p>
+            </li>
+            <li class="pos steps__step steps__step--right" style="--right: 1464; --y: 1577; --ch: 22">
+              <h3 class="steps__title">2.Approve access.</h3>
+              <p class="steps__body">Your agent asks only for what it needs. You approve with one tap.</p>
+            </li>
+            <li class="pos steps__step" style="--x: 60; --y: 2083; --ch: 22">
+              <h3 class="steps__title">3.Wake up to results.</h3>
+              <p class="steps__body">Everything is ready in the morning. Nothing gets sent without your "yes".</p>
+            </li>
+          </ol>
+
+          <!-- The leash runs down the middle and ends in the collar + AC tag -->
+          <div class="pos steps__leash" style="--x: 455; --y: 1278; --w: 524">
+            <img class="ink-on-light" src="./brand/pictures/agentcollar-leash-dark-ink.png" alt="" />
+            <img class="ink-on-dark" src="./brand/pictures/agentcollar-leash-light-ink.png" alt="" />
+          </div>
+
+          <span class="pos star" style="--x: 969; --y: 1250; --w: 69; --r: 7deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 1336; --y: 2678; --w: 75; --r: -9deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 1150; --y: 2961; --w: 74; --r: 11deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 188; --y: 3031; --w: 75; --r: -5deg" aria-hidden="true"></span>
         </section>
 
         <!-- ============ 3. MANIFESTO (spec: specs/manifesto.md) ============ -->
