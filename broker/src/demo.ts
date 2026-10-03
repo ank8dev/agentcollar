@@ -3,7 +3,7 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import { styleText } from "node:util";
 import { check } from "./check.ts";
-import { issueMandate, revoke } from "./mandate.ts";
+import { approve, issueMandate, requestMandate, revoke } from "./mandate.ts";
 
 // --- small printing helpers ---
 
@@ -54,12 +54,13 @@ attempt(token, "gmail.read");
 attempt(token, "gmail.draft");
 
 title("6. Kill switch");
-const token2 = issueMandate("digest-agent", "Second task", ["gmail.read"], 60, 5);
-console.log(`  new mandate: ${short(token2)}   allowed: gmail.read   expires in 60s`);
-attempt(token2, "gmail.read");
-revoke(token2);
+const second = requestMandate("digest-agent", "Second task", ["gmail.read"], 60, 5);
+approve(second.id);
+console.log(`  new mandate: ${second.id}   allowed: gmail.read   expires in 60s`);
+attempt(second.token, "gmail.read");
+revoke(second.id); // the human uses the public id, not the secret token
 console.log(styleText(["bold", "yellow"], "  revoke() called by the human"));
-attempt(token2, "gmail.read");
+attempt(second.token, "gmail.read");
 
 title("Done");
 console.log("  Every attempt above is also written to data/audit.log");

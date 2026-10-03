@@ -7,4 +7,5 @@ data/
 # Secrets (Phase 4: Google OAuth client, encryption keys)
 .env
 .env.*
+!.env.example
 *.pem

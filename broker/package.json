@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "demo": "tsx src/demo.ts",
+    "server": "tsx src/server.ts",
+    "agent": "tsx src/agent.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
