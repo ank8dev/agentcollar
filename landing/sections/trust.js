@@ -51,6 +51,46 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     const deckX = phone ? PHONE_DECK_X : DECK_X;
     const rowX = phone ? PHONE_ROW_X : ROW_X;
     const shift = phone ? PHONE_SHIFT : SHIFT;
+    // Phones: step-by-step instead of following the finger frame by frame. On iPhones any
+    // per-frame scroll-linked motion inside the sticky block shakes (Safari keeps the sticky
+    // block and the animation slightly out of sync). So the scroll only picks a STEP —
+    // deck, then card 1…4 in the centre — and a CSS transition glides the cards there,
+    // run by the browser on its own. JS writes to the DOM only when the step changes.
+    if (phone) {
+      const sticky = section.querySelector('.trust__sticky');
+      const stickyTop = () => parseFloat(getComputedStyle(sticky).top) || 0;
+      section.dataset.scrollAnim = 'steps';
+      // (no gsap.set on these elements: GSAP would write `translate: none` inline and
+      // override the CSS translate that the transition animates)
+      cards.forEach((card, i) => card.style.setProperty('--x', deckX[i]));
+      let step = -1;
+      const show = (next) => {
+        if (next === step) return;
+        step = next;
+        cards.forEach((card, i) => {
+          card.style.setProperty('--dx', step === 0 ? 0 : rowX[i] - deckX[i]);
+          card.style.setProperty('--tilt', 0);
+        });
+        list.style.setProperty('--shift', step <= 1 ? 0 : -(step - 1) * (CARD_W + 40));
+      };
+      show(0);
+      const st = ScrollTrigger.create({
+        trigger: sticky,
+        start: () => `top ${stickyTop()}px`,
+        end: () => `+=${window.innerHeight * 2}`,
+        invalidateOnRefresh: true,
+        // 0 = deck, 1–4 = card 1–4 in the centre
+        onUpdate: ({ progress: p }) => show(p < 0.1 ? 0 : p < 0.32 ? 1 : p < 0.52 ? 2 : p < 0.72 ? 3 : 4),
+      });
+      return () => {
+        st.kill();
+        delete section.dataset.motion;
+        delete section.dataset.scrollAnim;
+        cards.forEach((card) => ['--dx', '--x', '--tilt'].forEach((p) => card.style.removeProperty(p)));
+        list.style.removeProperty('--shift');
+      };
+    }
+
     gsap.set(cards, { '--x': (i) => deckX[i], force3D: true });
     gsap.set(list, { force3D: true });
 

@@ -230,6 +230,16 @@
   }
 }
 
+/* ---------- 2c. Phones: step by step (trust.js picks the step, CSS glides there) ---------- */
+.trust[data-scroll-anim='steps'] .trust-card {
+  transition:
+    translate 0.75s cubic-bezier(0.3, 0.7, 0.2, 1),
+    rotate 0.75s ease;
+}
+.trust[data-scroll-anim='steps'] .trust-cards {
+  transition: translate 0.75s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
 /* ---------- 3. Phones: the same deck → row effect, with big cards ---------- */
 /* On phones the page scale (--u ≈ 0.25) would make cards 140 px wide with 9 px text, so the
    cards get their own, 2.1× bigger scale. trust.js uses phone positions to match. */
