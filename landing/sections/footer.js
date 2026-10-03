@@ -51,76 +51,109 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     });
   });
 
-  // 2. Parallax: over the whole footer the horizon lags the scroll by 80 Figma px
-  //    (it moves up a little slower than the page). Lands exactly on the spec at the page end.
-  const u = () => footer.offsetWidth / FIGMA_W;
-  gsap.fromTo(
-    horizon,
-    { y: () => -80 * u() },
-    {
-      y: 0,
-      ease: 'none',
+  const content = footer.querySelector('.site-footer__sticky');
+  const outline = footer.querySelector('.footer-cta__outline-path');
+
+  // gsap.matchMedia reverts everything below (tweens, inline styles, data-motion) when the
+  // width crosses 768 px, then builds it again for the other layout.
+  const mm = gsap.matchMedia();
+  mm.add({ phone: '(max-width: 767.98px)', desktop: '(min-width: 768px)' }, ({ conditions }) => {
+    const phone = conditions.phone;
+    // Phones: footer.css adds a sticky phase (the content box holds at the screen bottom).
+    if (phone) footer.dataset.motion = 'sticky';
+
+    // One Figma px in screen px for the footer's content (bigger on phones, see footer.css)
+    const u = () => content.offsetWidth / FIGMA_W;
+
+    // 2. Parallax: over the whole footer the horizon lags the scroll by 80 Figma px
+    //    (it moves up a little slower than the page). Lands exactly on the spec at the page end.
+    gsap.fromTo(
+      horizon,
+      { y: () => -80 * u() },
+      {
+        y: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: footer,
+          start: 'top bottom',
+          end: 'bottom bottom',
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      },
+    );
+    gsap.fromTo(
+      earth,
+      { rotate: -4 },
+      {
+        rotate: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
+      },
+    );
+
+    // 3. CTA: flight, then the outline.
+    const footerDocTop = () => footer.getBoundingClientRect().top + window.scrollY;
+    let flightStart;
+    let flightEnd;
+    if (phone) {
+      // Phones: the whole flight happens while the content box is stuck to the screen
+      // bottom. It sticks when its bottom reaches the screen bottom and stays for the extra
+      // height (--stick); the flight uses the first 85% of that, the rest is a short hold
+      // on the finished button before the page ends.
+      const stickStart = () => footerDocTop() + content.offsetHeight - window.innerHeight;
+      const stickLength = () => footer.offsetHeight - content.offsetHeight;
+      flightStart = () => stickStart();
+      flightEnd = () => {
+        const end = Math.min(stickStart() + 0.85 * stickLength(), ScrollTrigger.maxScroll(window));
+        return Math.max(end, flightStart() + 160);
+      };
+    } else {
+      // Desktop: starts when the star on the Earth is fully on screen; ends when the button
+      // sits a bit above the middle of the screen (or at the page end, if that comes first).
+      flightStart = () => footerDocTop() + (6131 - FOOTER_TOP) * u() - window.innerHeight;
+      flightEnd = () => {
+        const ideal = footerDocTop() + (BUTTON_CENTER_Y - FOOTER_TOP) * u() - 0.45 * window.innerHeight;
+        const end = Math.min(ideal, ScrollTrigger.maxScroll(window));
+        return Math.max(end, flightStart() + 160);
+      };
+    }
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'power1.inOut', duration: 1 },
       scrollTrigger: {
         trigger: footer,
-        start: 'top bottom',
-        end: 'bottom bottom',
-        scrub: true,
+        start: flightStart,
+        end: flightEnd,
+        scrub: 0.6,
         invalidateOnRefresh: true,
       },
-    },
-  );
-  gsap.fromTo(
-    earth,
-    { rotate: -4 },
-    {
-      rotate: 0,
-      ease: 'none',
-      scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
-    },
-  );
+    });
 
-  // 3. CTA: flight, then the outline.
-  //    Starts when the star on the Earth is fully on screen; ends when the button sits a bit
-  //    above the middle of the screen (or at the page end, if that comes first).
-  const outline = footer.querySelector('.footer-cta__outline-path');
-  const footerDocTop = () => footer.getBoundingClientRect().top + window.scrollY;
-  const flightStart = () => footerDocTop() + (6131 - FOOTER_TOP) * u() - window.innerHeight;
-  const flightEnd = () => {
-    const ideal = footerDocTop() + (BUTTON_CENTER_Y - FOOTER_TOP) * u() - 0.45 * window.innerHeight;
-    const end = Math.min(ideal, ScrollTrigger.maxScroll(window));
-    return Math.max(end, flightStart() + 160);
-  };
+    if (import.meta.env.DEV) window.__footerCTA = tl; // dev only: inspect the flight frame by frame
 
-  const tl = gsap.timeline({
-    defaults: { ease: 'power1.inOut', duration: 1 },
-    scrollTrigger: {
-      trigger: footer,
-      start: flightStart,
-      end: flightEnd,
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-    },
-  });
-
-  if (import.meta.env.DEV) window.__footerCTA = tl; // dev only: inspect the flight frame by frame
-
-  tl.fromTo(
-    starbox,
-    { xPercent: START_X_PCT, yPercent: START_Y_PCT, scale: START_SCALE, transformOrigin: '0 0' },
-    { xPercent: 0, yPercent: 0, scale: 1 },
-    0,
-  )
-    // the label straightens on the way up: one continuous morph, same timing as the star
-    .fromTo(path, { attr: { d: PATH_START } }, { attr: { d: PATH_END } }, 0)
-    .fromTo(text, { fontSize: FONT_START }, { fontSize: FONT_END }, 0);
-
-  // …then the white marker outline is drawn around star + label (pathLength = 1000)
-  if (outline) {
     tl.fromTo(
-      outline,
-      { strokeDasharray: 1000, strokeDashoffset: 1000 },
-      { strokeDashoffset: 0, duration: 0.7, ease: 'power1.inOut' },
-      0.85,
-    );
-  }
+      starbox,
+      { xPercent: START_X_PCT, yPercent: START_Y_PCT, scale: START_SCALE, transformOrigin: '0 0' },
+      { xPercent: 0, yPercent: 0, scale: 1 },
+      0,
+    )
+      // the label straightens on the way up: one continuous morph, same timing as the star
+      .fromTo(path, { attr: { d: PATH_START } }, { attr: { d: PATH_END } }, 0)
+      .fromTo(text, { fontSize: FONT_START }, { fontSize: FONT_END }, 0);
+
+    // …then the white marker outline is drawn around star + label (pathLength = 1000)
+    if (outline) {
+      tl.fromTo(
+        outline,
+        { strokeDasharray: 1000, strokeDashoffset: 1000 },
+        { strokeDashoffset: 0, duration: 0.7, ease: 'power1.inOut' },
+        0.85,
+      );
+    }
+
+    return () => {
+      delete footer.dataset.motion;
+    };
+  });
 }
