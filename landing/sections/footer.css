@@ -21,6 +21,18 @@
   height: 100%;
 }
 
+.site-footer__cord {
+  height: calc(250 * var(--u));
+  overflow: visible;
+  pointer-events: none;
+}
+
+@media (max-width: 767.98px) {
+  .site-footer__cord {
+    display: none;
+  }
+}
+
 .site-footer__tag {
   z-index: 1; /* behind the horizon group: the flying star lands ON the medallion */
   pointer-events: none;
@@ -61,8 +73,16 @@
 /* ---------- The CTA: ONE link = star + label + hand-drawn outline (a button) ---------- */
 .site-footer .footer-cta {
   /* (doubled selector: .pos in styles.css is imported after this file and sets height/rotate)
-     box = the button: 376..1136 x 5735..5885 */
-  height: calc(150 * var(--u));
+     box = the button. Geometry in Figma px (phones; desktop overrides below):
+     link box --x/--y/--w + its height --lh; the star's end box --sx/--sy/--sw */
+  --x: 376;
+  --y: 5735;
+  --w: 760;
+  --lh: 150;
+  --sx: 406;
+  --sy: 5745;
+  --sw: 130;
+  height: calc(var(--lh) * var(--u));
   display: block;
   rotate: none; /* no stacking context: the star can sit behind the Earth while the label stays in front */
   color: var(--paper);
@@ -103,9 +123,9 @@
    footer.js flies it here from its start box on the Earth. */
 .footer-cta__starbox {
   position: absolute;
-  left: calc((406 - 376) * var(--u));
-  top: calc((5745 - 5735) * var(--u));
-  width: calc(130 * var(--u));
+  left: calc((var(--sx) - var(--x)) * var(--u));
+  top: calc((var(--sy) - var(--y)) * var(--u));
+  width: calc(var(--sw) * var(--u));
   aspect-ratio: 688 / 663;
 }
 
@@ -119,8 +139,8 @@
 /* The one label: an SVG covering the footer band in page coordinates, overflowing the link box */
 .footer-cta__label {
   position: absolute;
-  left: calc((0 - 376) * var(--u));
-  top: calc((5200 - 5735) * var(--u));
+  left: calc((0 - var(--x)) * var(--u));
+  top: calc((5200 - var(--y)) * var(--u));
   width: calc(1512 * var(--u));
   height: calc(1542 * var(--u));
   overflow: visible;
@@ -232,16 +252,36 @@
    unit --fu (capped so the whole footer still fits one screen), centred on the page: the
    sides of the Figma frame fall off-screen (.page clips them). */
 /* ---------- Desktop: full-width Figma footer, cut to the screen height ----------
-   At the page end the tag, the button and the top of the full-width Earth must all be on
-   screen. So the footer is only as tall as needed (tag → bottom = one screen minus the
-   header); the Earth keeps its full size and width, only its top cap shows. The tag sits
-   100 Figma px lower than in Figma so the three fit together. */
+   The medallion hangs on its cord from above; right under it a compact "Star on GitHub"
+   button; below, a much bigger Earth whose curve spans the whole screen width. The footer
+   is only as tall as needed, so at the page end the cord, medallion, button and the
+   Earth's cap are all on screen. */
 @media (min-width: 768px) {
   .site-footer.stage {
-    height: min(calc(1542 * var(--u)), calc(145 * var(--u) + 100vh - 96px));
+    height: clamp(calc(950 * var(--u)), calc(90 * var(--u) + 100vh), calc(1542 * var(--u)));
   }
   .site-footer .site-footer__tag {
     top: calc((5365 - var(--top)) * var(--u));
+  }
+  .site-footer .site-footer__cord {
+    top: calc((5160 - var(--top)) * var(--u));
+    height: calc(250 * var(--u));
+  }
+  /* compact button right under the medallion (0.72 of the phone button) */
+  .site-footer .footer-cta {
+    --x: 483;
+    --y: 5705;
+    --w: 547;
+    --lh: 108;
+    --sx: 504.6;
+    --sy: 5712.2;
+    --sw: 93.6;
+  }
+  /* Earth ×1.36: disc radius 1200, top of the disc at y 5921, centred on x 772 */
+  .site-footer .site-footer__earth {
+    left: calc(-491.2 * var(--u));
+    top: calc((5863.5 - var(--top)) * var(--u));
+    width: calc(2567 * var(--u));
   }
 }
 

@@ -12,25 +12,42 @@
 const FIGMA_W = 1512;
 const FOOTER_TOP = 5200;
 
-// Star boxes (Figma page px). END = the star's place inside the button (CSS default).
-const END_STAR = { x: 406, y: 5745, w: 130, h: 125.3 };
-const START_STAR = { x: 572, y: 5801, w: 343 };
-const START_SCALE = START_STAR.w / END_STAR.w;
-const START_X_PCT = ((START_STAR.x - END_STAR.x) / END_STAR.w) * 100;
-const START_Y_PCT = ((START_STAR.y - END_STAR.y) / END_STAR.h) * 100;
-
-// Label paths (page px; the label SVG's viewBox is in page coordinates).
-// Start: arc concentric with the Earth (centre 772/6928, baseline radius 893).
-// End: straight baseline y 5832 to the right of the star, centred on x 836.
-const PATH_START = 'M442 6056 Q772 5925 1102 6056'; // lifted ~42 px so the curved label sits ON the horizon
-const PATH_END = 'M566 5832 Q836 5832 1106 5832';
-const FONT_START = 56;
-const FONT_END = 64;
-const BUTTON_CENTER_Y = 5810;
+// Geometry (Figma page px) per layout. END = the star's place inside the button; START = the
+// star sitting on the Earth's top. Label paths are in page coordinates: START is an arc
+// concentric with the Earth (the label rides on the horizon), END a straight baseline.
+const GEO = {
+  // phones: original Figma footer (Earth centre 772/6928, radius 882)
+  phone: {
+    end: { x: 406, y: 5745, w: 130, h: 125.3 },
+    start: { x: 572, y: 5801, w: 343 },
+    pathStart: 'M442 6056 Q772 5925 1102 6056',
+    pathEnd: 'M566 5832 Q836 5832 1106 5832',
+    fontStart: 56,
+    fontEnd: 64,
+  },
+  // desktop: compact button under the medallion, big Earth (centre 772/7121, radius 1200)
+  desktop: {
+    end: { x: 504.6, y: 5712.2, w: 93.6, h: 90.2 },
+    start: { x: 672, y: 5788, w: 200 },
+    pathStart: 'M442 5910.2 Q772 5821.8 1102 5910.2',
+    pathEnd: 'M619.8 5774.8 Q814.2 5774.8 1008.6 5774.8',
+    fontStart: 46,
+    fontEnd: 46,
+  },
+};
 
 export function init({ gsap, ScrollTrigger, reducedMotion }) {
   const footer = document.querySelector('.site-footer');
-  if (!footer || reducedMotion) return;
+  if (!footer) return;
+
+  // Static end state for the current layout (also what reduced motion shows)
+  const isPhone = window.matchMedia('(max-width: 767.98px)').matches;
+  const endGeo = isPhone ? GEO.phone : GEO.desktop;
+  footer.querySelector('.footer-cta__path')?.setAttribute('d', endGeo.pathEnd);
+  const labelText = footer.querySelector('.footer-cta__label text');
+  if (labelText) labelText.style.fontSize = endGeo.fontEnd + 'px';
+
+  if (reducedMotion) return;
 
   const starbox = footer.querySelector('.footer-cta__starbox');
   const path = footer.querySelector('.footer-cta__path');
@@ -59,6 +76,7 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
   const mm = gsap.matchMedia();
   mm.add({ phone: '(max-width: 767.98px)', desktop: '(min-width: 768px)' }, ({ conditions }) => {
     const phone = conditions.phone;
+    const g = phone ? GEO.phone : GEO.desktop;
     // Phones: footer.css adds a sticky phase (the content box holds at the screen bottom).
     // Desktop keeps the full-width Figma footer and the original scroll-through flight.
     if (phone) footer.dataset.motion = 'sticky';
@@ -116,6 +134,13 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
       flightEnd = () => Math.max(ScrollTrigger.maxScroll(window), flightStart() + 160);
     }
 
+    // The button becomes clickable only once it is fully built (outline drawn).
+    const link = footer.querySelector('.footer-cta');
+    const arm = (p) => {
+      if (link) link.dataset.armed = p >= 0.97 ? 'true' : 'false';
+    };
+    arm(0);
+
     const tl = gsap.timeline({
       defaults: { ease: 'power1.inOut', duration: 1 },
       scrollTrigger: {
@@ -124,28 +149,29 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
         end: flightEnd,
         scrub: 0.6,
         invalidateOnRefresh: true,
+        // the button is clickable once the scroll has reached the end of the flight
+        onUpdate: (self) => arm(self.progress),
+        onRefresh: (self) => arm(self.progress),
       },
     });
 
     if (import.meta.env.DEV) window.__footerCTA = tl; // dev only: inspect the flight frame by frame
 
-    // The button becomes clickable only once it is fully built (outline drawn).
-    const link = footer.querySelector('.footer-cta');
-    const arm = () => {
-      if (link) link.dataset.armed = tl.progress() >= 0.97 ? 'true' : 'false';
-    };
-    tl.eventCallback('onUpdate', arm);
-    arm();
 
     tl.fromTo(
       starbox,
-      { xPercent: START_X_PCT, yPercent: START_Y_PCT, scale: START_SCALE, transformOrigin: '0 0' },
+      {
+        xPercent: ((g.start.x - g.end.x) / g.end.w) * 100,
+        yPercent: ((g.start.y - g.end.y) / g.end.h) * 100,
+        scale: g.start.w / g.end.w,
+        transformOrigin: '0 0',
+      },
       { xPercent: 0, yPercent: 0, scale: 1 },
       0,
     )
       // the label straightens on the way up: one continuous morph, same timing as the star
-      .fromTo(path, { attr: { d: PATH_START } }, { attr: { d: PATH_END } }, 0)
-      .fromTo(text, { fontSize: FONT_START }, { fontSize: FONT_END }, 0);
+      .fromTo(path, { attr: { d: g.pathStart } }, { attr: { d: g.pathEnd } }, 0)
+      .fromTo(text, { fontSize: g.fontStart }, { fontSize: g.fontEnd }, 0);
 
     // …then the white marker outline is drawn around star + label (pathLength = 1000)
     if (outline) {
