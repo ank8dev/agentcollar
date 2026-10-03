@@ -1,6 +1,6 @@
 // Section: hero
 // Intro on page load:
-//  1. the sand highlight is DRAWN like a real marker: one thick hand-drawn stroke
+//  1. the sand marker is DRAWN like a real marker: one dense hand-drawn scribble
 //     (.hero__stroke) grows from start to end (stroke-dashoffset 1000 → 0, pathLength=1000);
 //  2. then the headline types itself letter by letter, like a typewriter.
 // The starting state is set by CSS (html.intro, added in <head>) so nothing flashes.
@@ -49,7 +49,7 @@ export function init({ gsap, reducedMotion }) {
   const tl = gsap.timeline({ delay: 0.4 });
   if (import.meta.env.DEV) window.__heroIntro = tl; // dev only: inspect the intro frame by frame
 
-  // 1. The marker highlights line 1, loops, and comes back along line 2
+  // 1. The marker scribbles back and forth (steady hand: gentle in/out)
   tl.to(stroke, { strokeDashoffset: 0, duration: 1.8, ease: 'sine.inOut' });
 
   // 2. Typewriter: each letter appears instantly, one after another

@@ -153,9 +153,9 @@ h3,
   z-index: 50;
   height: var(--header-h);
   margin-bottom: calc(-1 * var(--header-h));
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* mark | Star on GitHub (centre) | wordmark */
   align-items: center;
-  justify-content: space-between;
   padding: 0 calc(44 * var(--u)) 0 calc(33 * var(--u));
   background: var(--paper);
   transition: translate 0.35s ease-out;
@@ -171,12 +171,49 @@ h3,
 }
 
 .site-header__wordmark {
+  justify-self: end;
   font-style: italic;
   font-size: max(calc(34 * var(--u)), 15px);
 }
 
+.site-header__mark {
+  justify-self: start;
+}
+
+/* "Star on GitHub" in the header: same as the footer button, but no outline */
+.site-header__star {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--font-display);
+  font-size: max(calc(30 * var(--u)), 14px);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 6px 4px; /* bigger tap target */
+}
+
+.site-header__star-icon {
+  position: relative; /* overrides .star's absolute-free default */
+  display: inline-block;
+  width: 1.25em;
+  transition: scale 0.3s ease-out, background-color 0.3s ease-out;
+}
+
+.site-header__star:hover .site-header__star-icon {
+  --star-color: var(--raspberry);
+  scale: 1.12;
+}
+
+.site-header__star:focus-visible {
+  outline: 2px dashed var(--ink);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .site-header {
+  .site-header,
+  .site-header__star-icon {
     transition: none;
   }
 }

@@ -55,41 +55,61 @@
   }
 }
 
-/* ---------- The CTA: ONE link = star + one morphing label ---------- */
+/* ---------- The CTA: ONE link = star + label + hand-drawn outline (a button) ---------- */
 .site-footer .footer-cta {
   /* (doubled selector: .pos in styles.css is imported after this file and sets height/rotate)
-     box = END star box: 489..1001 x 5537..6030.4 */
-  height: calc(493.4 * var(--u));
+     box = the button: 376..1136 x 5735..5885 */
+  height: calc(150 * var(--u));
   display: block;
   rotate: none; /* no stacking context: the star can sit behind the Earth while the label stays in front */
-  pointer-events: none; /* only the star and the label glyphs are hit targets (both follow the flight) */
   color: var(--paper);
   text-decoration: none;
-  outline: none; /* the focus ring is drawn around the star, which moves (see below) */
+  outline: none; /* focus ring: see :focus-visible below */
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Wrapper that footer.js flies from the start box to the end box.
-   The star itself is a mask, so the focus ring lives on this wrapper. */
-.footer-cta__starbox {
+/* White marker outline around star + label (footer.js draws it at the end of the flight) */
+.footer-cta__outline {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.footer-cta__outline-path {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: url(#crayon);
+}
+
+/* The star's END box sits at the button's left: x 406, y 5745, w 130 (relative to the link box).
+   footer.js flies it here from its start box on the Earth. */
+.footer-cta__starbox {
+  position: absolute;
+  left: calc((406 - 376) * var(--u));
+  top: calc((5745 - 5735) * var(--u));
+  width: calc(130 * var(--u));
+  aspect-ratio: 688 / 663;
 }
 
 .footer-cta__star {
   position: absolute;
   inset: 0;
   --star-color: var(--star);
-  transition: background-color 0.2s ease;
+  transition: scale 0.35s ease-out, background-color 0.35s ease-out;
 }
 
 /* The one label: an SVG covering the footer band in page coordinates, overflowing the link box */
 .footer-cta__label {
   position: absolute;
-  left: calc((0 - 489) * var(--u));
-  top: calc((5200 - 5537) * var(--u));
+  left: calc((0 - 376) * var(--u));
+  top: calc((5200 - 5735) * var(--u));
   width: calc(1512 * var(--u));
   height: calc(1542 * var(--u));
   overflow: visible;
@@ -98,21 +118,16 @@
 }
 
 .footer-cta__label text {
-  font-family: var(--font);
-  font-style: italic;
-  font-size: 72px; /* SVG user units = Figma px; footer.js tweens 60 -> 72 */
-  letter-spacing: 3px;
+  font-family: var(--font-display);
+  font-size: 64px; /* SVG user units = Figma px; footer.js tweens 56 -> 64 */
+  letter-spacing: 2px;
   fill: var(--paper);
-  pointer-events: auto; /* the glyphs are part of the link */
 }
 
-/* Hover: the star gently grows and warms up (smooth, no wiggle) */
-.footer-cta__star {
-  transition: scale 0.35s ease-out, background-color 0.35s ease-out;
-}
+/* Hover: the star gently grows and warms up */
 .footer-cta:hover .footer-cta__star {
   --star-color: var(--rose);
-  scale: 1.05;
+  scale: 1.08;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -121,10 +136,11 @@
   }
 }
 
-/* Keyboard focus: a dashed paper ring around the star, wherever it is in its flight */
-.footer-cta:focus-visible .footer-cta__starbox {
-  outline: max(calc(5 * var(--u)), 2px) dashed var(--paper);
-  outline-offset: max(calc(8 * var(--u)), 3px);
+/* Keyboard focus: dashed ring around the whole button */
+.footer-cta:focus-visible {
+  outline: max(calc(4 * var(--u)), 2px) dashed var(--paper);
+  outline-offset: max(calc(10 * var(--u)), 4px);
+  border-radius: calc(24 * var(--u));
 }
 .footer-cta:focus-visible .footer-cta__star {
   --star-color: var(--rose);

@@ -32,11 +32,6 @@
         <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="warp" />
         <feDisplacementMap in="SourceGraphic" in2="warp" scale="12" xChannelSelector="R" yChannelSelector="G" />
       </filter>
-      <!-- Rough, slightly wobbly marker edges for big strokes (hero highlight) -->
-      <filter id="marker-edge" x="-10%" y="-20%" width="120%" height="140%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="4" result="n" />
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
     </svg>
 
     <!--
@@ -49,6 +44,9 @@
         <a class="site-header__mark" href="./" aria-label="AgentCollar home">
           <img src="./brand/logo/agentcollar-mark-black.svg" alt="" />
         </a>
+        <a class="site-header__star" href="https://github.com/ank8dev/agentcollar">
+          <span class="star site-header__star-icon" aria-hidden="true"></span>Star on GitHub
+        </a>
         <span class="site-header__wordmark">AgentCollar</span>
       </header>
 
@@ -57,20 +55,20 @@
         <section class="hero stage" style="--top: 0; --h: 1060" aria-labelledby="hero-title">
           <img class="pos" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
 
-          <!-- Sand marker: ONE hand-drawn highlighter stroke (no image) — along line 1, a loop,
-               back along line 2. hero.js draws it from start to end (stroke-dashoffset), so the
-               animation IS the drawing. #marker-edge roughens its edges like a real marker. -->
+          <!-- Sand marker: ONE dense, uneven marker scribble (no image). hero.js draws it from start
+               to end (stroke-dashoffset), so the animation IS the drawing. The #crayon filter
+               roughens its edges like a real marker. -->
           <svg class="pos hero__marker" style="--x: 365; --y: 268; --w: 822" viewBox="0 0 974 415" aria-hidden="true" focusable="false">
             <path
               class="hero__stroke"
               pathLength="1000"
-              d="M43 154 C64 152 130 150 167 146 C205 143 231 135 267 132 C304 128 342 129 386 128 C430 126 487 124 529 123 C572 121 604 121 641 120 C678 120 707 111 752 121 C797 130 891 159 910 177 C930 194 898 211 870 224 C843 237 784 249 746 255 C708 260 681 256 642 257 C604 257 555 258 513 259 C471 260 435 262 388 263 C341 264 279 267 230 267 C182 268 118 266 96 266"
+              d="M58 250 C60 254 58 299 70 274 C82 250 109 115 124 115 C138 116 135 277 149 276 C163 275 186 112 200 110 C213 108 206 265 223 265 C240 264 281 106 293 107 C305 108 275 267 289 270 C303 274 352 121 368 126 C385 131 366 300 378 299 C390 299 422 129 434 123 C446 117 430 267 443 266 C456 266 488 118 504 121 C520 125 513 288 528 286 C543 285 575 115 588 112 C601 109 584 271 600 270 C616 269 657 106 675 107 C692 109 678 277 695 279 C713 282 755 120 769 121 C782 121 756 283 771 284 C786 284 833 141 851 124 C869 106 865 178 868 190"
               fill="none"
               stroke="#f2d7a6"
-              stroke-width="104"
+              stroke-width="62"
               stroke-linecap="round"
               stroke-linejoin="round"
-              filter="url(#marker-edge)"
+              filter="url(#crayon)"
             />
           </svg>
 
@@ -250,30 +248,39 @@
 
         <!-- AC tag: the footer is dark, so always the white one. Drawn above the CTA star (the star ends "under the tag"). -->
         <!-- Sky-colored disc behind the tag's round plate: its letters are see-through, and the star sits behind it in the end state -->
-        <img class="pos site-footer__tag" style="--x: 559; --y: 5375; --w: 371" src="./brand/logo/agentcollar-tag-white.png" alt="" />
+        <img class="pos site-footer__tag" style="--x: 559; --y: 5265; --w: 371" src="./brand/logo/agentcollar-tag-white.png" alt="" />
 
         <!-- Stars (some twinkle, see footer.js) -->
         <span class="pos star site-footer__twinkle" style="--x: 441; --y: 5520; --w: 73" aria-hidden="true"></span>
         <span class="pos star site-footer__twinkle" style="--x: 1162; --y: 5482; --w: 66" aria-hidden="true"></span>
-        <span class="pos star" style="--x: 960; --y: 5731; --w: 37" aria-hidden="true"></span>
+        <span class="pos star" style="--x: 1250; --y: 5640; --w: 37" aria-hidden="true"></span>
         <span class="pos star site-footer__twinkle" style="--x: 136; --y: 5809; --w: 39" aria-hidden="true"></span>
         <span class="pos star site-footer__twinkle" style="--x: 1328; --y: 6043; --w: 55" aria-hidden="true"></span>
 
         <!-- The horizon: Earth + the CTA that rises from it. Moves together (slow parallax). -->
         <div class="site-footer__horizon">
           <!--
-            CTA: ONE link = the star + ONE label. The link box is the END star box (star under the tag).
-            footer.js starts the star small on the Earth's top and flies it up while you scroll;
-            the label is a single <textPath> whose path morphs from the curved horizon arc to a straight line.
-            Path coordinates are Figma page px (the SVG's viewBox is the footer band in page coords).
+            CTA: ONE link = star + ONE label + a hand-drawn outline. End state (CSS default) is a
+            button under the tag: star on the left, straight label on the right, white marker
+            outline around both. footer.js starts the star big on the Earth's top with the label
+            curved along the horizon, flies the star up to the button's left, straightens the
+            label (path morph), then "draws" the outline (stroke-dashoffset). Scrubbed by scroll.
+            Link box = the button: x 376..1136, y 5735..5885 (Figma page px).
           -->
-          <a class="pos footer-cta" style="--x: 489; --y: 5537; --w: 512" href="https://github.com/ank8dev/agentcollar" aria-label="Star AgentCollar on GitHub">
+          <a class="pos footer-cta" style="--x: 376; --y: 5735; --w: 760" href="https://github.com/ank8dev/agentcollar" aria-label="Star AgentCollar on GitHub">
+            <svg class="footer-cta__outline" viewBox="0 0 760 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path
+                class="footer-cta__outline-path"
+                pathLength="1000"
+                d="M34 14 C200 4 560 6 724 13 C752 15 757 42 755 78 C753 114 749 139 720 142 C540 151 222 148 42 141 C15 139 6 113 7 77 C8 42 12 16 50 11 C112 4 168 6 214 9"
+              />
+            </svg>
             <span class="footer-cta__starbox">
               <span class="star footer-cta__star" aria-hidden="true"></span>
             </span>
             <svg class="footer-cta__label" viewBox="0 5200 1512 1542" aria-hidden="true" focusable="false">
-              <!-- end state: straight line, centred on x 745 / y ~5802. Start (set by footer.js): M442 6098.2 Q772 5967 1102 6098.2 -->
-              <path id="cta-path" class="footer-cta__path" fill="none" d="M415 5827 Q745 5827 1075 5827" />
+              <!-- end state: straight baseline y 5832 from x 566 to 1106. Start (footer.js): arc along the Earth -->
+              <path id="cta-path" class="footer-cta__path" fill="none" d="M566 5832 Q836 5832 1106 5832" />
               <text><textPath href="#cta-path" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
             </svg>
           </a>

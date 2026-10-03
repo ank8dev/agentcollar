@@ -43,7 +43,7 @@ if (header) {
 // Moves the CSS `translate` property via --py, so it never fights the star's own
 // `rotate` (Figma tilt) or the footer's twinkle (`scale`).
 if (!reducedMotion) {
-  gsap.utils.toArray('.star:not(.footer-cta__star)').forEach((star) => {
+  gsap.utils.toArray('.star:not(.footer-cta__star):not(.site-header__star-icon)').forEach((star) => {
     const depth = gsap.utils.random(60, 220); // Figma px of travel; bigger = "closer"
     gsap.fromTo(
       star,
