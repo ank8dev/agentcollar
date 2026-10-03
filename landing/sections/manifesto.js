@@ -50,15 +50,12 @@ export function init({ gsap, reducedMotion }) {
 
   const tl = gsap.timeline({
     defaults: { ease: 'power1.out' },
-    scrollTrigger: phone
-      ? // Phones: the text is held on screen (sticky); words clear over the whole hold
-        { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 0.8 }
-      : {
-          trigger: text,
-          start: 'top 85%', // first word starts clearing when the text enters the screen
-          end: 'bottom 40%', // all clear a bit above the middle of the screen
-          scrub: 0.8, // follows the scroll with a short, soft catch-up
-        },
+    scrollTrigger: {
+      trigger: text,
+      start: phone ? 'top 80%' : 'top 85%', // first word starts clearing when the text enters
+      end: phone ? 'bottom 55%' : 'bottom 40%', // all clear a bit above the middle of the screen
+      scrub: 0.8, // follows the scroll with a short, soft catch-up
+    },
   });
 
   // Words: blurred (but visible) → sharp, one after another
@@ -69,6 +66,12 @@ export function init({ gsap, reducedMotion }) {
   );
 
   // Marker stroke after the last word
+  // Phones: the stroke is a background on the last sentence; grow it after the words
+  const strong = text.querySelector('strong');
+  if (phone && strong) {
+    tl.fromTo(strong, { '--hl': 0 }, { '--hl': 1, duration: 2, ease: 'power1.inOut' });
+  }
+
   if (marker && !phone) {
     tl.fromTo(
       marker,

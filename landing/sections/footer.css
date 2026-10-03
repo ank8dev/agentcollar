@@ -234,7 +234,8 @@
     /* (doubled selector: .stage in styles.css is imported after this file and sets height) */
     --fu: min(calc(100cqw / var(--frame) * 1.75), calc(100svh / 1600));
     --stick: 0px;
-    height: calc(1542 * var(--fu) + var(--stick));
+    --below: 120px; /* extra Earth under the browser's bottom toolbar */
+    height: calc(1542 * var(--fu) + var(--below) + var(--stick));
   }
 
   .site-footer .site-footer__sticky,
@@ -246,13 +247,23 @@
   /* the content box: the whole Figma frame width at the phone scale, centred */
   .site-footer__sticky {
     width: calc(1512 * var(--fu));
-    height: calc(1542 * var(--fu));
+    height: calc(1542 * var(--fu) + var(--below));
     margin-left: calc(50% - 756 * var(--fu));
     overflow: clip; /* the Earth's lower part never shows below the content box */
   }
 
   .site-footer .site-footer__sky {
     left: calc(50% - (756 + 100) * var(--fu));
+  }
+
+  /* badges stay above the bottom toolbar */
+  .site-footer .site-footer__line {
+    bottom: calc(30 * var(--fu) + var(--below));
+  }
+
+  /* stars: pull them toward the centre so they land on the (narrow) phone screen */
+  .site-footer .star.pos {
+    left: calc((756 + (var(--x) - 756) * 0.55) * var(--u));
   }
 
   /* With motion (footer.js sets data-motion): the footer gets --stick of extra height and

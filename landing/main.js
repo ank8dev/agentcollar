@@ -39,6 +39,19 @@ if (header) {
   });
 }
 
+// Browser toolbar color (Safari/Chrome on phones): paper, and night sky once the footer
+// fills the screen, so the bars blend into the space scene instead of showing a yellow strip.
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+const band = document.querySelector('.footer-band');
+if (themeMeta && band) {
+  ScrollTrigger.create({
+    trigger: band,
+    start: 'top top',
+    end: 'max',
+    onToggle: (self) => themeMeta.setAttribute('content', self.isActive ? '#04080f' : '#f0f6e7'),
+  });
+}
+
 // Parallax: every decorative star drifts at its own speed while it passes the screen.
 // Moves the CSS `translate` property via --py, so it never fights the star's own
 // `rotate` (Figma tilt) or the footer's twinkle (`scale`).

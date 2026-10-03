@@ -66,27 +66,25 @@
   inset: 0;
 }
 
-/* ---------- Phones: big type, held on screen while the words clear up ---------- */
+/* ---------- Phones: big type; words clear up as the text scrolls by ---------- */
 @media (max-width: 767.98px) {
   .manifesto.stage {
-    height: 240svh; /* the extra scroll is the reading time */
+    height: auto;
+    padding: 16vw 0;
   }
 
   .manifesto__pin {
-    position: sticky;
+    position: relative;
     inset: auto;
-    top: 0;
-    height: 100svh;
-    display: grid;
-    place-items: center;
+    padding: 14vw 0;
   }
 
-  /* the blob stretches behind the text block */
+  /* the blob stretches behind the whole text block */
   .manifesto .manifesto__blob {
     left: -14vw;
-    top: 14svh;
+    top: 0;
     width: 128vw;
-    height: 72svh;
+    height: 100%;
     aspect-ratio: auto;
   }
 
@@ -108,22 +106,16 @@
     margin-bottom: 0.25em;
   }
 
-  /* the Figma stroke follows the last line instead of its desktop position */
+  /* the Figma stroke runs under EACH line of the last sentence (box-decoration-break: clone),
+     and manifesto.js grows it left → right after the words have appeared (--hl 0 → 1) */
   .manifesto .manifesto__marker {
     display: none;
   }
   .manifesto__text strong {
-    position: relative;
-    isolation: isolate; /* the stroke (::before, z -1) stays behind the text but above the blob */
-    display: inline-block;
-    padding: 0.05em 0.25em 0.1em;
-  }
-  .manifesto__text strong::before {
-    content: '';
-    position: absolute;
-    inset: 0.3em -0.15em 0;
-    z-index: -1;
-    background: #a96851;
-    mask: url('../brand/pictures/agentcollar-marker-manifesto.png') center / 100% 100% no-repeat;
+    padding: 0 0.15em;
+    background: url('../brand/pictures/agentcollar-marker-manifesto-color.png') left 70% /
+      calc(var(--hl, 1) * 100%) 72% no-repeat;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 }

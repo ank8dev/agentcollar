@@ -159,7 +159,7 @@
   }
 
   .trust[data-mobile-cards='fan'][data-motion] .trust__sticky {
-    --head: 178px; /* heading at a real phone size (≈ 6 lines) */
+    --head: 214px; /* heading at a real phone size (≈ 6 lines of 25 px) */
     --gap: 16px;
     --cards-h: calc(655 * 100cqw / var(--frame) * var(--phone-scale));
     top: max(52px, calc(50vh - (var(--head) + var(--gap) + var(--cards-h)) / 2));
@@ -167,9 +167,9 @@
   }
 
   .trust[data-mobile-cards='fan'][data-motion] .trust__heading {
-    font-size: 21px;
-    line-height: 28px;
-    padding-inline: 18px;
+    font-size: 25px;
+    line-height: 33px;
+    padding-inline: 16px;
   }
 }
 

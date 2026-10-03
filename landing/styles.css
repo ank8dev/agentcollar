@@ -41,6 +41,15 @@
   box-sizing: border-box;
 }
 
+/* No sideways panning on phones; no rubber-band "white" when pulling past the ends.
+   Behind the page: paper above (hero), night sky below (footer) — the browser's bottom
+   toolbar and any overscroll show the right color. */
+html {
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  background: linear-gradient(to bottom, var(--paper) 50%, var(--ink) 50%);
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -253,6 +262,28 @@ h3,
 /* Phones: the hero fills the screen and its content is scaled up ×1.9 and centred
    below the header (the desktop layout scaled to a phone would be tiny). */
 @media (max-width: 767.98px) {
+  /* a slightly bigger header on phones */
+  .site-header {
+    --header-h: 60px;
+    padding: 0 16px;
+  }
+  .site-header__mark img {
+    width: 34px;
+  }
+  .site-header__star {
+    font-size: 17px;
+  }
+  .site-header__wordmark {
+    font-size: 19px;
+  }
+
+  /* hero stars: pulled toward the centre (the scaled hero would push them off-screen),
+     and a bit smaller so they don't crowd the drawing */
+  .hero .star.pos {
+    left: calc((756 + (var(--x) - 756) * 0.6) * var(--u));
+    width: calc(var(--w) * 0.7 * var(--u));
+  }
+
   .hero.stage {
     --hero-k: 1.9;
     --hero-content: calc(1048 * var(--u) * var(--hero-k)); /* collar top → drawing bottom */
@@ -264,7 +295,7 @@ h3,
     height: calc(1060 * var(--u));
     transform-origin: 50% 0;
     transform: translateY(
-        calc(48px + (max(100svh, 560px) - 48px - var(--hero-content)) / 2 - 98 * var(--u) * var(--hero-k))
+        calc(60px + (max(100svh, 560px) - 60px - var(--hero-content)) / 2 - 98 * var(--u) * var(--hero-k))
       )
       scale(var(--hero-k));
   }
