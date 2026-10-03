@@ -2,3 +2,4 @@ node_modules/
 dist/
 design-reference/
 .DS_Store
+.claude/
