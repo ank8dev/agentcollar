@@ -1,0 +1,10 @@
+# Installed packages: recreated by `npm install`, never committed
+node_modules/
+
+# Local runtime data (audit log, later: mandates, tokens)
+data/
+
+# Secrets (Phase 4: Google OAuth client, encryption keys)
+.env
+.env.*
+*.pem

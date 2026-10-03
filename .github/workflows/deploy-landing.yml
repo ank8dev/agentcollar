@@ -5,6 +5,8 @@ name: Deploy landing
 on:
   push:
     branches: [main]
+    # Only redeploy when the landing itself changes (not on broker commits)
+    paths: ['landing/**', '.github/workflows/deploy-landing.yml']
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    // Modern JavaScript that Node 22 understands natively
+    "target": "ES2022",
+    // Use Node's own rules for `import` (ES modules)
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    // Strictest type checking: catches mistakes before the code runs
+    "strict": true,
+    // tsx runs the code; tsc only checks types and writes no files
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

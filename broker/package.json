@@ -1,0 +1,16 @@
+{
+  "name": "agentcollar-broker",
+  "version": "0.1.0",
+  "description": "AgentCollar broker: checks an agent's mandate before every action",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hello": "tsx src/hello.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
