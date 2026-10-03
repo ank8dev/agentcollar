@@ -22,7 +22,7 @@ const START_Y_PCT = ((START_STAR.y - END_STAR.y) / END_STAR.h) * 100;
 // Label paths (page px; the label SVG's viewBox is in page coordinates).
 // Start: arc concentric with the Earth (centre 772/6928, baseline radius 893).
 // End: straight baseline y 5832 to the right of the star, centred on x 836.
-const PATH_START = 'M442 6098.2 Q772 5967 1102 6098.2';
+const PATH_START = 'M442 6056 Q772 5925 1102 6056'; // lifted ~42 px so the curved label sits ON the horizon
 const PATH_END = 'M566 5832 Q836 5832 1106 5832';
 const FONT_START = 56;
 const FONT_END = 64;

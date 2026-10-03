@@ -29,13 +29,16 @@ for (const section of [hero, steps, manifesto, trust, footer]) {
   section.init({ gsap, ScrollTrigger, reducedMotion });
 }
 
-// Header: slide away while scrolling down, come back when scrolling up.
+// Header: night version while the footer is under it (Safari also tints its top bar from it).
 const header = document.querySelector('.site-header');
-if (header) {
+const footerBand = document.querySelector('.footer-band');
+if (header && footerBand) {
   ScrollTrigger.create({
-    start: 0,
-    end: 'max',
-    onUpdate: (self) => header.classList.toggle('is-hidden', self.direction === 1 && self.scroll() > 200),
+    trigger: footerBand,
+    start: () => `top ${header.offsetHeight}px`,
+    // dark from the moment the footer reaches the header until you scroll back above it
+    onEnter: () => header.classList.add('site-header--night'),
+    onLeaveBack: () => header.classList.remove('site-header--night'),
   });
 }
 
@@ -47,8 +50,8 @@ if (themeMeta && band) {
   ScrollTrigger.create({
     trigger: band,
     start: 'top top',
-    end: 'max',
-    onToggle: (self) => themeMeta.setAttribute('content', self.isActive ? '#04080f' : '#f0f6e7'),
+    onEnter: () => themeMeta.setAttribute('content', '#04080f'),
+    onLeaveBack: () => themeMeta.setAttribute('content', '#f0f6e7'),
   });
 }
 

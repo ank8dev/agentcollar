@@ -14,12 +14,6 @@
   fill: var(--sky);
 }
 
-.site-footer__sky path {
-  /* the wobble would pull the bottom/side edges in; only the top edge is ever visible */
-  stroke: var(--sky);
-  stroke-width: 24;
-}
-
 /* Everything but the sky. Desktop: a plain full-size box (children keep the footer's
    coordinates). Phones: see the bottom of this file. */
 .site-footer__sticky {
