@@ -233,29 +233,41 @@
         <!-- The horizon: Earth + the CTA that rises from it. Moves together (slow parallax). -->
         <div class="site-footer__horizon">
           <!--
-            CTA. The link box is the END state (star under the tag, label on a rose pill).
-            footer.js starts it small on the Earth's top and flies it up while you scroll.
+            CTA: ONE link = the star + ONE label. The link box is the END star box (star under the tag).
+            footer.js starts the star small on the Earth's top and flies it up while you scroll;
+            the label is a single <textPath> whose path morphs from the curved horizon arc to a straight line.
+            Path coordinates are Figma page px (the SVG's viewBox is the footer band in page coords).
           -->
-          <a class="pos footer-cta" style="--x: 405; --y: 5537; --w: 680" href="https://github.com/ank8dev/agentcollar">
-            <span class="star footer-cta__star" aria-hidden="true"></span>
-            <svg class="footer-cta__pill" viewBox="0 0 680 120" aria-hidden="true" focusable="false">
-              <path filter="url(#crayon)" d="M58 14 C200 6 480 8 624 16 C664 20 672 44 670 62 C668 84 656 104 616 106 C470 114 210 112 62 104 C24 102 10 84 10 60 C10 36 22 16 58 14 Z" />
+          <a class="pos footer-cta" style="--x: 489; --y: 5537; --w: 512" href="https://github.com/ank8dev/agentcollar" aria-label="Star AgentCollar on GitHub">
+            <span class="footer-cta__starbox">
+              <span class="star footer-cta__star" aria-hidden="true"></span>
+            </span>
+            <svg class="footer-cta__label" viewBox="0 5200 1512 1542" aria-hidden="true" focusable="false">
+              <!-- end state: straight line, centred on x 745 / y ~5802. Start (set by footer.js): M442 6098.2 Q772 5967 1102 6098.2 -->
+              <path id="cta-path" class="footer-cta__path" fill="none" d="M415 5827 Q745 5827 1075 5827" />
+              <text><textPath href="#cta-path" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
             </svg>
-            <span class="footer-cta__label">Star on GitHub</span>
           </a>
 
           <!-- Earth: its disc is the circle centre (772, 6928), radius 882 (glow around it is in the PNG) -->
           <img class="pos site-footer__earth" style="--x: -156.5; --y: 6003.7; --w: 1886.7" src="./brand/pictures/agentcollar-earth.png" alt="" />
-
-          <!-- Start-state label, curved along the horizon (arc concentric with the Earth). Decorative copy of the link text. -->
-          <svg class="pos footer-cta__curved" style="--x: 0; --y: 5200; --w: 1512" viewBox="0 0 1512 1542" aria-hidden="true" focusable="false">
-            <path id="footer-cta-arc" fill="none" d="M325.5 954.6 A893 893 0 0 1 1218.5 954.6" />
-            <text><textPath href="#footer-cta-arc" startOffset="50%" text-anchor="middle">Star on GitHub</textPath></text>
-          </svg>
         </div>
 
+        <!-- Footer line: a small hand-drawn cloud drifting over the Earth -->
         <p class="site-footer__line">
-          © 2026 AgentCollar · <a href="https://github.com/ank8dev/agentcollar">GitHub</a>
+          <svg class="site-footer__cloud" viewBox="0 0 450 110" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path
+              filter="url(#crayon)"
+              d="M40 94 C12 94 4 68 26 57 C20 34 50 22 70 34 C80 12 120 8 136 28 C152 6 196 6 210 26 C226 6 270 8 284 30 C302 12 342 16 346 38 C368 26 404 36 400 58 C432 60 446 88 414 96 C330 104 120 104 40 94 Z"
+            />
+          </svg>
+          <span class="site-footer__line-text">
+            © 2026 AgentCollar ·
+            <a href="https://github.com/ank8dev/agentcollar"
+              ><svg class="site-footer__gh" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg
+              >GitHub</a
+            >
+          </span>
         </p>
       </footer>
     </div>
