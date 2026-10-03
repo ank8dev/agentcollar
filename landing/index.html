@@ -23,12 +23,21 @@
     <script>
       // Hide the hero marker/headline until the intro animation draws them (no flash).
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.classList.add('intro');
-        setTimeout(() => document.documentElement.classList.remove('intro'), 4000); // safety net
+        document.documentElement.classList.add('intro', 'preloading');
+        setTimeout(() => document.documentElement.classList.remove('intro', 'preloading'), 12000); // safety net
       }
     </script>
   </head>
   <body>
+    <!-- Preloader: shown on every visit until the page (fonts + images) has loaded.
+         The AC medallion spins, "AgentCollar" types itself, un-types, and the medallion
+         flies into the header's icon. Run by preloader.js. -->
+    <div class="preloader" aria-hidden="true">
+      <div class="preloader__row">
+        <img class="preloader__medallion" src="./brand/logo/agentcollar-mark-black.svg" alt="" width="120" height="120" />
+        <span class="preloader__word">AgentCollar</span>
+      </div>
+    </div>
     <!-- Shared SVG filter: makes clean vector strokes look like crayon/marker -->
     <svg class="svg-defs" aria-hidden="true" focusable="false">
       <filter id="crayon" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">

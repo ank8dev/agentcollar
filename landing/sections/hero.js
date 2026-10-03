@@ -26,7 +26,7 @@ function splitChars(el) {
   return chars;
 }
 
-export function init({ gsap, reducedMotion }) {
+export function init({ gsap, reducedMotion, ready = Promise.resolve() }) {
   const root = document.documentElement;
   const stroke = document.querySelector('.hero__stroke');
   const title = document.querySelector('.hero__title');
@@ -46,7 +46,8 @@ export function init({ gsap, reducedMotion }) {
   gsap.set(title, { opacity: 1 });
   root.classList.remove('intro');
 
-  const tl = gsap.timeline({ delay: 0.4 });
+  const tl = gsap.timeline({ delay: 0.15, paused: true });
+  ready.then(() => tl.play()); // starts right after the preloader
   if (import.meta.env.DEV) window.__heroIntro = tl; // dev only: inspect the intro frame by frame
 
   // 1. The marker scribbles back and forth (steady hand: gentle in/out)

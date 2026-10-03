@@ -9,6 +9,7 @@ import * as manifesto from './sections/manifesto.js';
 import * as trust from './sections/trust.js';
 import * as footer from './sections/footer.js';
 import { initTweaks } from './tweaks.js';
+import { runPreloader } from './preloader.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,8 +26,13 @@ if (!reducedMotion) {
   gsap.ticker.lagSmoothing(0);
 }
 
+// Preloader first; the hero intro waits for it (ready), the other sections start now.
+const ready = reducedMotion ? Promise.resolve() : runPreloader({ gsap });
+if (reducedMotion) document.documentElement.classList.remove('preloading');
+ready.then(() => ScrollTrigger.refresh());
+
 for (const section of [hero, steps, manifesto, trust, footer]) {
-  section.init({ gsap, ScrollTrigger, reducedMotion });
+  section.init({ gsap, ScrollTrigger, reducedMotion, ready });
 }
 
 // Header: night version while the footer is under it (Safari also tints its top bar from it).

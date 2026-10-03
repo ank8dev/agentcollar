@@ -409,3 +409,46 @@ h3,
     animation: none;
   }
 }
+
+/* ============================================================
+   Preloader (preloader.js)
+   ============================================================ */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* no preloader without JS / with reduced motion (the head script adds .preloading) */
+html:not(.preloading) .preloader {
+  display: none;
+}
+
+/* no scrolling while it is on screen */
+html.preloading,
+html.preloading body {
+  overflow: hidden;
+}
+
+.preloader__row {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+}
+
+.preloader__medallion {
+  width: clamp(84px, 10vw, 128px);
+  height: auto;
+  animation: medallion-spin 1.4s linear infinite; /* keyframes defined above */
+}
+
+.preloader__word {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(30px, 5vw, 64px);
+  white-space: pre;
+}
