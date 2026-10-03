@@ -16,6 +16,13 @@
     />
 
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      // Hide the hero marker/headline until the intro animation draws them (no flash).
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('intro');
+        setTimeout(() => document.documentElement.classList.remove('intro'), 4000); // safety net
+      }
+    </script>
   </head>
   <body>
     <!-- Shared SVG filter: makes clean vector strokes look like crayon/marker -->
@@ -45,8 +52,22 @@
         <section class="hero stage" style="--top: 0; --h: 1060" aria-labelledby="hero-title">
           <img class="pos" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
 
-          <!-- Sand marker: the exact shape from Figma, used as a stencil and filled with --sand -->
-          <span class="pos marker marker--hero" style="--x: 365; --y: 268; --w: 822" aria-hidden="true"></span>
+          <!-- Sand marker: ONE hand-drawn marker line (no image). hero.js draws it from start to
+               end (stroke-dashoffset), so the animation IS the drawing. The #crayon filter
+               roughens its edges like a real marker. -->
+          <svg class="pos hero__marker" style="--x: 365; --y: 268; --w: 822" viewBox="0 0 974 415" aria-hidden="true" focusable="false">
+            <path
+              class="hero__stroke"
+              pathLength="1000"
+              d="M58 250 C60 254 58 299 70 274 C82 250 109 115 124 115 C138 116 135 277 149 276 C163 275 186 112 200 110 C213 108 206 265 223 265 C240 264 281 106 293 107 C305 108 275 267 289 270 C303 274 352 121 368 126 C385 131 366 300 378 299 C390 299 422 129 434 123 C446 117 430 267 443 266 C456 266 488 118 504 121 C520 125 513 288 528 286 C543 285 575 115 588 112 C601 109 584 271 600 270 C616 269 657 106 675 107 C692 109 678 277 695 279 C713 282 755 120 769 121 C782 121 756 283 771 284 C786 284 833 141 851 124 C869 106 865 178 868 190"
+              fill="none"
+              stroke="#f2d7a6"
+              stroke-width="62"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              filter="url(#crayon)"
+            />
+          </svg>
 
           <h1 class="hero__title" id="hero-title">Let agents work.<br />Keep the keys.</h1>
 
@@ -177,7 +198,8 @@
           or "carousel" (swipe row with scroll-snap). Dev shortcut: add ?cards=carousel to the URL.
         -->
         <section class="trust stage" style="--top: 4000; --h: 1200" aria-labelledby="trust-title" data-mobile-cards="fan">
-          <!-- Sticks to the screen while the cards spread (native sticky = no scroll jitter) -->
+
+          <!-- Heading + cards stick to the screen together while the cards spread (native sticky = no jitter) -->
           <div class="trust__sticky">
             <div class="trust__heading">
               <h2 id="trust-title">Your agent never sees your password.</h2>

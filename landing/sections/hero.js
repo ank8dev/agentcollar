@@ -1,9 +1,10 @@
 // Section: hero
 // Intro on page load:
-//  1. the sand marker paints itself left → right, like a real marker filling in a stripe
-//     (a soft-edged gradient added to the stroke's mask sweeps across it);
+//  1. the sand marker is DRAWN like a real marker: one thick hand-drawn line
+//     (.hero__stroke) grows from start to end (stroke-dashoffset 1000 → 0, pathLength=1000);
 //  2. then the headline types itself letter by letter, like a typewriter.
-// Reduced motion: nothing happens, the HTML/CSS show the final state.
+// The starting state is set by CSS (html.intro, added in <head>) so nothing flashes.
+// Reduced motion: no html.intro → everything is simply shown.
 
 // Wrap every character of `el` in a span (keeping <br>s). Returns the spans.
 function splitChars(el) {
@@ -26,29 +27,31 @@ function splitChars(el) {
 }
 
 export function init({ gsap, reducedMotion }) {
-  if (reducedMotion) return;
-
-  const marker = document.querySelector('.marker--hero');
+  const root = document.documentElement;
+  const stroke = document.querySelector('.hero__stroke');
   const title = document.querySelector('.hero__title');
-  if (!marker || !title) return;
+  if (reducedMotion || !stroke || !title) {
+    root.classList.remove('intro');
+    return;
+  }
 
   // Screen readers get the whole sentence once, not letter by letter.
   title.setAttribute('aria-label', title.textContent.replace(/\s+/g, ' ').trim());
   const chars = splitChars(title);
   chars.forEach((c) => c.setAttribute('aria-hidden', 'true'));
 
-  marker.classList.add('is-painting');
-  gsap.set(marker, { '--paint': '0%' });
+  // Take over the starting state from CSS, then drop the class.
+  gsap.set(stroke, { strokeDasharray: 1000, strokeDashoffset: 1000 }); // pathLength=1000 (big enough that GSAP's px rounding is invisible)
   gsap.set(chars, { opacity: 0 });
+  gsap.set(title, { opacity: 1 });
+  root.classList.remove('intro');
 
-  const tl = gsap.timeline({ delay: 0.35 });
+  const tl = gsap.timeline({ delay: 0.4 });
+  if (import.meta.env.DEV) window.__heroIntro = tl; // dev only: inspect the intro frame by frame
 
-  // 1. Marker paints across (slight ease, like a hand speeding up then slowing)
-  tl.to(marker, { '--paint': '115%', duration: 1.1, ease: 'power1.inOut' });
+  // 1. The marker scribbles back and forth (steady hand: gentle in/out)
+  tl.to(stroke, { strokeDashoffset: 0, duration: 1.8, ease: 'sine.inOut' });
 
   // 2. Typewriter: each letter appears instantly, one after another
-  tl.to(chars, { opacity: 1, duration: 0.01, stagger: 0.05, ease: 'none' }, '-=0.15');
-
-  // Back to the plain mask when done (no gradient left behind)
-  tl.add(() => marker.classList.remove('is-painting'));
+  tl.to(chars, { opacity: 1, duration: 0.01, stagger: 0.05, ease: 'none' }, '-=0.1');
 }

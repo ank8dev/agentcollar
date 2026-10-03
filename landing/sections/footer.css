@@ -36,8 +36,23 @@
   /* rotate around the disc centre, not the PNG's centre (PNG has an uneven glow) */
   transform-origin: 49.2% 47.5%;
   max-width: none; /* wider than the page on purpose (base img rule caps at 100%) */
+  /* very, very slow spin (one turn in 6 minutes). Uses the CSS `rotate` property,
+     separate from the GSAP parallax transform. */
+  animation: earth-spin 360s linear infinite;
   pointer-events: none;
   user-select: none;
+}
+
+@keyframes earth-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__earth {
+    animation: none;
+  }
 }
 
 /* ---------- The CTA: ONE link = star + one morphing label ---------- */

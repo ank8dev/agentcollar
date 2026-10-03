@@ -133,21 +133,6 @@ h3,
   pointer-events: none;
 }
 
-.marker--hero.is-painting {
-  /* hero.js sweeps --paint 0% → 115%: the stroke's own shape AND a soft-edged
-     gradient, so the sand appears as if a marker paints it left → right */
-  mask-image: var(--shape), linear-gradient(100deg, #000 calc(var(--paint) - 12%), transparent var(--paint));
-  mask-size: contain, 100% 100%;
-  mask-position: center, center;
-  mask-repeat: no-repeat, no-repeat;
-  mask-composite: intersect;
-}
-
-.marker--hero {
-  --shape: url('./brand/pictures/agentcollar-marker-hero.png');
-  aspect-ratio: 974 / 415;
-}
-
 .star {
   aspect-ratio: 688 / 663;
   background: var(--star-color, var(--star));
@@ -159,10 +144,10 @@ h3,
 /* ============================================================
    7. Header
    ============================================================ */
-/* Floating header: sticks to the top while you scroll. The negative margin lets it
-   overlap the hero (as in Figma) instead of pushing the page down. */
+/* Floating header: compact, sticks to the top, solid paper. Slides away while you scroll down, comes back when you scroll up (main.js).
+   The negative margin lets it overlap the hero instead of pushing the page down. */
 .site-header {
-  --header-h: max(calc(117 * var(--u)), 52px);
+  --header-h: max(calc(76 * var(--u)), 48px);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -171,25 +156,49 @@ h3,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 calc(50 * var(--u)) 0 calc(33 * var(--u));
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 0 calc(44 * var(--u)) 0 calc(33 * var(--u));
+  background: var(--paper);
+  transition: translate 0.35s ease-out;
+}
+
+.site-header.is-hidden {
+  translate: 0 -110%;
 }
 
 .site-header__mark img {
-  width: max(calc(57 * var(--u)), 20px);
+  width: max(calc(42 * var(--u)), 26px);
   height: auto;
 }
 
 .site-header__wordmark {
   font-style: italic;
-  font-size: max(calc(48 * var(--u)), 12px);
+  font-size: max(calc(34 * var(--u)), 15px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
 }
 
 /* ============================================================
    8. Hero
    ============================================================ */
+.hero__marker {
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Before the intro runs (html.intro is set in <head>): marker line not drawn yet,
+   headline hidden. hero.js animates them in and removes the class. */
+.intro .hero__stroke {
+  stroke-dasharray: 1000; /* = pathLength: the line is fully "undrawn" */
+  stroke-dashoffset: 1000;
+}
+.intro .hero__title {
+  opacity: 0;
+}
+
 .hero__title {
   position: absolute;
   top: calc(335 * var(--u));

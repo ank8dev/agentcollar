@@ -29,6 +29,16 @@ for (const section of [hero, steps, manifesto, trust, footer]) {
   section.init({ gsap, ScrollTrigger, reducedMotion });
 }
 
+// Header: slide away while scrolling down, come back when scrolling up.
+const header = document.querySelector('.site-header');
+if (header) {
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (self) => header.classList.toggle('is-hidden', self.direction === 1 && self.scroll() > 200),
+  });
+}
+
 // Parallax: every decorative star drifts at its own speed while it passes the screen.
 // Moves the CSS `translate` property via --py, so it never fights the star's own
 // `rotate` (Figma tilt) or the footer's twinkle (`scale`).

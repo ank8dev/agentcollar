@@ -41,16 +41,15 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     gsap.set(list, { '--shift': 0 });
     gsap.set(cards, { '--dx': 0, '--tilt': 0 });
 
-    // Same value as the CSS `top` of .trust__sticky, in px.
-    const stickyTop = () =>
-      Math.min(0, window.innerHeight - section.querySelector('.trust__sticky').offsetHeight);
+    // The cards' sticky box and its CSS `top` (px) — the spread starts when it sticks.
+    const sticky = section.querySelector('.trust__sticky');
+    const stickyTop = () => parseFloat(getComputedStyle(sticky).top) || 0;
 
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: section,
-        // The sticky phase starts when the section top reaches the sticky offset
-        // (0, or negative when the content is taller than the screen)…
+        trigger: sticky,
+        // The spread starts when the cards' box reaches its sticky position…
         start: () => `top ${stickyTop()}px`,
         // …and lasts exactly the extra height added in CSS (--spread-distance: 200vh).
         end: () => `+=${window.innerHeight * 2}`,

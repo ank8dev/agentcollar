@@ -110,13 +110,27 @@
   height: calc(var(--h) * var(--u) + var(--spread-distance));
 }
 
-/* The browser keeps the content on screen while the section scrolls by (position: sticky).
-   If the content is taller than the screen, stick it with its bottom on the screen bottom
-   (negative top) so all four cards stay fully visible. */
+/* Heading + cards stick together (position: sticky): the browser keeps them centred on
+   screen while the section scrolls by. To fit one screen, the heading becomes a compact
+   3-line block (smaller type) right above the cards. */
 .trust[data-motion] .trust__sticky {
+  --head: calc(3 * 50 * var(--u)); /* 3 lines × line-height */
+  --gap: calc(40 * var(--u));
   position: sticky;
-  top: min(0px, calc(100vh - var(--h) * var(--u)));
-  height: calc(var(--h) * var(--u));
+  top: max(64px, calc(50vh - (var(--head) + var(--gap) + 655 * var(--u)) / 2));
+  margin-top: calc((4473 - var(--top)) * var(--u) - var(--head) - var(--gap));
+  height: calc(var(--head) + var(--gap) + 655 * var(--u));
+}
+
+.trust[data-motion] .trust__heading {
+  top: 0;
+  font-size: calc(36 * var(--u));
+  line-height: calc(50 * var(--u));
+}
+
+.trust[data-motion] .trust__heading h2,
+.trust[data-motion] .trust__heading p {
+  max-width: 52ch; /* h2 = 1 line, sentence = 2 lines */
 }
 
 .trust[data-motion] .trust-cards {
@@ -127,7 +141,7 @@
 
 .trust[data-motion] .trust-card {
   position: absolute;
-  top: calc((4473 - var(--top)) * var(--u));
+  top: calc(var(--head) + var(--gap)); /* below the compact heading */
   left: calc(var(--x) * var(--u)); /* deck position */
   translate: calc(var(--dx, 0) * var(--u)) 0; /* phase 1: distance to the row position */
   rotate: calc(var(--tilt, 0) * 1deg);
