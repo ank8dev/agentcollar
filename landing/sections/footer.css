@@ -177,10 +177,24 @@
   fill: currentColor;
 }
 
+.site-footer__line a {
+  white-space: nowrap;
+  transition: opacity 0.2s ease-out;
+}
+
 .site-footer__line a:hover {
-  opacity: 1;
-  text-decoration: underline wavy;
-  text-underline-offset: 0.25em;
+  opacity: 0.6; /* no underline: links just dim a little on hover */
+}
+
+/* owner's pixel-art avatar (32×32): keep the pixels crisp */
+.site-footer__avatar {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: 0.35em;
+  vertical-align: -0.38em;
+  border-radius: 3px;
+  image-rendering: pixelated;
 }
 
 .site-footer__line a:focus-visible {

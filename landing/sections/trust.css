@@ -86,21 +86,16 @@
 
 /* Placeholder until the hand-drawn icons arrive: swap in an <img> per data-icon. */
 .trust-card__icon {
+  /* hand-drawn icon (474×474 PNG, transparent) in the lower part of the card */
   position: absolute;
-  top: calc(280 * var(--cu));
+  top: calc(250 * var(--cu));
   left: 50%;
-  width: calc(300 * var(--cu));
+  width: calc(340 * var(--cu));
+  height: auto;
   aspect-ratio: 1;
   translate: -50% 0;
-  border: max(calc(4 * var(--cu)), 1px) dashed var(--ink);
-  border-radius: calc(24 * var(--cu));
-  display: grid;
-  place-items: center;
-  font-size: calc(24 * var(--cu));
-}
-
-.trust-card__icon::after {
-  content: attr(data-icon);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---------- 2. Animated: deck → row (trust.js sets data-motion) ---------- */

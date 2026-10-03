@@ -32,6 +32,11 @@
         <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="warp" />
         <feDisplacementMap in="SourceGraphic" in2="warp" scale="12" xChannelSelector="R" yChannelSelector="G" />
       </filter>
+      <!-- Rough, slightly wobbly marker edges for big strokes (hero highlight) -->
+      <filter id="marker-edge" x="-10%" y="-20%" width="120%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="4" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
     </svg>
 
     <!--
@@ -52,20 +57,20 @@
         <section class="hero stage" style="--top: 0; --h: 1060" aria-labelledby="hero-title">
           <img class="pos" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
 
-          <!-- Sand marker: ONE hand-drawn marker line (no image). hero.js draws it from start to
-               end (stroke-dashoffset), so the animation IS the drawing. The #crayon filter
-               roughens its edges like a real marker. -->
+          <!-- Sand marker: ONE hand-drawn highlighter stroke (no image) — along line 1, a loop,
+               back along line 2. hero.js draws it from start to end (stroke-dashoffset), so the
+               animation IS the drawing. #marker-edge roughens its edges like a real marker. -->
           <svg class="pos hero__marker" style="--x: 365; --y: 268; --w: 822" viewBox="0 0 974 415" aria-hidden="true" focusable="false">
             <path
               class="hero__stroke"
               pathLength="1000"
-              d="M58 250 C60 254 58 299 70 274 C82 250 109 115 124 115 C138 116 135 277 149 276 C163 275 186 112 200 110 C213 108 206 265 223 265 C240 264 281 106 293 107 C305 108 275 267 289 270 C303 274 352 121 368 126 C385 131 366 300 378 299 C390 299 422 129 434 123 C446 117 430 267 443 266 C456 266 488 118 504 121 C520 125 513 288 528 286 C543 285 575 115 588 112 C601 109 584 271 600 270 C616 269 657 106 675 107 C692 109 678 277 695 279 C713 282 755 120 769 121 C782 121 756 283 771 284 C786 284 833 141 851 124 C869 106 865 178 868 190"
+              d="M43 154 C64 152 130 150 167 146 C205 143 231 135 267 132 C304 128 342 129 386 128 C430 126 487 124 529 123 C572 121 604 121 641 120 C678 120 707 111 752 121 C797 130 891 159 910 177 C930 194 898 211 870 224 C843 237 784 249 746 255 C708 260 681 256 642 257 C604 257 555 258 513 259 C471 260 435 262 388 263 C341 264 279 267 230 267 C182 268 118 266 96 266"
               fill="none"
               stroke="#f2d7a6"
-              stroke-width="62"
+              stroke-width="104"
               stroke-linecap="round"
               stroke-linejoin="round"
-              filter="url(#crayon)"
+              filter="url(#marker-edge)"
             />
           </svg>
 
@@ -211,22 +216,22 @@
               <li class="trust-card trust-card--sage" style="--x: 86">
                 <h3>Short-lived.</h3>
                 <p>Tokens expire in minutes.</p>
-                <div class="trust-card__icon" data-icon="hourglass" aria-hidden="true"></div>
+                <img class="trust-card__icon" src="./brand/pictures/agentcollar-card-1-short-lived-hourglass.png" alt="" width="474" height="474" loading="lazy" />
               </li>
               <li class="trust-card trust-card--rose" style="--x: 246">
                 <h3>One task only.</h3>
                 <p>Drafts can't become sends.</p>
-                <div class="trust-card__icon" data-icon="target" aria-hidden="true"></div>
+                <img class="trust-card__icon" src="./brand/pictures/agentcollar-card-2-one-task-target.png" alt="" width="474" height="474" loading="lazy" />
               </li>
               <li class="trust-card trust-card--mist" style="--x: 428">
                 <h3>Revoke anytime.</h3>
                 <p>One tap stops everything.</p>
-                <div class="trust-card__icon" data-icon="open-hand" aria-hidden="true"></div>
+                <img class="trust-card__icon" src="./brand/pictures/agentcollar-card-3-revoke-hand.png" alt="" width="474" height="474" loading="lazy" />
               </li>
               <li class="trust-card trust-card--sand" style="--x: 615">
                 <h3>Fully logged.</h3>
                 <p>Risky actions wait for your "yes".</p>
-                <div class="trust-card__icon" data-icon="scroll" aria-hidden="true"></div>
+                <img class="trust-card__icon" src="./brand/pictures/agentcollar-card-4-logged-scroll.png" alt="" width="474" height="474" loading="lazy" />
               </li>
             </ul>
           </div>
@@ -287,9 +292,11 @@
           </svg>
           <span class="site-footer__line-text">
             © 2026 AgentCollar ·
-            <a href="https://github.com/ank8dev/agentcollar"
-              ><svg class="site-footer__gh" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg
-              >GitHub</a
+            <a href="https://github.com/ank8dev/agentcollar"><svg class="site-footer__gh" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg >GitHub</a> ·
+            <a href="https://x.com/ank8dev"><svg class="site-footer__gh" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>X</a> ·
+            made by
+            <a class="site-footer__me" href="https://github.com/ank8dev"
+              ><img class="site-footer__avatar" src="./images/ank-avatar.png" alt="" width="32" height="32" />ank8dev</a
             >
           </span>
         </p>
