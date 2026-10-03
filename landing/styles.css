@@ -1,0 +1,218 @@
+/* Each section has its own file, so sections can be built in parallel. */
+@import './sections/steps.css';
+@import './sections/manifesto.css';
+@import './sections/trust.css';
+@import './sections/footer.css';
+
+/* ============================================================
+   1. Brand colors (never change between themes)
+   ============================================================ */
+:root {
+  --ink: #04080f;
+  --paper: #f0f6e7;
+  --sage: #90aa8b;
+  --raspberry: #bd4f6c;
+  --rose: #dfbbb1;
+  --mist: #a9bcc8;
+  --mist-light: #c9d6d9;
+  --sand: #f2d7a6;
+  --star: #d1a392; /* the star drawing's own color (screenshots) */
+  --night-edge: #0e1520;
+
+  /* ----------------------------------------------------------
+     2. Theme roles: what each color is *used for*.
+     Components only use these, so a theme = new values here.
+     ---------------------------------------------------------- */
+  --bg: var(--paper);
+  --text: var(--ink);
+
+  --font: 'Intel One Mono', ui-monospace, monospace;
+  --frame: 1512; /* Figma frame width in px */
+
+  color-scheme: light;
+}
+
+/* Dark theme, when the system asks for it and the user didn't pick light */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--ink);
+    --text: var(--paper);
+    color-scheme: dark;
+  }
+}
+
+/* Dark theme, when the user picked it with the toggle */
+:root[data-theme='dark'] {
+  --bg: var(--ink);
+  --text: var(--paper);
+  color-scheme: dark;
+}
+
+/* ============================================================
+   3. Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ============================================================
+   4. The design unit
+   --u = one Figma pixel. On a 1512px screen --u is 1px,
+   on a 375px phone it is ~0.25px, so everything scales together.
+   (cqw = 1% of the .page width; .page is never wider than 1512px.)
+   ============================================================ */
+.page {
+  position: relative;
+  max-width: calc(var(--frame) * 1px);
+  margin-inline: auto;
+  container-type: inline-size;
+  overflow-x: clip; /* blobs may stick out of the frame, as in Figma */
+}
+
+.page * {
+  --u: calc(100cqw / var(--frame));
+}
+
+/* A section whose children are placed with Figma coordinates.
+   --top / --h = where the section starts on the Figma page and how tall it is.
+   Children use PAGE coordinates (--y as in Figma); --top is subtracted here.
+   Children may stick out of their section (blobs overlap neighbours, as in Figma). */
+.stage {
+  position: relative;
+  height: calc(var(--h) * var(--u));
+}
+
+.pos {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc((var(--y) - var(--top, 0)) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: auto;
+  rotate: var(--r, 0deg);
+}
+
+/* ============================================================
+   5. Light/dark versions of the drawings
+   Black-ink drawings for the light theme, white-ink for dark.
+   ============================================================ */
+.ink-on-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .ink-on-light {
+    display: none;
+  }
+  :root:not([data-theme='light']) .ink-on-dark {
+    display: block;
+  }
+}
+
+:root[data-theme='dark'] .ink-on-light {
+  display: none;
+}
+:root[data-theme='dark'] .ink-on-dark {
+  display: block;
+}
+
+/* ============================================================
+   6. Decorations
+   ============================================================ */
+/* One star drawing, any color: the PNG is used as a stencil (mask) */
+.star {
+  aspect-ratio: 688 / 663;
+  background: var(--star-color, var(--star));
+  mask: url('./brand/pictures/agentcollar-star.png') center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* ============================================================
+   7. Header
+   ============================================================ */
+.site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(30 * var(--u)) calc(50 * var(--u)) 0 calc(33 * var(--u));
+}
+
+.site-header__mark img {
+  width: max(calc(57 * var(--u)), 20px);
+  height: auto;
+}
+
+.site-header__wordmark {
+  font-style: italic;
+  font-size: max(calc(48 * var(--u)), 12px);
+}
+
+/* ============================================================
+   8. Hero
+   ============================================================ */
+.hero__title {
+  position: absolute;
+  top: calc(335 * var(--u));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: calc(64 * var(--u));
+  font-weight: 500;
+  line-height: 1.375;
+}
+
+/* The drawing fades out on the right, where the person is cut off */
+.hero__art {
+  aspect-ratio: 1;
+  mask-image:
+    linear-gradient(to right, #000 88%, transparent 100%),
+    linear-gradient(to bottom, #000 92%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.hero__art > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

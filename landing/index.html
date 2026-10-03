@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentCollar — Let agents work. Keep the keys.</title>
+    <meta name="description" content="A secure gateway that gives AI agents short-lived, task-scoped access instead of passwords." />
+    <link rel="icon" href="./brand/logo/agentcollar-mark-black.svg" />
+
+    <!-- Intel One Mono: regular, medium, bold + italics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Shared SVG filter: makes clean vector strokes look like crayon/marker -->
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <filter id="crayon" x="-10%" y="-10%" width="120%" height="120%">
+        <!-- 1. wobble the edges -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="warp" />
+        <feDisplacementMap in="SourceGraphic" in2="warp" scale="12" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <!--
+      Every positioned element gets its Figma numbers:
+      --x / --y = position, --w = width, in pixels of the 1512px-wide Figma frame.
+      CSS turns them into real sizes, so the page scales like the design.
+    -->
+    <div class="page">
+      <header class="site-header">
+        <a class="site-header__mark" href="./" aria-label="AgentCollar home">
+          <img class="ink-on-light" src="./brand/logo/agentcollar-mark-black.svg" alt="" />
+          <img class="ink-on-dark" src="./brand/logo/agentcollar-mark-white.svg" alt="" />
+        </a>
+        <span class="site-header__wordmark">AgentCollar</span>
+      </header>
+
+      <main>
+        <!-- ============ 1. HERO ============ -->
+        <section class="hero stage" style="--top: 0; --h: 1060" aria-labelledby="hero-title">
+          <img class="pos ink-on-light" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-black.png" alt="" />
+          <img class="pos ink-on-dark" style="--x: 636; --y: 98; --w: 239" src="./brand/logo/agentcollar-logo-white.png" alt="" />
+
+          <h1 class="hero__title" id="hero-title">Let agents work.<br />Keep the keys.</h1>
+
+          <!-- Illustration + the colored marker fills behind it -->
+          <div class="pos hero__art" style="--x: 463; --y: 542; --w: 604">
+            <svg class="hero__fills" viewBox="0 0 604 604" aria-hidden="true" focusable="false">
+              <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#crayon)">
+                <path transform="translate(98 66)" stroke="#878783" stroke-width="26" d="M24 21 L35 70 L63 13 L68 70 L90 13" />
+                <path transform="translate(386 87)" stroke="var(--mist-light)" stroke-width="28" d="M21 15 L27 84 L56 21 L64 84 L101 14 L108 84" />
+                <path transform="translate(28 199)" stroke="var(--mist)" stroke-width="28" d="M21 14 L26 79 L66 20 L66 87 L94 14 L112 87 L138 14" />
+                <path transform="translate(431 243)" stroke="var(--rose)" stroke-width="30" d="M34 20 L48 85 L79 15 L80 85 L120 15" />
+                <path transform="translate(42 360)" stroke="var(--rose)" stroke-width="26" d="M26 19 L34 49 L59 18 L73 54 L91 13" />
+                <path transform="translate(432 467)" stroke="#b4694a" stroke-width="30" d="M35 25 L36 100 L103 15 L97 108 L144 22 L138 99" />
+              </g>
+            </svg>
+            <img class="ink-on-light" src="./brand/pictures/agentcollar-hero-dark-ink.png" alt="An AI agent wearing a collar shakes hands with a person, surrounded by the tools it works with: files, code, charts, a checklist and messages." />
+            <img class="ink-on-dark" src="./brand/pictures/agentcollar-hero-light-ink.png" alt="An AI agent wearing a collar shakes hands with a person, surrounded by the tools it works with: files, code, charts, a checklist and messages." />
+          </div>
+
+          <span class="pos star" style="--x: 316; --y: 179; --w: 61; --r: -6deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 1248; --y: 368; --w: 68; --r: 8deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 154; --y: 493; --w: 57; --r: 12deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 212; --y: 884; --w: 37; --r: -10deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 1278; --y: 874; --w: 101; --r: 4deg" aria-hidden="true"></span>
+          <span class="pos star" style="--x: 539; --y: 1043; --w: 68; --r: -4deg" aria-hidden="true"></span>
+        </section>
+
+        <!-- ============ 2. HOW IT WORKS (spec: specs/steps.md) ============ -->
+        <section class="steps stage" style="--top: 1060; --h: 2140" aria-labelledby="steps-title">
+          <h2 class="visually-hidden" id="steps-title">How it works</h2>
+        </section>
+
+        <!-- ============ 3. MANIFESTO (spec: specs/manifesto.md) ============ -->
+        <section class="manifesto stage" style="--top: 3200; --h: 800" aria-label="Manifesto">
+        </section>
+
+        <!-- ============ 4. TRUST (spec: specs/trust.md) ============ -->
+        <section class="trust stage" style="--top: 4000; --h: 1200" aria-labelledby="trust-title">
+        </section>
+      </main>
+
+      <!-- ============ 5. FOOTER (spec: specs/footer.md) ============ -->
+      <footer class="site-footer stage" style="--top: 5200; --h: 1542">
+      </footer>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
