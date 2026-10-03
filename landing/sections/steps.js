@@ -1,8 +1,10 @@
 // Section: steps — see specs/steps.md
 // Export init(); main.js calls it once.
 //  - The leash "draws itself" top → bottom while you scroll through the section.
-//  - Each blob fades in and grows slightly when it enters (smooth ease, no bounce),
-//    then its text and drawing drift up into place. Plays once, not scrubbed.
+//  - Each step (blob + text + drawing) slides in from its own side when it enters:
+//    step 1 and 3 from the left, step 2 from the right. Smooth ease-out, plays once.
+//  - Parallax: while a step passes the screen, its layers drift at different speeds
+//    (blob slowest, drawing faster, text fastest), which reads as depth.
 // With reduced motion nothing is animated: the HTML/CSS already shows the final state.
 
 export function init({ gsap, reducedMotion }) {
@@ -28,29 +30,49 @@ export function init({ gsap, reducedMotion }) {
     );
   }
 
-  // 2. Blobs fade/grow in, then their text and drawing drift up, one group per step.
+  // 2. Steps slide in from their side, then drift with a layered parallax.
   const blobs = section.querySelectorAll('.steps__blob');
   const arts = section.querySelectorAll('.steps__art');
   const texts = section.querySelectorAll('.steps__step');
+  // One Figma px in screen px (the page scales with the viewport, max 1512 wide)
+  const u = () => document.querySelector('.page').clientWidth / 1512;
 
   blobs.forEach((blob, i) => {
-    const path = blob.querySelector('path');
-    if (!path) return;
+    const layers = [blob, arts[i], texts[i]].filter(Boolean);
+    const side = i % 2 === 0 ? -1 : 1; // left, right, left
 
-    const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' },
-      scrollTrigger: { trigger: blob, start: 'top 80%', once: true },
-    });
-
-    gsap.set(path, { transformOrigin: '50% 50%' });
-    tl.fromTo(path, { autoAlpha: 0, scale: 0.9 }, { autoAlpha: 1, scale: 1, duration: 1.1 });
-
-    const inside = [texts[i], arts[i]].filter(Boolean);
-    tl.fromTo(
-      inside,
-      { autoAlpha: 0, y: 28 },
-      { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power2.out', stagger: 0.15 },
-      0.3,
+    // Slide in from off-screen on that side
+    gsap.fromTo(
+      layers,
+      { x: () => side * 700 * u(), autoAlpha: 0 },
+      {
+        x: 0,
+        autoAlpha: 1,
+        duration: 1.2,
+        ease: 'power3.out',
+        stagger: 0.12,
+        scrollTrigger: { trigger: blob, start: 'top 85%', once: true },
+      },
     );
+
+    // Layered parallax (Figma px of vertical drift across the whole pass)
+    const DRIFT = [60, 130, 180]; // blob, drawing, text
+    layers.forEach((layer, k) => {
+      gsap.fromTo(
+        layer,
+        { y: () => (DRIFT[k] / 2) * u() },
+        {
+          y: () => (-DRIFT[k] / 2) * u(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: blob,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+    });
   });
 }

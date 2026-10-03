@@ -24,7 +24,9 @@
   --bg: var(--paper);
   --text: var(--ink);
 
-  --font: 'Intel One Mono', ui-monospace, monospace;
+  /* Typewriter look (owner's pick, 2026-10-03): headings + big statements / running text */
+  --font-display: 'Special Elite', 'Courier Prime', ui-monospace, monospace;
+  --font: 'Courier Prime', ui-monospace, monospace;
   --frame: 1512; /* Figma frame width in px */
 
   color-scheme: light;
@@ -58,6 +60,15 @@ h1,
 h2,
 p {
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+.site-header__wordmark,
+.manifesto__text,
+.footer-cta__label text {
+  font-family: var(--font-display);
 }
 
 .visually-hidden {
@@ -122,6 +133,16 @@ p {
   pointer-events: none;
 }
 
+.marker--hero.is-painting {
+  /* hero.js sweeps --paint 0% → 115%: the stroke's own shape AND a soft-edged
+     gradient, so the sand appears as if a marker paints it left → right */
+  mask-image: var(--shape), linear-gradient(100deg, #000 calc(var(--paint) - 12%), transparent var(--paint));
+  mask-size: contain, 100% 100%;
+  mask-position: center, center;
+  mask-repeat: no-repeat, no-repeat;
+  mask-composite: intersect;
+}
+
 .marker--hero {
   --shape: url('./brand/pictures/agentcollar-marker-hero.png');
   aspect-ratio: 974 / 415;
@@ -132,19 +153,28 @@ p {
   background: var(--star-color, var(--star));
   mask: url('./brand/pictures/agentcollar-star.png') center / contain no-repeat;
   pointer-events: none;
+  translate: 0 calc(var(--py, 0) * var(--u)); /* parallax offset, set by main.js */
 }
 
 /* ============================================================
    7. Header
    ============================================================ */
+/* Floating header: sticks to the top while you scroll. The negative margin lets it
+   overlap the hero (as in Figma) instead of pushing the page down. */
 .site-header {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 10;
+  --header-h: max(calc(117 * var(--u)), 52px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-h);
+  margin-bottom: calc(-1 * var(--header-h));
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(30 * var(--u)) calc(50 * var(--u)) 0 calc(33 * var(--u));
+  padding: 0 calc(50 * var(--u)) 0 calc(33 * var(--u));
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .site-header__mark img {

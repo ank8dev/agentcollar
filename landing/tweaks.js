@@ -23,13 +23,13 @@ const FONTS = [
 ];
 
 const KEY = 'agentcollar-font-tweaks';
-const DEFAULT = { display: 'Intel One Mono', body: 'Intel One Mono' };
+const DEFAULT = { display: 'Special Elite', body: 'Courier Prime' };
 
 // Headings and big statements use the display font; everything else the body font.
 const CSS = `
-:root { --font: var(--tweak-body, 'Intel One Mono', ui-monospace, monospace); }
-h1, h2, h3, .site-header__wordmark, .manifesto__text, .footer-cta__label text {
-  font-family: var(--tweak-display, var(--font));
+:root {
+  --font: var(--tweak-body, 'Courier Prime', ui-monospace, monospace);
+  --font-display: var(--tweak-display, 'Special Elite', monospace);
 }
 .tweaks {
   position: fixed; left: 16px; bottom: 16px; z-index: 1000;
@@ -52,7 +52,7 @@ h1, h2, h3, .site-header__wordmark, .manifesto__text, .footer-cta__label text {
 }
 `;
 
-const loaded = new Set(['Intel One Mono']);
+const loaded = new Set(['Intel One Mono', 'Special Elite', 'Courier Prime']);
 
 function loadFont(font) {
   if (loaded.has(font.family)) return;
@@ -137,7 +137,7 @@ export function initTweaks({ ScrollTrigger } = {}) {
     <label for="tw-display">Заголовки</label>${select('tw-display', state.display)}
     <label for="tw-body">Текст</label>${select('tw-body', state.body)}
     <div class="tweaks__row">
-      <button type="button" data-act="reset">Как в Figma</button>
+      <button type="button" data-act="reset">По умолчанию</button>
       <button type="button" data-act="close">Скрыть</button>
     </div>`;
 

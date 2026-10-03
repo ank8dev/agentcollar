@@ -57,10 +57,10 @@ export function init({ gsap, reducedMotion }) {
     },
   });
 
-  // Words: faint + blurred → sharp, one after another
+  // Words: blurred (but visible) → sharp, one after another
   tl.fromTo(
     words,
-    { opacity: 0.12, filter: 'blur(10px)', y: 8 },
+    { opacity: 0.38, filter: 'blur(6px)', y: 6 }, // still blurry, but you can see there is text
     { opacity: 1, filter: 'blur(0px)', y: 0, duration: 1, stagger: 0.35 },
   );
 
