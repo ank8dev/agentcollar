@@ -178,7 +178,39 @@
         </section>
 
         <!-- ============ 4. TRUST (spec: specs/trust.md) ============ -->
-        <section class="trust stage" style="--top: 4000; --h: 1200" aria-labelledby="trust-title">
+        <!--
+          data-mobile-cards: what phones (< 768px) get — "fan" (deck → row on scroll, like desktop)
+          or "carousel" (swipe row with scroll-snap). Dev shortcut: add ?cards=carousel to the URL.
+        -->
+        <section class="trust stage" style="--top: 4000; --h: 1200" aria-labelledby="trust-title" data-mobile-cards="fan">
+          <div class="trust__heading">
+            <h2 id="trust-title">Your agent never sees your password.</h2>
+            <p>Every token is short-lived, limited to one task, and you can revoke it anytime.</p>
+          </div>
+
+          <!-- --x = card position in the stacked deck (Figma px). trust.js slides them to the row. -->
+          <ul class="trust-cards" aria-label="Why your accounts stay safe">
+            <li class="trust-card trust-card--sage" style="--x: 86">
+              <h3>Short-lived.</h3>
+              <p>Tokens expire in minutes.</p>
+              <div class="trust-card__icon" data-icon="hourglass" aria-hidden="true"></div>
+            </li>
+            <li class="trust-card trust-card--rose" style="--x: 246">
+              <h3>One task only.</h3>
+              <p>Drafts can't become sends.</p>
+              <div class="trust-card__icon" data-icon="target" aria-hidden="true"></div>
+            </li>
+            <li class="trust-card trust-card--mist" style="--x: 428">
+              <h3>Revoke anytime.</h3>
+              <p>One tap stops everything.</p>
+              <div class="trust-card__icon" data-icon="open-hand" aria-hidden="true"></div>
+            </li>
+            <li class="trust-card trust-card--sand" style="--x: 615">
+              <h3>Fully logged.</h3>
+              <p>Risky actions wait for your "yes".</p>
+              <div class="trust-card__icon" data-icon="scroll" aria-hidden="true"></div>
+            </li>
+          </ul>
         </section>
       </main>
 
