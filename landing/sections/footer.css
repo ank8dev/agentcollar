@@ -1,22 +1,11 @@
 /* Section: footer — see specs/footer.md
-   Everything in here sits on the night sky, which is dark in BOTH themes:
-   light-ink assets and paper text always. */
+   Everything in here sits on the dark night sky: light-ink assets and paper text. */
 
 .site-footer {
   /* The Earth image is much taller than the footer: only its top cap shows. */
   overflow: clip;
   color: var(--paper);
   --sky: var(--ink);
-}
-
-/* Dark theme: the page is ink too, so the sky gets a slightly lighter night edge. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .site-footer {
-    --sky: var(--night-edge);
-  }
-}
-:root[data-theme='dark'] .site-footer {
-  --sky: var(--night-edge);
 }
 
 .site-footer__sky {

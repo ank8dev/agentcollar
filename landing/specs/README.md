@@ -26,15 +26,13 @@ Section bands: hero 0–1060 · steps 1060–3200 · manifesto 3200–4000 · tr
 
 ## Colors (CSS variables in `styles.css`)
 `--ink #04080F` · `--paper #F0F6E7` · `--sage #90AA8B` · `--raspberry #BD4F6C` · `--rose #DFBBB1` · `--mist #A9BCC8` · `--mist-light #C9D6D9` · `--sand #F2D7A6` · `--star #D1A392` · `--night-edge #0E1520`.
-Theme roles: `--bg`, `--text` (swap in dark theme). Use variables only, never raw hex in section CSS (except a one-off detail color noted in a spec).
+Roles: `--bg`, `--text`. Use variables only, never raw hex in section CSS (except a one-off detail color noted in a spec).
 
 ## Contrast rule (hard requirement)
-All text ≥ 4.5:1 against what is behind it, in both themes. On sage/rose/mist/sand use **ink** text. Check dark theme too.
+All text ≥ 4.5:1 against what is behind it. On sage/rose/mist/sand use **ink** text.
 
-## Light / dark theme
-- Dark theme = `prefers-color-scheme: dark` unless `<html data-theme="light">`, or `<html data-theme="dark">`. Copy the selector pattern used in `styles.css`.
-- Drawings: put both versions and use classes `ink-on-light` (black-ink `-dark-ink.png`) and `ink-on-dark` (white-ink `-light-ink.png`); CSS already shows the right one.
-- Colored blobs/cards keep the same colors in both themes; text on them stays ink.
+## Theme
+Light only (owner decision, 2026-10-03): no dark theme, no theme toggle. Use the black-ink (`-dark-ink.png`) drawings and black logos; the footer is the only dark area.
 
 ## Assets (all under `brand/`, reachable as `./brand/...` from `landing/`)
 - `brand/logo/agentcollar-{logo,mark,tag}-{black,white}.{svg,png}` (1024×1024 canvases)

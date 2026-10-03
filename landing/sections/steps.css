@@ -59,26 +59,6 @@
   line-height: calc(66 / 48);
 }
 
-/* Dark theme: parts of the text stick out past the blob edge (step 1 title
-   over the blob's top dip, step 2 lines past blob 2's left edge). Ink on the
-   ink page would be invisible there, so each glyph gets a sage halo: the text
-   always reads as ink on sage (7.9:1). Invisible where it already sits on sage. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .steps .steps__step {
-    text-shadow: var(--steps-halo);
-  }
-}
-:root[data-theme='dark'] .steps .steps__step {
-  text-shadow: var(--steps-halo);
-}
-
-.steps {
-  --steps-halo:
-    0 0 calc(3 * var(--u)) var(--sage), 0 0 calc(6 * var(--u)) var(--sage),
-    0 0 calc(10 * var(--u)) var(--sage), 0 0 calc(14 * var(--u)) var(--sage),
-    0 0 calc(18 * var(--u)) var(--sage), 0 0 calc(22 * var(--u)) var(--sage);
-}
-
 /* ---------- Leash ---------- */
 .steps__leash {
   z-index: 4;

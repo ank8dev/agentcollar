@@ -17,11 +17,9 @@
   --mist-light: #c9d6d9;
   --sand: #f2d7a6;
   --star: #d1a392; /* the star drawing's own color (screenshots) */
-  --night-edge: #0e1520;
 
   /* ----------------------------------------------------------
-     2. Theme roles: what each color is *used for*.
-     Components only use these, so a theme = new values here.
+     2. Roles: what each color is *used for*. The site is light only.
      ---------------------------------------------------------- */
   --bg: var(--paper);
   --text: var(--ink);
@@ -30,22 +28,6 @@
   --frame: 1512; /* Figma frame width in px */
 
   color-scheme: light;
-}
-
-/* Dark theme, when the system asks for it and the user didn't pick light */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: var(--ink);
-    --text: var(--paper);
-    color-scheme: dark;
-  }
-}
-
-/* Dark theme, when the user picked it with the toggle */
-:root[data-theme='dark'] {
-  --bg: var(--ink);
-  --text: var(--paper);
-  color-scheme: dark;
 }
 
 /* ============================================================
@@ -130,33 +112,21 @@ p {
 }
 
 /* ============================================================
-   5. Light/dark versions of the drawings
-   Black-ink drawings for the light theme, white-ink for dark.
-   ============================================================ */
-.ink-on-dark {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .ink-on-light {
-    display: none;
-  }
-  :root:not([data-theme='light']) .ink-on-dark {
-    display: block;
-  }
-}
-
-:root[data-theme='dark'] .ink-on-light {
-  display: none;
-}
-:root[data-theme='dark'] .ink-on-dark {
-  display: block;
-}
-
-/* ============================================================
    6. Decorations
    ============================================================ */
 /* One star drawing, any color: the PNG is used as a stencil (mask) */
+/* Marker highlight: a PNG of the Figma stroke used as a stencil, filled with sand */
+.marker {
+  background: var(--sand);
+  mask: var(--shape) center / contain no-repeat;
+  pointer-events: none;
+}
+
+.marker--hero {
+  --shape: url('./brand/pictures/agentcollar-marker-hero.png');
+  aspect-ratio: 974 / 415;
+}
+
 .star {
   aspect-ratio: 688 / 663;
   background: var(--star-color, var(--star));
