@@ -15,11 +15,3 @@ A secure gateway that gives AI agents short-lived, task-scoped access instead of
 |---|---|
 | `brand/` | Logos and hand-drawn illustrations (shared by everything) |
 | `landing/` | The landing page (Vite + GSAP), deployed to GitHub Pages on every push to `main` |
-
-## Run the landing page locally
-
-```sh
-cd landing
-npm install
-npm run dev
-```
