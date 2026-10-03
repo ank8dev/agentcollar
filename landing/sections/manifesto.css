@@ -35,7 +35,7 @@
   text-align: center;
   white-space: nowrap; /* only the <br>s break lines, like in Figma */
   color: var(--paper); /* on the blob in BOTH themes */
-  font-size: calc(75 * var(--u));
+  font-size: calc(78 * var(--u));
   font-weight: 400;
   line-height: calc(105 * var(--u));
 }
