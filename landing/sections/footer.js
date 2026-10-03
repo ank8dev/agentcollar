@@ -1,32 +1,39 @@
 // Section: footer — see specs/footer.md
 // Export init(); main.js calls it once.
 //
-// Three motions, all off with reduced motion (the CSS default IS the end state):
+// Three motions, all off with reduced motion (the HTML/CSS default IS the end state):
 //  1. a few stars twinkle (slow opacity/scale loops),
 //  2. the horizon (Earth + CTA) moves with a slow parallax and the Earth turns a little,
-//  3. the CTA: a small star on the Earth's top with curved text flies up under the tag
-//     and becomes a button with a straight label. Scrubbed by the scroll.
+//  3. the CTA: a small star on the Earth's top with a curved label flies up under the tag.
+//     The label is ONE <textPath>; its path morphs from the horizon arc to a straight line
+//     (same "M Q" structure, so GSAP tweens the numbers inside `d`). Scrubbed by the scroll.
 
 const FIGMA_W = 1512;
 const FOOTER_TOP = 5200;
 
-// CTA boxes (Figma page px). The link box is the end state; the star sits 84px into it.
-const END = { x: 405, y: 5537, w: 680, h: 493.4, starLeft: 84, starW: 512 };
+// Star boxes (Figma page px). The link box is the END star box; the star wrapper flies into it.
+const END_STAR = { x: 489, y: 5537, w: 512, h: 493.4 };
 const START_STAR = { x: 572, y: 5801, w: 343 };
-const START_SCALE = START_STAR.w / END.starW;
-// Where the link box must start so that its star lands on START_STAR (transform-origin 0 0).
-const START_X = START_STAR.x - END.starLeft * START_SCALE;
-const START_X_PCT = ((START_X - END.x) / END.w) * 100;
-const START_Y_PCT = ((START_STAR.y - END.y) / END.h) * 100;
+const START_SCALE = START_STAR.w / END_STAR.w;
+const START_X_PCT = ((START_STAR.x - END_STAR.x) / END_STAR.w) * 100;
+const START_Y_PCT = ((START_STAR.y - END_STAR.y) / END_STAR.h) * 100;
+
+// Label paths (page px, the label SVG's viewBox is in page coordinates).
+// Start: quadratic fit of the arc concentric with the Earth (centre 772/6928, baseline radius 893):
+//   ends at x 772 ± 330 on that circle, control point where the two end tangents meet.
+// End: a straight line at baseline y 5827 (glyphs centred on y ≈ 5802), centred on the star (x 745).
+const PATH_START = 'M442 6098.2 Q772 5967 1102 6098.2';
+const PATH_END = 'M415 5827 Q745 5827 1075 5827';
+const FONT_START = 60;
+const FONT_END = 72;
 
 export function init({ gsap, ScrollTrigger, reducedMotion }) {
   const footer = document.querySelector('.site-footer');
   if (!footer || reducedMotion) return;
 
-  const cta = footer.querySelector('.footer-cta');
-  const pill = footer.querySelector('.footer-cta__pill');
-  const label = footer.querySelector('.footer-cta__label');
-  const curved = footer.querySelector('.footer-cta__curved');
+  const starbox = footer.querySelector('.footer-cta__starbox');
+  const path = footer.querySelector('.footer-cta__path');
+  const text = footer.querySelector('.footer-cta__label text');
   const horizon = footer.querySelector('.site-footer__horizon');
   const earth = footer.querySelector('.site-footer__earth');
 
@@ -77,13 +84,13 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
   const footerDocTop = () => footer.getBoundingClientRect().top + window.scrollY;
   const flightStart = () => footerDocTop() + (6131 - FOOTER_TOP) * u() - window.innerHeight;
   const flightEnd = () => {
-    const ideal = footerDocTop() + (END.y - FOOTER_TOP) * u() - 0.06 * window.innerHeight;
+    const ideal = footerDocTop() + (END_STAR.y - FOOTER_TOP) * u() - 0.06 * window.innerHeight;
     const end = Math.min(ideal, ScrollTrigger.maxScroll(window));
     return Math.max(end, flightStart() + 120);
   };
 
   const tl = gsap.timeline({
-    defaults: { ease: 'none' },
+    defaults: { ease: 'power1.inOut', duration: 1 },
     scrollTrigger: {
       trigger: footer,
       start: flightStart,
@@ -94,12 +101,12 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
   });
 
   tl.fromTo(
-    cta,
+    starbox,
     { xPercent: START_X_PCT, yPercent: START_Y_PCT, scale: START_SCALE, transformOrigin: '0 0' },
-    { xPercent: 0, yPercent: 0, scale: 1, duration: 1, ease: 'power1.inOut' },
+    { xPercent: 0, yPercent: 0, scale: 1 },
     0,
   )
-    // curved text fades out early, the straight label + pill fade in late
-    .fromTo(curved, { opacity: 1 }, { opacity: 0, duration: 0.35 }, 0.1)
-    .fromTo([pill, label], { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.6);
+    // the label rides along and straightens out on the way up: one continuous morph, same timing as the star
+    .fromTo(path, { attr: { d: PATH_START } }, { attr: { d: PATH_END } }, 0)
+    .fromTo(text, { fontSize: FONT_START }, { fontSize: FONT_END }, 0);
 }

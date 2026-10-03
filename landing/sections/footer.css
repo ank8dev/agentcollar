@@ -47,127 +47,141 @@
   user-select: none;
 }
 
-/* ---------- Curved start-state label ---------- */
-.footer-cta__curved {
-  height: auto;
-  overflow: visible;
-  pointer-events: none;
-  opacity: 0; /* end state is the default; footer.js shows it at the start of the flight */
-}
-
-.footer-cta__curved text {
-  font-family: var(--font);
-  font-style: italic;
-  font-size: 62px; /* SVG user units = Figma px */
-  letter-spacing: 3px;
-  fill: var(--paper);
-  /* ink halo: keeps paper text ≥ 4.5:1 where it crosses the star or the light Earth */
-  stroke: var(--ink);
-  stroke-width: 9px;
-  stroke-linejoin: round;
-  paint-order: stroke;
-}
-
-/* ---------- The CTA: a real link ---------- */
+/* ---------- The CTA: ONE link = star + one morphing label ---------- */
 .site-footer .footer-cta {
-  /* (doubled selector: .pos in styles.css is imported after this file and sets height: auto)
-     box = end state: star (489..1001) plus the label pill that is wider than the star */
+  /* (doubled selector: .pos in styles.css is imported after this file and sets height/rotate)
+     box = END star box: 489..1001 x 5537..6030.4 */
   height: calc(493.4 * var(--u));
   display: block;
-  pointer-events: auto;
-  color: var(--ink);
+  rotate: none; /* no stacking context: the star can sit behind the Earth while the label stays in front */
+  pointer-events: none; /* only the star and the label glyphs are hit targets (both follow the flight) */
+  color: var(--paper);
   text-decoration: none;
-  border-radius: calc(40 * var(--u));
+  outline: none; /* the focus ring is drawn around the star, which moves (see below) */
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Wrapper that footer.js flies from the start box to the end box.
+   The star itself is a mask, so the focus ring lives on this wrapper. */
+.footer-cta__starbox {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: auto;
 }
 
 .footer-cta__star {
   position: absolute;
-  top: 0;
-  left: calc(84 * var(--u));
-  width: calc(512 * var(--u));
+  inset: 0;
   --star-color: var(--star);
-  transition:
-    rotate 0.3s ease,
-    scale 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
-/* Hand-drawn rose pill behind the label: makes it read as a button and keeps ink text on a light fill */
-.footer-cta__pill {
-  position: absolute;
-  left: 0;
-  top: calc((5750 - 5537) * var(--u));
-  width: 100%;
-  height: auto;
-  fill: var(--star);
-  overflow: visible;
-  transition: fill 0.2s ease;
-}
-
+/* The one label: an SVG covering the footer band in page coordinates, overflowing the link box */
 .footer-cta__label {
   position: absolute;
-  left: 0;
-  right: 0;
-  /* label centred on y ≈ 5802 (page) */
-  top: calc((5802 - 5537) * var(--u));
-  translate: 0 -50%;
-  text-align: center;
-  font-style: italic;
-  font-size: calc(72 * var(--u));
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--ink);
+  left: calc((0 - 489) * var(--u));
+  top: calc((5200 - 5537) * var(--u));
+  width: calc(1512 * var(--u));
+  height: calc(1542 * var(--u));
+  overflow: visible;
+  z-index: 1; /* in front of the Earth (the star stays behind it) */
+  pointer-events: none;
 }
 
-.footer-cta:hover .footer-cta__pill,
-.footer-cta:focus-visible .footer-cta__pill {
-  fill: var(--rose);
+.footer-cta__label text {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 72px; /* SVG user units = Figma px; footer.js tweens 60 -> 72 */
+  letter-spacing: 3px;
+  fill: var(--paper);
+  pointer-events: auto; /* the glyphs are part of the link */
 }
-.footer-cta:hover .footer-cta__star,
+
+/* Hover: a small cartoony wiggle of the star */
+.footer-cta:hover .footer-cta__star {
+  --star-color: var(--rose);
+  animation: footer-cta-wiggle 0.6s ease-in-out;
+  scale: 1.05;
+}
+
+@keyframes footer-cta-wiggle {
+  0% { rotate: 0deg; }
+  20% { rotate: -9deg; }
+  45% { rotate: 7deg; }
+  70% { rotate: -4deg; }
+  100% { rotate: 0deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-cta:hover .footer-cta__star {
+    animation: none;
+  }
+}
+
+/* Keyboard focus: a dashed paper ring around the star, wherever it is in its flight */
+.footer-cta:focus-visible .footer-cta__starbox {
+  outline: max(calc(5 * var(--u)), 2px) dashed var(--paper);
+  outline-offset: max(calc(8 * var(--u)), 3px);
+}
 .footer-cta:focus-visible .footer-cta__star {
   --star-color: var(--rose);
-  rotate: -8deg;
-  scale: 1.04;
-}
-.footer-cta:hover .footer-cta__label {
-  text-decoration: underline;
-  text-decoration-thickness: max(calc(4 * var(--u)), 1px);
-  text-underline-offset: 0.15em;
 }
 
-.footer-cta:focus-visible .footer-cta__pill,
-.footer-cta:focus-visible .footer-cta__label {
-  opacity: 1 !important; /* keyboard focus mid-flight: show the button label right away (beats GSAP's inline opacity) */
-}
-
-.footer-cta:focus-visible {
-  outline: max(calc(6 * var(--u)), 3px) solid var(--paper);
-  outline-offset: max(calc(10 * var(--u)), 4px);
-  z-index: 3; /* above the Earth even mid-flight */
-}
-
-/* ---------- Footer line ---------- */
+/* ---------- Footer line: a small cream cloud over the Earth ---------- */
 .site-footer__line {
   position: absolute;
   left: 50%;
-  bottom: calc(24 * var(--u));
+  bottom: calc(26 * var(--u));
   translate: -50% 0;
   z-index: 2;
-  padding: max(calc(8 * var(--u)), 4px) max(calc(20 * var(--u)), 10px);
-  border-radius: 999px;
-  background: var(--sky); /* solid backing strip over the light Earth */
-  color: var(--paper);
-  font-size: max(calc(20 * var(--u)), 12px);
+  margin: 0;
+  /* extra room on top for the cloud's puffs */
+  padding: max(calc(34 * var(--u)), 14px) max(calc(58 * var(--u)), 26px) max(calc(18 * var(--u)), 8px);
+  color: var(--ink);
+  font-size: max(calc(17 * var(--u)), 12px);
+  line-height: 1.2;
   white-space: nowrap;
+}
+
+/* Cream like the Earth's own clouds; translucent so it blends in */
+.site-footer__cloud {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--paper);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.site-footer__line-text {
+  position: relative; /* above the cloud */
+  opacity: 0.78;
 }
 
 .site-footer__line a {
   color: inherit;
-  text-underline-offset: 0.2em;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.site-footer__gh {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.35em;
+  vertical-align: -0.14em; /* sit on the text baseline */
+  fill: currentColor;
+}
+
+.site-footer__line a:hover {
+  opacity: 1;
+  text-decoration: underline wavy;
+  text-underline-offset: 0.25em;
 }
 
 .site-footer__line a:focus-visible {
-  outline: 2px solid var(--paper);
+  outline: 2px dashed var(--ink);
   outline-offset: 3px;
-  border-radius: 2px;
 }
