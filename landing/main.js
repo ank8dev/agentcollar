@@ -9,23 +9,16 @@ import * as manifesto from './sections/manifesto.js';
 import * as trust from './sections/trust.js';
 import * as footer from './sections/footer.js';
 import { initTweaks } from './tweaks.js';
-import { initPull } from './pull.js';
 
 gsap.registerPlugin(ScrollTrigger);
-// Phones: the browser's toolbars hide/show while scrolling, which fires "resize". Without
-// this, every such resize re-measures all scroll animations and the sticky cards jump.
-ScrollTrigger.config({ ignoreMobileResize: true });
 
 // Sections check this themselves: with reduced motion they show the final state, no animation.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Smooth scrolling (Lenis) — for mouse wheels / trackpads only. It still uses the browser's
-// real scroll position, so position: sticky and ScrollTrigger keep working; GSAP's ticker
-// drives it so both update in the same frame. On touch screens it is NOT started: its
-// touch listeners make iOS run every scroll through JavaScript, and sticky blocks (the
-// trust heading + cards) then shake. Native touch scrolling is smooth already.
-const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-if (!reducedMotion && finePointer) {
+// Smooth scrolling (Lenis). It still uses the browser's real scroll position, so
+// position: sticky and ScrollTrigger keep working; GSAP's ticker drives it so both
+// update in the same frame.
+if (!reducedMotion) {
   const lenis = new Lenis({ lerp: 0.1 });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -81,13 +74,11 @@ if (!reducedMotion) {
   });
 }
 
-// No pinch-zoom (iOS Safari ignores user-scalable=no; its own gesture events still fire).
+// No pinch-zoom: iOS Safari ignores user-scalable=no, but its own gesture events can be
+// cancelled (these don't touch scrolling, unlike touch-action / touchmove handlers).
 for (const type of ['gesturestart', 'gesturechange']) {
   document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
 }
-
-// Limited pull-up at the very bottom that reveals the spinning medallion (touch screens)
-initPull({ gsap });
 
 // Font tweaks panel: dev server or ?tweaks only.
 initTweaks({ ScrollTrigger });

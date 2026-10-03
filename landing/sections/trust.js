@@ -51,61 +51,8 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     const deckX = phone ? PHONE_DECK_X : DECK_X;
     const rowX = phone ? PHONE_ROW_X : ROW_X;
     const shift = phone ? PHONE_SHIFT : SHIFT;
-    // Phones: step-by-step instead of following the finger frame by frame. On iPhones any
-    // per-frame scroll-linked motion inside the sticky block shakes (Safari keeps the sticky
-    // block and the animation slightly out of sync). So the scroll only picks a STEP —
-    // deck, then card 1…4 in the centre — and a CSS transition glides the cards there,
-    // run by the browser on its own. JS writes to the DOM only when the step changes.
-    if (phone) {
-      const sticky = section.querySelector('.trust__sticky');
-      const stickyTop = () => parseFloat(getComputedStyle(sticky).top) || 0;
-      section.dataset.scrollAnim = 'steps';
-      // (no gsap.set on these elements: GSAP would write `translate: none` inline and
-      // override the CSS translate that the transition animates)
-      cards.forEach((card, i) => card.style.setProperty('--x', deckX[i]));
-      let step = -1;
-      const show = (next) => {
-        if (next === step) return;
-        step = next;
-        cards.forEach((card, i) => {
-          card.style.setProperty('--dx', step === 0 ? 0 : rowX[i] - deckX[i]);
-          card.style.setProperty('--tilt', 0);
-        });
-        list.style.setProperty('--shift', step <= 1 ? 0 : -(step - 1) * (CARD_W + 40));
-      };
-      show(0);
-      const st = ScrollTrigger.create({
-        trigger: sticky,
-        start: () => `top ${stickyTop()}px`,
-        end: () => `+=${window.innerHeight * 2}`,
-        invalidateOnRefresh: true,
-        // 0 = deck, 1–4 = card 1–4 in the centre
-        onUpdate: ({ progress: p }) => show(p < 0.1 ? 0 : p < 0.32 ? 1 : p < 0.52 ? 2 : p < 0.72 ? 3 : 4),
-      });
-      return () => {
-        st.kill();
-        delete section.dataset.motion;
-        delete section.dataset.scrollAnim;
-        cards.forEach((card) => ['--dx', '--x', '--tilt'].forEach((p) => card.style.removeProperty(p)));
-        list.style.removeProperty('--shift');
-      };
-    }
-
-    gsap.set(cards, { '--x': (i) => deckX[i], force3D: true });
-    gsap.set(list, { force3D: true });
-
-    // Preferred: CSS scroll-driven animation (trust.css). The browser runs it on the same
-    // fast thread as the scrolling itself, so the sticky block can't shake (on iPhones a
-    // JS-driven version jittered). JS only hands over the target numbers once.
-    if (CSS.supports('animation-timeline: view()')) {
-      gsap.set(cards, { '--dx-end': (i) => rowX[i] - deckX[i], '--tilt-mid': (i) => TILT[i] });
-      gsap.set(list, { '--shift-end': shift });
-      section.dataset.scrollAnim = 'css';
-      return () => {
-        delete section.dataset.motion;
-        delete section.dataset.scrollAnim;
-      };
-    }
+    gsap.set(list, { '--shift': 0 });
+    gsap.set(cards, { '--dx': 0, '--tilt': 0, '--x': (i) => deckX[i] });
 
     // The cards' sticky box and its CSS `top` (px) — the spread starts when it sticks.
     const sticky = section.querySelector('.trust__sticky');
@@ -126,19 +73,14 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
 
     if (import.meta.env.DEV) window.__trustTL = tl; // dev only: inspect frame by frame
 
-    // Moves use plain transforms (x / rotation, GPU-composited) instead of CSS variables,
-    // so the browser doesn't recalculate styles every frame (that made the cards shake on
-    // iPhones). Figma units → px: one card is 590 Figma px wide.
-    const px = () => cards[0].offsetWidth / CARD_W;
-
     // 1. deck → row, with a small fan rotation on the way
     cards.forEach((card, i) => {
-      tl.to(card, { x: () => (rowX[i] - deckX[i]) * px(), duration: 1, ease: 'power1.inOut' }, 0)
-        .to(card, { rotation: TILT[i], duration: 0.5, ease: 'sine.out' }, 0)
-        .to(card, { rotation: 0, duration: 0.5, ease: 'sine.in' }, 0.5);
+      tl.to(card, { '--dx': rowX[i] - deckX[i], duration: 1, ease: 'power1.inOut' }, 0)
+        .to(card, { '--tilt': TILT[i], duration: 0.5, ease: 'sine.out' }, 0)
+        .to(card, { '--tilt': 0, duration: 0.5, ease: 'sine.in' }, 0.5);
     });
     // 2. short hold, then the whole row slides left so card 4 is fully visible
-    tl.to(list, { x: () => shift * px(), duration: phone ? 2 : 1.1, ease: 'power1.inOut' }, 1.15);
+    tl.to(list, { '--shift': shift, duration: phone ? 2 : 1.1, ease: 'power1.inOut' }, 1.15);
     tl.to({}, { duration: 0.15 }); // brief hold before the section scrolls on
 
     return () => {
