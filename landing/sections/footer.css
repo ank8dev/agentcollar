@@ -146,74 +146,71 @@
   --star-color: var(--rose);
 }
 
-/* ---------- Footer line: a small cream cloud over the Earth ---------- */
+/* ---------- Footer line: three small badges + tiny copyright, over the Earth ---------- */
 .site-footer__line {
   position: absolute;
   left: 50%;
-  bottom: calc(26 * var(--u));
+  bottom: calc(30 * var(--u));
   translate: -50% 0;
   z-index: 2;
-  margin: 0;
-  /* extra room on top for the cloud's puffs */
-  padding: max(calc(34 * var(--u)), 14px) max(calc(58 * var(--u)), 26px) max(calc(18 * var(--u)), 8px);
-  color: var(--ink);
-  font-size: max(calc(17 * var(--u)), 12px);
-  line-height: 1.2;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: max(calc(10 * var(--u)), 6px);
 }
 
-/* Cream like the Earth's own clouds; translucent so it blends in */
-.site-footer__cloud {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  fill: var(--paper);
-  opacity: 0.72;
-  pointer-events: none;
+.site-footer__badges {
+  display: flex;
+  gap: max(calc(18 * var(--u)), 10px);
 }
 
-.site-footer__line-text {
-  position: relative; /* above the cloud */
-  opacity: 0.78;
+/* round ink badge with a slightly wobbly paper rim (hand-drawn), glyph in paper */
+.site-footer__badge {
+  display: grid;
+  place-items: center;
+  width: max(calc(64 * var(--u)), 40px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 max(calc(3 * var(--u)), 2px) var(--paper);
+  transition: scale 0.25s ease-out;
 }
 
-.site-footer__line a {
-  color: inherit;
-  text-decoration: none;
-  border-radius: 4px;
-}
-
-.site-footer__gh {
-  width: 1em;
-  height: 1em;
-  margin-right: 0.35em;
-  vertical-align: -0.14em; /* sit on the text baseline */
+.site-footer__badge svg {
+  width: 46%;
+  height: 46%;
   fill: currentColor;
 }
 
-.site-footer__line a {
-  white-space: nowrap;
-  transition: opacity 0.2s ease-out;
-}
-
-.site-footer__line a:hover {
-  opacity: 0.6; /* no underline: links just dim a little on hover */
-}
-
-/* owner's pixel-art avatar (32×32): keep the pixels crisp */
-.site-footer__avatar {
-  display: inline-block;
-  width: 1.4em;
-  height: 1.4em;
-  margin-right: 0.35em;
-  vertical-align: -0.38em;
-  border-radius: 3px;
+/* owner's pixel-art avatar fills its badge; keep the pixels crisp */
+.site-footer__badge--me img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   image-rendering: pixelated;
 }
 
-.site-footer__line a:focus-visible {
-  outline: 2px dashed var(--ink);
-  outline-offset: 3px;
+.site-footer__badge:hover {
+  scale: 1.08;
+}
+
+.site-footer__badge:focus-visible {
+  outline: 2px dashed var(--paper);
+  outline-offset: 4px;
+}
+
+.site-footer__copy {
+  margin: 0;
+  font-size: max(calc(14 * var(--u)), 11px);
+  color: var(--paper);
+  opacity: 0.75;
+  text-shadow: 0 0 6px var(--ink), 0 0 2px var(--ink); /* readable over the bright Earth */
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__badge {
+    transition: none;
+  }
 }
