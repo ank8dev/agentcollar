@@ -2,8 +2,10 @@
    Everything in here sits on the dark night sky: light-ink assets and paper text. */
 
 .site-footer {
-  /* The Earth image is much taller than the footer: only its top cap shows. */
-  overflow: clip;
+  /* The Earth image is much taller than the footer: only its top cap shows (clip the
+     bottom). Sideways the page frame clips it — except on wide screens (see styles.css). */
+  overflow-x: visible;
+  overflow-y: clip;
   color: var(--paper);
   --sky: var(--ink);
 }

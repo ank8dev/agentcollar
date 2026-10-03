@@ -104,6 +104,24 @@ h3,
   --u: calc(100cqw / var(--frame));
 }
 
+/* Footer band: full-width night sky under the footer's domed top edge (the dome is ~210 px
+   tall at the frame edges; on narrow screens the band is as wide as the page, so this only
+   shows on screens wider than the 1512-px frame). */
+.footer-band {
+  background: linear-gradient(to bottom, transparent 210px, var(--ink) 210px);
+}
+
+/* Wide screens: let the Earth and sky run past the frame (round Earth edge, no hard cut);
+   the full-width band clips at the screen edge instead, so there is no horizontal scroll. */
+@media (min-width: 1513px) {
+  .footer-band {
+    overflow-x: clip;
+  }
+  .page--footer {
+    overflow-x: visible;
+  }
+}
+
 /* A section whose children are placed with Figma coordinates.
    --top / --h = where the section starts on the Figma page and how tall it is.
    Children use PAGE coordinates (--y as in Figma); --top is subtracted here.
