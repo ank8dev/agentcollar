@@ -43,3 +43,17 @@ export function issueMandate(
 
   return token;
 }
+
+// Kill switch: the human stops a mandate immediately.
+// We mark it instead of deleting it, so check() can still say "revoked" (not "unknown")
+// and the audit log still knows which agent it belonged to.
+// Returns false if there was no such mandate.
+export function revoke(token: string): boolean {
+  const mandate = mandates.get(token);
+  if (mandate === undefined) {
+    return false;
+  }
+
+  mandate.revoked = true;
+  return true;
+}
