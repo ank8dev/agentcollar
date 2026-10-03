@@ -5,6 +5,7 @@ import * as steps from './sections/steps.js';
 import * as manifesto from './sections/manifesto.js';
 import * as trust from './sections/trust.js';
 import * as footer from './sections/footer.js';
+import { initTweaks } from './tweaks.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,3 +15,6 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 for (const section of [steps, manifesto, trust, footer]) {
   section.init({ gsap, ScrollTrigger, reducedMotion });
 }
+
+// Font tweaks panel: dev server or ?tweaks only.
+initTweaks({ ScrollTrigger });

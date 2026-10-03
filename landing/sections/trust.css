@@ -12,6 +12,12 @@
   height: calc(1915 * var(--u));
 }
 
+/* Wrapper of heading + cards. Static layouts: a plain full-size box (no effect). */
+.trust__sticky {
+  position: relative;
+  height: 100%;
+}
+
 /* ---------- Heading ---------- */
 .trust__heading {
   position: absolute;
@@ -99,6 +105,17 @@
 
 /* ---------- 2. Animated: deck → row (trust.js sets data-motion) ---------- */
 .trust[data-motion] {
+  /* section = its own height + the scroll distance during which the cards spread */
+  --spread-distance: 200vh;
+  height: calc(var(--h) * var(--u) + var(--spread-distance));
+}
+
+/* The browser keeps the content on screen while the section scrolls by (position: sticky).
+   If the content is taller than the screen, stick it with its bottom on the screen bottom
+   (negative top) so all four cards stay fully visible. */
+.trust[data-motion] .trust__sticky {
+  position: sticky;
+  top: min(0px, calc(100vh - var(--h) * var(--u)));
   height: calc(var(--h) * var(--u));
 }
 

@@ -1,5 +1,7 @@
 // Section: trust — see specs/trust.md
-// Four cards start stacked like a deck, then spread into a row while the section is pinned.
+// Four cards start stacked like a deck, then spread into a row while the section is held
+// on screen by CSS position: sticky (see trust.css) — the browser does the holding, so it
+// stays perfectly in sync with the scroll; GSAP only scrubs the cards by scroll progress.
 // Positions are Figma px; CSS multiplies them by --u, so the animation scales with the page
 // and needs no recalculation on resize.
 
@@ -24,7 +26,7 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
 
   const mm = gsap.matchMedia();
   // gsap.matchMedia runs the callback when any condition matches and reverts it all
-  // (tweens, pin, inline styles) when crossing 768 px, then runs it again.
+  // (tweens, inline styles) when crossing 768 px, then runs it again.
   mm.add({ phone: '(max-width: 767.98px)', desktop: '(min-width: 768px)' }, ({ conditions }) => {
     // Carousel: pure CSS scroll-snap. Only make the scroller reachable by keyboard.
     if (conditions.phone && section.dataset.mobileCards === 'carousel') {
@@ -32,25 +34,27 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
       return () => list.removeAttribute('tabindex');
     }
 
-    // Reduced motion: keep the CSS default, a static 2×2 grid. No pin, no tweens.
+    // Reduced motion: keep the CSS default, a static 2×2 grid. No sticky, no tweens.
     if (reducedMotion) return;
 
     section.dataset.motion = 'deck';
     gsap.set(list, { '--shift': 0 });
     gsap.set(cards, { '--dx': 0, '--tilt': 0 });
 
+    // Same value as the CSS `top` of .trust__sticky, in px.
+    const stickyTop = () =>
+      Math.min(0, window.innerHeight - section.querySelector('.trust__sticky').offsetHeight);
+
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: section,
-        // Section taller than the screen (desktop): pin when its bottom reaches the
-        // screen bottom, so all four cards are fully visible. Otherwise centre it.
-        start: () => (section.offsetHeight > window.innerHeight ? 'bottom bottom' : 'center center'),
-        end: () => '+=' + Math.round(window.innerHeight * 2),
-        pin: true,
-        // .page is a CSS container, which breaks position: fixed inside it → pin with transforms.
-        pinType: 'transform',
-        scrub: 0.6,
+        // The sticky phase starts when the section top reaches the sticky offset
+        // (0, or negative when the content is taller than the screen)…
+        start: () => `top ${stickyTop()}px`,
+        // …and lasts exactly the extra height added in CSS (--spread-distance: 200vh).
+        end: () => `+=${window.innerHeight * 2}`,
+        scrub: 0.5, // short, soft catch-up
         invalidateOnRefresh: true,
       },
     });
@@ -63,7 +67,7 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     });
     // 2. short hold, then the whole row slides left so card 4 is fully visible
     tl.to(list, { '--shift': SHIFT, duration: 1.1, ease: 'power1.inOut' }, 1.15);
-    tl.to({}, { duration: 0.15 }); // brief hold before unpinning
+    tl.to({}, { duration: 0.15 }); // brief hold before the section scrolls on
 
     return () => {
       delete section.dataset.motion;
