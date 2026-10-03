@@ -27,10 +27,10 @@ const GEO = {
   },
   // desktop: compact button under the medallion, big Earth (centre 772/7121, radius 1200)
   desktop: {
-    end: { x: 546, y: 5661, w: 78, h: 75.2 },
-    start: { x: 672, y: 5788, w: 200 },
+    end: { x: 546, y: 5743, w: 78, h: 75.2 },
+    start: { x: 627, y: 5701.5, w: 290 },
     pathStart: 'M442 5910.2 Q772 5821.8 1102 5910.2',
-    pathEnd: 'M642 5713.2 Q804 5713.2 966 5713.2',
+    pathEnd: 'M642 5795.2 Q804 5795.2 966 5795.2',
     fontStart: 46,
     fontEnd: 38,
   },

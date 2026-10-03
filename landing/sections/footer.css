@@ -273,13 +273,14 @@
     width: calc(290 * var(--u));
   }
   /* compact button right under the medallion (0.6 of the phone button) */
+  /* centred between the medallion (bottom ~5643) and the Earth (top 5921) */
   .site-footer .footer-cta {
     --x: 528;
-    --y: 5655;
+    --y: 5737;
     --w: 456;
     --lh: 90;
     --sx: 546;
-    --sy: 5661;
+    --sy: 5743;
     --sw: 78;
   }
   /* Earth ×1.36: disc radius 1200, top of the disc at y 5921, centred on x 772 */
@@ -415,5 +416,12 @@
   .site-footer .star.pos {
     left: calc(var(--mx, var(--x)) * var(--u));
     top: calc((var(--my, var(--y)) - var(--top, 0)) * var(--u));
+  }
+}
+
+/* extra desktop stars: only on wide screens */
+@media (max-width: 767.98px) {
+  .site-footer__desk-star {
+    display: none;
   }
 }
