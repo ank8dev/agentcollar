@@ -143,7 +143,37 @@
   will-change: translate, rotate;
 }
 
-/* ---------- 3. Phones: carousel variant ---------- */
+/* ---------- 3. Phones: the same deck → row effect, with big cards ---------- */
+/* On phones the page scale (--u ≈ 0.25) would make cards 140 px wide with 9 px text, so the
+   cards get their own, 2.1× bigger scale. trust.js uses phone positions to match. */
+@media (max-width: 767.98px) {
+  .trust[data-mobile-cards='fan'][data-motion] {
+    --phone-scale: 2.1;
+    height: calc(var(--h) * var(--u) + var(--spread-distance) + 240px);
+  }
+
+  .trust[data-mobile-cards='fan'][data-motion] .trust-cards,
+  .trust[data-mobile-cards='fan'][data-motion] .trust-cards * {
+    --u: calc(100cqw / var(--frame) * var(--phone-scale));
+    --cu: var(--u);
+  }
+
+  .trust[data-mobile-cards='fan'][data-motion] .trust__sticky {
+    --head: 112px; /* heading at a readable phone size (≈ 5 lines) */
+    --gap: 14px;
+    --cards-h: calc(655 * 100cqw / var(--frame) * var(--phone-scale));
+    top: max(52px, calc(50vh - (var(--head) + var(--gap) + var(--cards-h)) / 2));
+    height: calc(var(--head) + var(--gap) + var(--cards-h));
+  }
+
+  .trust[data-mobile-cards='fan'][data-motion] .trust__heading {
+    font-size: 15px;
+    line-height: 21px;
+    padding-inline: 16px;
+  }
+}
+
+/* ---------- 4. Phones: carousel variant (opt-in: data-mobile-cards="carousel") ---------- */
 @media (max-width: 767.98px) {
   .trust[data-mobile-cards='carousel'] {
     --cu: calc(80cqw / 590); /* cards ≈ 80vw wide */
