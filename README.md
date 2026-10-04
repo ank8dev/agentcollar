@@ -85,15 +85,14 @@ npm install -g agentcollar   # or install it: then the short name `agcl` works t
 agcl                         # intro → setup wizard (first time) → broker
 ```
 
-> The npm package is prepared but **not published yet**. Until the first release, run it from source:
->
-> ```bash
-> git clone https://github.com/ank8dev/agentcollar
-> cd agentcollar/broker
-> npm install                # also builds dist/
-> npm link                   # puts `agcl` and `agentcollar` on your PATH
-> agcl
-> ```
+Working on the code? Run it from source instead:
+
+```bash
+git clone https://github.com/ank8dev/agentcollar
+cd agentcollar/broker
+npm install                # also builds dist/
+npm link                   # puts `agcl` and `agentcollar` on your PATH
+```
 
 **The setup wizard** (`agcl setup`) connects **your own** Telegram bot without editing any file:
 paste the token from [@BotFather](https://t.me/BotFather) (hidden while you type, checked with
@@ -131,7 +130,7 @@ npm run agent      # terminal 2: asks for a mandate, waits for you, reads, draft
 ## Use it from Claude Code (MCP)
 
 ```bash
-claude mcp add agentcollar -- npx -y agentcollar mcp     # once published
+claude mcp add agentcollar -- npx -y agentcollar mcp
 claude mcp add agentcollar -- agcl mcp                   # from source, after npm link
 ```
 
@@ -182,7 +181,7 @@ Known limits today: mandates live in memory (they disappear when the broker stop
 - [ ] Refresh token encrypted at rest, key in the macOS Keychain
 - [x] An MCP interface, so existing agents can use the broker
 - [x] A terminal CLI: `agcl` (setup wizard, live watch, mandates, logs, revoke)
-- [x] One-command install from npm (`npx agentcollar`), published with provenance — *prepared, first release pending*
+- [x] One-command install from npm (`npx agentcollar`), published with provenance ([v0.1.0](https://www.npmjs.com/package/agentcollar))
 - [ ] Mandates survive a restart
 - [ ] Morning report: what every agent did tonight
 
