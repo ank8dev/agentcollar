@@ -12,6 +12,9 @@ export type CheckCode =
   | "action_not_allowed"
   | "limit_reached";
 
+// The order of the checks. A failure code tells how far a request got: "expired" = check 3.
+export const CHECK_ORDER: CheckCode[] = ["unknown_token", "not_approved", "expired", "revoked", "action_not_allowed", "limit_reached"];
+
 // The answer to "may this agent do this action right now?"
 export type CheckResult = {
   allowed: boolean;
@@ -26,7 +29,7 @@ export function check(token: string, action: Action): CheckResult {
 
   // For an unknown token there is no mandate, so no agent name either.
   const agent = mandates.get(token)?.agent ?? "unknown";
-  writeAudit(agent, action, result.allowed, result.reason);
+  writeAudit(agent, action, result.allowed, result.reason, result.code);
 
   return result;
 }

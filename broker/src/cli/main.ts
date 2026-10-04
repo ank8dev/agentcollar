@@ -14,6 +14,11 @@ const COMMANDS: Record<string, Command> = {
     summary: "подключить своего Telegram-бота (мастер настройки)",
     run: async () => (await import("./setup.ts")).runSetup(),
   },
+  logs: {
+    usage: "agentcollar logs [--agent <имя>] [--denied] [--today]",
+    summary: "аудит-лог: кто, что, когда, разрешено или нет",
+    run: async (args) => (await import("./logs.ts")).runLogs(args),
+  },
   revoke: {
     usage: "agentcollar revoke <id>",
     summary: "мгновенно отозвать мандат (kill switch)",
