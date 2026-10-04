@@ -28,10 +28,6 @@
     "agentcollar": "dist/cli.js",
     "agcl": "dist/cli.js"
   },
-  "exports": {
-    "./cli": "./dist/cli.js",
-    "./package.json": "./package.json"
-  },
   "files": [
     "dist",
     "README.md",
