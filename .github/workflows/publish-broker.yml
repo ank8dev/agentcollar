@@ -2,9 +2,13 @@
 #   cd broker && npm version 0.1.1 && git push --follow-tags   (tag must be v0.1.1)
 #
 # Auth: npm "trusted publishing" (OIDC). npm checks that the request comes from THIS repository
-# and THIS workflow file, so no long-lived NPM_TOKEN secret exists that could be stolen.
-# One-time setup on npmjs.com: package agentcollar → Settings → Trusted publishing →
-# GitHub Actions, repository ank8dev/agentcollar, workflow publish-broker.yml.
+# and THIS workflow file, so no long-lived npm token exists that could be stolen.
+# One-time setup on npmjs.com, for BOTH packages (agentcollar and agcl): Settings →
+# Trusted publishing → GitHub Actions, repository ank8dev/agentcollar, workflow publish-broker.yml.
+#
+# First release only: trusted publishing can be set up once a package exists, so v0.1.0 uses a
+# temporary granular token in the NPM_TOKEN secret. After that release: set up trusted publishing,
+# then delete the secret (gh secret delete NPM_TOKEN) and the token on npmjs.com.
 #
 # Provenance: npm records a signed statement "this tarball was built by this workflow from this
 # commit" (Sigstore). It shows on the npm page and anyone can check it: npm audit signatures.
@@ -56,3 +60,18 @@ jobs:
       - run: npm pack --dry-run
 
       - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # empty after the first release: OIDC is used
+
+      # the short-name package `agcl` (npx agcl == npx agentcollar); it rarely changes
+      - name: Publish agcl if this version is not on npm yet
+        working-directory: npm-alias/agcl
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "agcl@$VERSION" version > /dev/null 2>&1; then
+            echo "agcl@$VERSION is already on npm"
+          else
+            npm publish --provenance --access public
+          fi

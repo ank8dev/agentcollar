@@ -191,6 +191,7 @@ Known limits today: mandates live in memory (they disappear when the broker stop
 | Folder | What |
 |---|---|
 | [`broker/`](broker/) | The broker and the `agcl` CLI: TypeScript, runs on your own machine; published to npm as `agentcollar` |
+| [`npm-alias/agcl/`](npm-alias/agcl/) | Tiny package that reserves the name `agcl` on npm (`npx agcl` == `npx agentcollar`) |
 | [`docs/`](docs/) | Learning guide (`docs/learn-by-running.md`) and parked ideas (`docs/ideas/`) |
 | [`landing/`](landing/) | The website (Vite + GSAP), deployed to GitHub Pages on every push to `main` that changes `landing/` |
 | [`brand/`](brand/) | Logos and hand-drawn illustrations |
