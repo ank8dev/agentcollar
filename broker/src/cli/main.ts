@@ -20,6 +20,11 @@ const COMMANDS: Record<string, Command> = {
     summary: "connect your own Telegram bot (setup wizard)",
     run: async () => (await import("./setup.ts")).runSetup(),
   },
+  gmail: {
+    usage: "agcl gmail connect|status|disconnect",
+    summary: "connect your real Gmail (read + drafts; send stays blocked by the broker)",
+    run: async (args) => (await import("./gmail.ts")).runGmail(args),
+  },
   server: {
     usage: "agcl server",
     summary: "start the broker on 127.0.0.1",

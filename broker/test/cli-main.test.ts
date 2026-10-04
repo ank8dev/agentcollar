@@ -37,7 +37,7 @@ test("parseCommand: --no-intro is a flag anywhere, not an argument", () => {
 test("bin: --help lists every command, says agcl == agentcollar, and exits 0", () => {
   const { code, out } = run("--help");
   assert.equal(code, 0);
-  for (const command of ["setup", "server", "watch", "mandates", "logs", "revoke", "mcp"]) {
+  for (const command of ["setup", "gmail", "server", "watch", "mandates", "logs", "revoke", "mcp"]) {
     assert.ok(out.includes(`agcl ${command}`), command);
   }
   assert.ok(out.includes("agcl watch == agentcollar watch"));
@@ -53,4 +53,10 @@ test("bin: revoke without an id shows its usage and exits 1", () => {
   const { code, out } = run("revoke");
   assert.equal(code, 1);
   assert.ok(out.includes("agcl revoke <id>"));
+});
+
+test("bin: agcl gmail without a subcommand shows its usage and exits 1", () => {
+  const { code, out } = run("gmail");
+  assert.equal(code, 1);
+  assert.ok(out.includes("agcl gmail connect"));
 });

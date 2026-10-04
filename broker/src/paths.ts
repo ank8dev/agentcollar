@@ -11,6 +11,8 @@ export const homeDir = process.env.AGENTCOLLAR_HOME ?? join(homedir(), ".agentco
 export const envFile = join(homeDir, ".env"); // Telegram bot token + your user id
 export const auditLogFile = join(homeDir, "audit.log"); // every check and every human decision
 export const snapshotFile = join(homeDir, "mandates.json"); // for `agentcollar mandates`
+export const googleClientFile = join(homeDir, "google-client.json"); // your Google Cloud "Desktop app" client
+export const gmailInfoFile = join(homeDir, "gmail.json"); // which Gmail is connected (no secrets)
 
 // 700: only your macOS user can open the folder at all. chmod also fixes an existing folder.
 export function ensureHome(): void {

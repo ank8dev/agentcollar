@@ -5,7 +5,8 @@ import "./env.ts"; // first: loads broker/.env into process.env
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { askInTerminal, decide, denyStalePending, oneLine } from "./approval.ts";
 import { check, type CheckCode } from "./check.ts";
-import { createDraft, listInbox, sendEmail } from "./gmail-fake.ts";
+import { loadMailbox, readGmailInfo } from "./google/connection.ts";
+import { isEmailAddress } from "./mailbox.ts";
 import { mandates, onMandatesChanged, requestMandate, type Mandate } from "./mandate.ts";
 import { writeMandatesSnapshot } from "./snapshot.ts";
 import { notifyRevoked, notifyTimedOut, sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
@@ -31,6 +32,24 @@ const telegram = telegramConfig();
 // data/mandates.json for `agentcollar mandates`: fresh on start (memory is empty), then after every change.
 writeMandatesSnapshot();
 onMandatesChanged(() => writeMandatesSnapshot());
+
+// Your real Gmail after `agcl gmail connect`, otherwise the fake inbox.
+const mailbox = loadMailbox();
+
+// Reading/drafting through Gmail can fail (network, Google sign-in expired): tell the agent why, as 502.
+async function viaMailbox<T>(action: () => Promise<T>): Promise<T> {
+  try {
+    return await action();
+  } catch (error) {
+    throw new HttpError(502, (error as Error).message);
+  }
+}
+
+function requireEmail(body: Record<string, unknown>, field: string): string {
+  const value = requireString(body, field);
+  if (!isEmailAddress(value)) throw new HttpError(400, `"${field}" must be one email address`);
+  return value;
+}
 
 // A pending mandate nobody answered becomes "denied" after 10 minutes (fail closed).
 const PENDING_TIMEOUT_MS = 10 * 60 * 1000;
@@ -209,20 +228,22 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
   if (method === "GET" && path === "/inbox") {
     guard(req, "gmail.read");
-    return sendJson(res, 200, { messages: listInbox() });
+    return sendJson(res, 200, { messages: await viaMailbox(() => mailbox.listInbox()) });
   }
 
   if (method === "POST" && path === "/drafts") {
     guard(req, "gmail.draft");
     const body = await readJson(req);
-    const draft = createDraft(requireString(body, "to"), requireString(body, "subject"), requireString(body, "body"));
+    const [to, subject, text] = [requireEmail(body, "to"), requireString(body, "subject"), requireString(body, "body")];
+    const draft = await viaMailbox(() => mailbox.createDraft(to, subject, text));
     return sendJson(res, 201, { draft }); // 201 = "created"
   }
 
   if (method === "POST" && path === "/send") {
     guard(req, "gmail.send");
     const body = await readJson(req);
-    const email = sendEmail(requireString(body, "to"), requireString(body, "subject"), requireString(body, "body"));
+    const [to, subject, text] = [requireEmail(body, "to"), requireString(body, "subject"), requireString(body, "body")];
+    const email = await viaMailbox(() => mailbox.sendEmail(to, subject, text));
     return sendJson(res, 200, { sent: email });
   }
 
@@ -246,6 +267,8 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`Broker listening on http://${HOST}:${PORT}`);
+  const gmail = readGmailInfo();
+  console.log(mailbox.kind === "gmail" ? `Mailbox: Gmail (${gmail?.email ?? "connected"})` : "Mailbox: fake inbox (connect your Gmail: agcl gmail connect)");
   console.log(telegram ? "Approvals: Telegram" : "Approvals: this terminal (no TELEGRAM_BOT_TOKEN in .env)");
 });
 
