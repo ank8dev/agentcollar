@@ -150,6 +150,8 @@ Known limits today: mandates live in memory (they disappear on restart), Gmail i
 - [ ] An MCP interface, so existing agents can use the broker
 - [ ] Morning report: what every agent did tonight
 
+> **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
+
 ## Repository
 
 | Folder | What |
