@@ -37,7 +37,7 @@
 
 .site-footer__earth {
   /* rotate around the disc centre, not the PNG's centre (PNG has an uneven glow) */
-  transform-origin: 49.2% 47.5%;
+  transform-origin: 50% 47.8%;
   max-width: none; /* wider than the page on purpose (base img rule caps at 100%) */
   /* very, very slow spin (one turn in 6 minutes). Uses the CSS `rotate` property,
      separate from the GSAP parallax transform. */
@@ -283,11 +283,11 @@
     --sy: 5743;
     --sw: 78;
   }
-  /* Earth ×1.36: disc radius 1200, top of the disc at y 5921, centred on x 772 */
+  /* bigger Earth: disc radius 1200, top of the disc at y 5921, centred on x 772 */
   .site-footer .site-footer__earth {
-    left: calc(-491.2 * var(--u));
-    top: calc((5863.5 - var(--top)) * var(--u));
-    width: calc(2567 * var(--u));
+    left: calc(-428 * var(--u));
+    top: calc((5921 - var(--top)) * var(--u));
+    width: calc(2400 * var(--u));
   }
 }
 
