@@ -1,4 +1,4 @@
-// Logic of the setup wizard (npm run setup), with no terminal input/output,
+// Logic of the setup wizard (agcl setup), with no terminal input/output,
 // so every piece can be tested. The dialog itself is in src/cli/setup.ts.
 import { randomInt } from "node:crypto";
 import { chmodSync, writeFileSync } from "node:fs";
@@ -89,7 +89,7 @@ async function call(token: string, method: string, params: object): Promise<unkn
   if (data.ok) return data.result;
 
   if (data.error_code === 401) throw new Error("Telegram не узнал этот токен. Скопируй его заново у @BotFather (/mybots → бот → API Token).");
-  if (data.error_code === 409) throw new Error("Этого бота уже слушает другая программа. Останови npm run server и запусти npm run setup снова.");
+  if (data.error_code === 409) throw new Error("Этого бота уже слушает другая программа. Останови agcl server и запусти agcl setup снова.");
   throw new Error(`Telegram ${method}: ${data.description}`);
 }
 

@@ -54,7 +54,7 @@ export async function runMandates(args: string[]): Promise<number> {
 
   const snapshot = readMandatesSnapshot();
   if (snapshot === null) {
-    console.log("Брокер ещё не запускался. Запусти: npm run server");
+    console.log("Брокер ещё не запускался. Запусти: agcl server");
     return 0;
   }
   if (!isRunning(snapshot.pid)) {

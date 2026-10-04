@@ -27,7 +27,7 @@ test("an id that is not 8 hex characters is refused without any request", async 
   const urls = fakeBroker(200, {});
   const result = await revokeMandate("../../x", 8787);
   assert.equal(result.ok, false);
-  assert.match(result.message, /agentcollar revoke <id>/);
+  assert.match(result.message, /agcl revoke <id>/);
   assert.deepEqual(urls, []);
 });
 
@@ -42,6 +42,6 @@ test("broker not running gives a clear hint", async () => {
   }) as unknown as typeof fetch;
   assert.deepEqual(await revokeMandate("deadbeef", 8787), {
     ok: false,
-    message: "Брокер не отвечает. Он запущен (npm run server)?",
+    message: "Брокер не отвечает. Он запущен (agcl server)?",
   });
 });

@@ -15,8 +15,13 @@ test("parseCommand: the first word is the command, the rest are its arguments", 
   assert.deepEqual(parseCommand(["revoke", "a935774d"]), { kind: "run", name: "revoke", args: ["a935774d"], flags: { noIntro: false } });
 });
 
-test("parseCommand: no words, --help or -h -> help", () => {
-  assert.deepEqual(parseCommand([]), { kind: "help" });
+test("parseCommand: no words -> the default flow (intro, setup if needed, server)", () => {
+  assert.deepEqual(parseCommand([]), { kind: "default", flags: { noIntro: false } });
+  assert.deepEqual(parseCommand(["--no-intro"]), { kind: "default", flags: { noIntro: true } });
+});
+
+test("parseCommand: help, --help or -h -> help", () => {
+  assert.deepEqual(parseCommand(["help"]), { kind: "help" });
   assert.deepEqual(parseCommand(["--help"]), { kind: "help" });
   assert.deepEqual(parseCommand(["-h"]), { kind: "help" });
 });
@@ -29,10 +34,13 @@ test("parseCommand: --no-intro is a flag anywhere, not an argument", () => {
   assert.deepEqual(parseCommand(["--no-intro", "setup"]), { kind: "run", name: "setup", args: [], flags: { noIntro: true } });
 });
 
-test("bin: --help lists every command and exits 0", () => {
+test("bin: --help lists every command, says agcl == agentcollar, and exits 0", () => {
   const { code, out } = run("--help");
   assert.equal(code, 0);
-  for (const command of ["setup", "revoke"]) assert.ok(out.includes(`agentcollar ${command}`), command);
+  for (const command of ["setup", "server", "watch", "mandates", "logs", "revoke", "mcp"]) {
+    assert.ok(out.includes(`agcl ${command}`), command);
+  }
+  assert.ok(out.includes("agcl watch == agentcollar watch"));
 });
 
 test("bin: an unknown command says so and exits 1", () => {
@@ -44,5 +52,5 @@ test("bin: an unknown command says so and exits 1", () => {
 test("bin: revoke without an id shows its usage and exits 1", () => {
   const { code, out } = run("revoke");
   assert.equal(code, 1);
-  assert.ok(out.includes("agentcollar revoke <id>"));
+  assert.ok(out.includes("agcl revoke <id>"));
 });

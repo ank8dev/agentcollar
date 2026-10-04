@@ -110,5 +110,5 @@ test("broker not running -> a clear error for the model", async () => {
   }) as unknown as typeof fetch;
   const result = await tools().request_mandate!.call({ task: "t", actions: ["gmail.read"], expiresInSeconds: 60, limit: 1 });
   assert.equal(result.isError, true);
-  assert.match(textOf(result), /npm run server/);
+  assert.match(textOf(result), /agcl server/);
 });

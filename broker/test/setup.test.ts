@@ -145,5 +145,5 @@ test("pollForStart returns the user and the next offset", async () => {
 
 test("another program polling the same bot (409) gives a clear error", async () => {
   fakeTelegram(() => ({ ok: false, error_code: 409, description: "Conflict: terminated by other getUpdates request" }));
-  await assert.rejects(pollForStart(TOKEN, "K7P2M9QX", 0), /npm run server/);
+  await assert.rejects(pollForStart(TOKEN, "K7P2M9QX", 0), /agcl server/);
 });

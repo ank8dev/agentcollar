@@ -1,6 +1,6 @@
 // Phase 2: the broker as a local HTTP server.
 // The agent talks to it over HTTP; every Gmail endpoint goes through check() first.
-// Run: npm run server
+// Run: agcl server (or npm run server)
 import "./env.ts"; // first: loads broker/.env into process.env
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { askInTerminal, decide, denyStalePending, oneLine } from "./approval.ts";

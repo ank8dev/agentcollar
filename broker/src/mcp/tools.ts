@@ -17,7 +17,7 @@ function failure(message: string): ToolResult {
   return { content: [{ type: "text", text: message }], isError: true };
 }
 
-const BROKER_DOWN = failure("The AgentCollar broker is not running. Ask the human to start it: npm run server");
+const BROKER_DOWN = failure("The AgentCollar broker is not running. Ask the human to start it: agcl server");
 
 const mandateId = { type: "string", description: "The mandateId returned by request_mandate." };
 const emailFields = {

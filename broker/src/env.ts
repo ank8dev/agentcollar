@@ -5,8 +5,9 @@ import { envFile, legacyFiles } from "./paths.ts";
 
 if (existsSync(envFile)) {
   process.loadEnvFile(envFile); // built into Node: puts the lines of .env into process.env
-} else if (existsSync(legacyFiles.env)) {
-  // Older setups kept it in broker/.env. Still works; `agentcollar setup` offers to move it.
+} else if (process.env.AGENTCOLLAR_HOME === undefined && existsSync(legacyFiles.env)) {
+  // Older setups kept it in broker/.env. Still works; `agcl setup` offers to move it.
+  // (Not when AGENTCOLLAR_HOME is set: an explicit home means "look only there".)
   process.loadEnvFile(legacyFiles.env);
-  console.error("AgentCollar: настройки ещё в broker/.env — запусти agentcollar setup, чтобы перенести их в ~/.agentcollar/");
+  console.error("AgentCollar: настройки ещё в broker/.env — запусти agcl setup, чтобы перенести их в ~/.agentcollar/");
 }

@@ -1,4 +1,4 @@
-// agentcollar setup (or npm run setup) — connects the broker to YOUR Telegram bot, without editing files by hand.
+// agcl setup (= agentcollar setup, npm run setup) — connects the broker to YOUR Telegram bot, without editing files by hand.
 // 1) asks for the bot token and checks it with Telegram,
 // 2) you press Start in the bot: we take your user id from that message,
 // 3) writes ~/.agentcollar/.env readable only by you (600).
@@ -120,13 +120,13 @@ async function setup(): Promise<number> {
   }
   await skipOldUpdates(token); // tell Telegram we handled these messages
   if (user === undefined) {
-    console.log("Время вышло. Запусти agentcollar setup ещё раз.");
+    console.log("Время вышло. Запусти agcl setup ещё раз.");
     return 1;
   }
 
   const who = [user.firstName, user.username ? `@${user.username}` : "", `id ${user.id}`].filter(Boolean).join(", ");
   if (!yes(await ask(`✓ Это ты? ${who} [y/N] `))) {
-    console.log("Ничего не записал. Запусти agentcollar setup ещё раз.");
+    console.log("Ничего не записал. Запусти agcl setup ещё раз.");
     return 1;
   }
 
@@ -137,6 +137,6 @@ async function setup(): Promise<number> {
   await sendText(token, user.id, "✅ Брокер настроен. Запросы мандатов будут приходить сюда.").catch(() => {});
 
   console.log(`✓ Записано в ${envFile} (права 600: читать может только твой пользователь macOS)`);
-  console.log("Дальше: npm run server");
+  console.log("Дальше: agcl server (или просто agcl)");
   return 0;
 }
