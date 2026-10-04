@@ -5,7 +5,7 @@ import { basename, dirname } from "node:path";
 import { styleText } from "node:util";
 import type { AuditEntry } from "../audit-log.ts";
 import { auditLogFile } from "../audit.ts";
-import { formatEntry, isToday } from "./format.ts";
+import { fit, formatEntry, isToday, termWidth } from "./format.ts";
 import { createTail } from "./tail.ts";
 
 const RECENT = 10; // how many past events to show first, for context
@@ -21,7 +21,10 @@ export async function runWatch(args: string[]): Promise<number> {
   }
 
   console.log(`${styleText("bold", "AgentCollar · watch")}   ${styleText("dim", "Ctrl+C to quit")}`);
-  console.log(styleText("dim", "checks: 1 token · 2 approved · 3 not expired · 4 not revoked · 5 action allowed · 6 limit"));
+  const legend = termWidth() >= 90
+    ? "checks: 1 token · 2 approved · 3 not expired · 4 not revoked · 5 action allowed · 6 limit"
+    : "✓✗· = checks: token, approved, time, revoked, action, limit";
+  console.log(styleText("dim", fit(legend, termWidth())));
 
   const tail = createTail(auditLogFile);
   const past = tail.readNew().slice(-RECENT);

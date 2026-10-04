@@ -68,6 +68,8 @@ function render(mask: Mask, dotsWide: number, angle: number): string[] {
 
 const big = loadMask(48 * SUPERSAMPLE);
 const spin = Array.from({ length: 12 }, (_, i) => render(big, 48, i * 30));
+const small = loadMask(32 * SUPERSAMPLE);
+const spinSmall = Array.from({ length: 12 }, (_, i) => render(small, 32, i * 30));
 const shrink = [32, 20, 12].map((dots) => render(loadMask(dots * SUPERSAMPLE), dots, 0));
 const icon = render(loadMask(8 * SUPERSAMPLE), 8, 0);
 
@@ -79,6 +81,9 @@ writeFileSync(
 
 // The medallion, 48×48 dots (24 columns × 12 rows), turned 0°, 30°, … 330° clockwise.
 export const SPIN: string[][] = ${list(spin)};
+
+// The same, 32×32 dots (16 columns × 8 rows), for narrow terminal windows.
+export const SPIN_SMALL: string[][] = ${list(spinSmall)};
 
 // Upright and smaller (32, 20, 12 dots): the medallion "flies" into the header.
 export const SHRINK: string[][] = ${list(shrink)};

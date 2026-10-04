@@ -2,35 +2,49 @@
 // and un-types, then the medallion shrinks into the header. About 1.7 s; any key skips it.
 // The frames are plain text made once from the logo (see tools/gen-intro.ts).
 import { styleText } from "node:util";
-import { ICON, SHRINK, SPIN } from "./intro-frames.ts";
+import { ICON, SHRINK, SPIN, SPIN_SMALL } from "./intro-frames.ts";
 
 export type Frame = { lines: string[]; delayMs: number };
 
 const WORD = "AgentCollar";
 const WELCOME = "Welcome. Let agents work. Keep the keys.";
-const HEIGHT = SPIN[0]!.length; // every frame has this many lines, so each one overwrites the last
-const WORD_ROW = Math.floor(HEIGHT / 2) - 1;
-const WORD_COLUMN = 28;
+const WELCOME_SHORT = "Let agents work. Keep the keys.";
 
-function frame(medallion: string[], word = "", delayMs = 0): Frame {
-  const lines = Array.from({ length: HEIGHT }, (_, row) => {
-    const left = medallion[row] ?? "";
-    return row === WORD_ROW && word !== "" ? left.padEnd(WORD_COLUMN) + word : left;
-  });
-  return { lines, delayMs };
+export type IntroSize = "big" | "small" | "none";
+
+// The big medallion needs 60×16, the small one 44×12; a smaller window gets no intro at all.
+export function introSize(columns: number, rows: number): IntroSize {
+  if (columns >= 60 && rows >= SPIN[0]!.length + 4) return "big";
+  if (columns >= 44 && rows >= SPIN_SMALL[0]!.length + 4) return "small";
+  return "none";
 }
 
 // The whole animation as data: easy to test (duration, sizes) and to play.
-export function introTimeline(): Frame[] {
-  const upright = SPIN[0]!;
+export function introTimeline(size: Exclude<IntroSize, "none"> = "big", width = 100): Frame[] {
+  const spin = size === "big" ? SPIN : SPIN_SMALL;
+  const height = spin[0]!.length; // every frame has this many lines, so each one overwrites the last
+  const wordRow = Math.floor(height / 2) - 1;
+  const wordColumn = Math.max(...spin[0]!.map((line) => [...line].length)) + 3;
+
+  const frame = (medallion: string[], word = "", delayMs = 0): Frame => ({
+    lines: Array.from({ length: height }, (_, row) => {
+      const left = medallion[row] ?? "";
+      return row === wordRow && word !== "" ? left.padEnd(wordColumn) + word : left;
+    }),
+    delayMs,
+  });
+
+  const upright = spin[0]!;
   const frames: Frame[] = [];
-  for (const turned of SPIN) frames.push(frame(turned, "", 40)); // one full turn
+  for (const turned of spin) frames.push(frame(turned, "", 40)); // one full turn
   frames.push(frame(upright, "", 40)); // settles upright
   for (let i = 1; i <= WORD.length; i++) frames.push(frame(upright, WORD.slice(0, i), 45)); // types
   frames[frames.length - 1]!.delayMs = 250; // holds the full name
   for (let i = WORD.length - 1; i >= 0; i--) frames.push(frame(upright, WORD.slice(0, i), 22)); // un-types
-  for (const smaller of SHRINK) frames.push(frame(smaller, "", 60)); // flies into the header
-  frames.push(frame([`${ICON[0]}  ${styleText("bold", WORD)}`, `${ICON[1]}  ${WELCOME}`]));
+  const shrink = size === "big" ? SHRINK : SHRINK.slice(1); // the small intro starts at 32 dots already
+  for (const smaller of shrink) frames.push(frame(smaller, "", 60)); // flies into the header
+  const welcome = width >= WELCOME.length + 6 ? WELCOME : WELCOME_SHORT;
+  frames.push(frame([`${ICON[0]}  ${styleText("bold", WORD)}`, `${ICON[1]}  ${welcome}`]));
   return frames;
 }
 
@@ -47,7 +61,7 @@ export function shouldShowIntro(c: IntroContext): boolean {
   if (c.noIntro || !c.stdoutTTY) return false;
   if (c.env.CI !== undefined || c.env.TERM === "dumb") return false;
   if (c.env.NO_COLOR !== undefined && c.env.NO_COLOR !== "") return false; // no-color.org rule
-  return c.columns >= 72 && c.rows >= HEIGHT + 4;
+  return introSize(c.columns, c.rows) !== "none";
 }
 
 // ANSI escape codes used below:
@@ -59,7 +73,10 @@ export function shouldShowIntro(c: IntroContext): boolean {
 const ESC = "\u001b";
 
 export async function playIntro(out: NodeJS.WriteStream = process.stdout, input: NodeJS.ReadStream = process.stdin): Promise<void> {
-  const frames = introTimeline();
+  const size = introSize(out.columns ?? 100, out.rows ?? 40);
+  if (size === "none") return;
+  const frames = introTimeline(size, out.columns ?? 100);
+  const HEIGHT = frames[0]!.lines.length;
   let skipped = false;
   let ctrlC = false;
   let wake: () => void = () => {};

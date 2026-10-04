@@ -2,6 +2,7 @@
 import { styleText } from "node:util";
 import { oneLine } from "../approval.ts";
 import { readMandatesSnapshot, type SnapshotMandate } from "../snapshot.ts";
+import { fit, termWidth } from "./format.ts";
 
 export type Row = { id: string; agent: string; actions: string; state: string; timeLeft: string; limit: string; live: boolean };
 
@@ -46,6 +47,41 @@ function isRunning(pid: number): boolean {
 
 const COLUMNS = ["ID", "AGENT", "ACTIONS", "STATE", "TIME LEFT", "USED"] as const;
 
+function colorState(row: Row, text: string): string {
+  if (row.live) return styleText("green", text);
+  if (row.state === "waiting") return styleText("yellow", text);
+  return text;
+}
+
+// A table when it fits the window, otherwise one small "card" (two lines) per mandate.
+export function formatMandates(mandates: SnapshotMandate[], now: number = Date.now(), width: number = termWidth()): string {
+  const rows = [...mandates].sort((a, b) => b.createdAt - a.createdAt).map((m) => mandateRow(m, now));
+  const cells = (r: Row) => [r.id, r.agent, r.actions, r.state, r.timeLeft, r.limit];
+  const widths = COLUMNS.map((title, i) => Math.max(title.length, ...rows.map((r) => cells(r)[i]!.length)));
+  const tableWidth = widths.reduce((sum, w) => sum + w, 0) + 2 * (widths.length - 1);
+  const dimIfEnded = (row: Row, text: string) => (row.live || row.state === "waiting" ? text : styleText("dim", text));
+
+  if (tableWidth <= width) {
+    // pad first, color after: color codes are invisible but would break the padding
+    const lines = [styleText("dim", COLUMNS.map((title, i) => title.padEnd(widths[i]!)).join("  "))];
+    for (const row of rows) {
+      const line = cells(row).map((c, i) => c.padEnd(widths[i]!));
+      line[3] = colorState(row, line[3]!);
+      lines.push(dimIfEnded(row, line.join("  ")));
+    }
+    return lines.join("\n");
+  }
+
+  return rows
+    .map((row) => {
+      const time = row.timeLeft === "—" ? "" : `  ${row.timeLeft} left`;
+      const head = fit(`${row.id}  ${row.state}${time}  ${row.limit} used`, width);
+      const colored = head.replace(row.state, colorState(row, row.state));
+      return dimIfEnded(row, `${colored}\n  ${fit(`${row.agent} · ${row.actions}`, width - 2)}`);
+    })
+    .join("\n");
+}
+
 export async function runMandates(args: string[]): Promise<number> {
   if (args.length > 0) {
     console.error(`agcl mandates takes no arguments: ${args.join(" ")}`);
@@ -65,17 +101,6 @@ export async function runMandates(args: string[]): Promise<number> {
     console.log("No mandates yet.");
     return 0;
   }
-
-  const rows = [...snapshot.mandates].sort((a, b) => b.createdAt - a.createdAt).map((m) => mandateRow(m));
-  const cells = (r: Row) => [r.id, r.agent, r.actions, r.state, r.timeLeft, r.limit];
-  const widths = COLUMNS.map((title, i) => Math.max(title.length, ...rows.map((r) => cells(r)[i]!.length)));
-
-  // pad first, color after: color codes are invisible but would break the padding
-  console.log(styleText("dim", COLUMNS.map((title, i) => title.padEnd(widths[i]!)).join("  ")));
-  for (const row of rows) {
-    const line = cells(row).map((cell, i) => cell.padEnd(widths[i]!));
-    line[3] = row.live ? styleText("green", line[3]!) : row.state === "waiting" ? styleText("yellow", line[3]!) : line[3]!;
-    console.log(row.live || row.state === "waiting" ? line.join("  ") : styleText("dim", line.join("  ")));
-  }
+  console.log(formatMandates(snapshot.mandates));
   return 0;
 }

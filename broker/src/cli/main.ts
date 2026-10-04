@@ -2,6 +2,7 @@
 // both names point to one file, so `agcl watch` == `agentcollar watch`.
 // Each command lives in its own file and is loaded only when it is used.
 import { styleText } from "node:util";
+import { fit, termWidth, wrap } from "./format.ts";
 
 export type Flags = { noIntro: boolean };
 
@@ -82,10 +83,15 @@ export function parseCommand(argv: string[]): Parsed {
 }
 
 function helpText(): string {
+  const screen = termWidth();
   const width = Math.max(...Object.values(COMMANDS).map((c) => c.usage.length)) + 3;
-  const row = (left: string, right: string) => `  ${styleText("cyan", left.padEnd(width))}${right}`;
+  // wide window: "usage   summary" on one line; narrow: the summary goes under the usage
+  const row = (left: string, right: string) =>
+    screen >= width + 40
+      ? `  ${styleText("cyan", left.padEnd(width))}${fit(right, screen - width - 2)}`
+      : `  ${styleText("cyan", fit(left, screen - 2))}\n${wrap(right, screen - 6).map((line) => `      ${line}`).join("\n")}`;
   return [
-    `${styleText("bold", "AgentCollar")} — let agents work, keep the keys.`,
+    fit(`${styleText("bold", "AgentCollar")} — let agents work, keep the keys.`, screen + 20),
     "",
     row("agcl", "intro → setup wizard (first time only) → broker"),
     ...Object.values(COMMANDS).map((c) => row(c.usage, c.summary)),
@@ -93,8 +99,8 @@ function helpText(): string {
     row("--no-intro", "skip the intro"),
     row("-h, --help", "this help"),
     "",
-    styleText("dim", "agcl is the short name of agentcollar: agcl watch == agentcollar watch"),
-    styleText("dim", "Your data: ~/.agentcollar/ (only you can open it)"),
+    styleText("dim", fit("agcl is the short name of agentcollar: agcl watch == agentcollar watch", screen)),
+    styleText("dim", fit("Your data: ~/.agentcollar/ (only you can open it)", screen)),
   ].join("\n");
 }
 
