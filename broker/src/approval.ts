@@ -2,7 +2,7 @@
 // Two channels: Telegram (if configured) or the terminal where the server runs.
 import { createInterface } from "node:readline/promises";
 import { writeAudit } from "./audit.ts";
-import { approve, deny, revoke, type Mandate } from "./mandate.ts";
+import { approve, deny, findStalePending, revoke, type Mandate } from "./mandate.ts";
 
 export type Decision = "approve" | "deny" | "revoke";
 
@@ -16,6 +16,17 @@ export function decide(id: string, decision: Decision, by: string): Mandate | un
     writeAudit(mandate.agent, `mandate.${decision}`, decision === "approve", `${decision} by ${by}, mandate ${id}`);
   }
   return mandate;
+}
+
+// Fail closed: a request nobody answered in time is denied, never left hanging.
+// Returns the mandates it denied, so the server can update their Telegram messages.
+export function denyStalePending(maxAgeMs: number, now: number = Date.now()): Mandate[] {
+  const denied: Mandate[] = [];
+  for (const mandate of findStalePending(maxAgeMs, now)) {
+    const result = decide(mandate.id, "deny", "timeout");
+    if (result !== undefined) denied.push(result);
+  }
+  return denied;
 }
 
 // Text written by the agent (its name, the task) is shown to the human, so a bad agent
@@ -57,8 +68,17 @@ export function askInTerminal(mandate: Mandate): void {
     const answer = await rl.question(`\nНовый запрос мандата:\n${describe(mandate)}\nОдобрить? [y/N] `);
     rl.close();
 
-    const decision = answer.trim().toLowerCase() === "y" ? "approve" : "deny";
-    decide(mandate.id, decision, "terminal");
-    console.log(decision === "approve" ? "  ✅ одобрен" : "  ❌ отклонён");
+    console.log(applyTerminalAnswer(mandate, answer));
   });
+}
+
+// Applies the human's terminal answer and says what REALLY happened.
+// The question may have waited so long that the mandate already timed out
+// (or was decided in Telegram): then the answer changes nothing, and we say so.
+export function applyTerminalAnswer(mandate: Mandate, answer: string): string {
+  const decision = answer.trim().toLowerCase() === "y" ? "approve" : "deny";
+  if (decide(mandate.id, decision, "terminal") === undefined) {
+    return "  ⌛ уже решено (время вышло или ответили в Telegram), ответ не применён";
+  }
+  return decision === "approve" ? "  ✅ одобрен" : "  ❌ отклонён";
 }

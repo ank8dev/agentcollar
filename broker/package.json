@@ -8,6 +8,7 @@
     "demo": "tsx src/demo.ts",
     "server": "tsx src/server.ts",
     "agent": "tsx src/agent.ts",
+    "test": "BROKER_AUDIT_LOG=${TMPDIR:-/tmp}/agentcollar-test-audit.log tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

@@ -49,7 +49,7 @@ function runChecks(token: string, action: Action): CheckResult {
     return deny("not_approved", "mandate is waiting for human approval");
   }
   if (mandate.status === "denied") {
-    return deny("not_approved", "mandate was denied by the human");
+    return deny("not_approved", "mandate was denied (by the human, or no answer in time)");
   }
 
   // 3. Not expired

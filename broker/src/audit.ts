@@ -1,10 +1,11 @@
 import { appendFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 // broker/data/audit.log, found from this file's folder (broker/src),
 // so it lands in the same place no matter where you run the command from.
-const dataDir = join(import.meta.dirname, "..", "data");
-const logFile = join(dataDir, "audit.log");
+// Tests set BROKER_AUDIT_LOG to a temp file, so they never write into your real log.
+const logFile = process.env.BROKER_AUDIT_LOG ?? join(import.meta.dirname, "..", "data", "audit.log");
+const dataDir = dirname(logFile);
 
 // Text that came from outside (agent name, action) could contain a line break
 // and fake a second log line. JSON.stringify wraps it in quotes and turns a line

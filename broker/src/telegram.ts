@@ -54,13 +54,30 @@ function statusLine(mandate: Mandate): string {
   return "⏳ Ждёт решения";
 }
 
+// Which Telegram message shows which mandate, so it can be edited later (e.g. on timeout).
+const sentMessages = new Map<string, { chatId: number; messageId: number }>(); // mandate id -> message
+
 // Sent when an agent asks for a mandate. Only the public id goes to Telegram, never the token.
 // Plain text (no parse_mode): the agent wrote the task text, so we do not let it format anything.
 export async function sendApprovalRequest(config: TelegramConfig, mandate: Mandate): Promise<void> {
-  await callApi(config, "sendMessage", {
+  const message = (await callApi(config, "sendMessage", {
     chat_id: config.approverId, // in a private chat, chat id = user id
     text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n${statusLine(mandate)}`,
     reply_markup: { inline_keyboard: buttons(mandate) },
+  })) as { message_id: number };
+  sentMessages.set(mandate.id, { chatId: config.approverId, messageId: message.message_id });
+}
+
+// Nobody answered in time: the message must not keep showing "waiting" with live buttons.
+export async function notifyTimedOut(config: TelegramConfig, mandate: Mandate): Promise<void> {
+  const sent = sentMessages.get(mandate.id);
+  if (sent === undefined) return; // this mandate was never shown in Telegram
+  sentMessages.delete(mandate.id);
+  await callApi(config, "editMessageText", {
+    chat_id: sent.chatId,
+    message_id: sent.messageId,
+    text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n⌛ Время вышло`,
+    reply_markup: { inline_keyboard: [] },
   });
 }
 

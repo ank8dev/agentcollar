@@ -4,11 +4,11 @@
 import { existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
-import { askInTerminal, decide, oneLine } from "./approval.ts";
+import { askInTerminal, decide, denyStalePending, oneLine } from "./approval.ts";
 import { check, type CheckCode } from "./check.ts";
 import { createDraft, listInbox, sendEmail } from "./gmail-fake.ts";
 import { mandates, requestMandate, type Mandate } from "./mandate.ts";
-import { sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
+import { notifyTimedOut, sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
 
 // --- configuration from broker/.env (secrets live there, never in the code) ---
 
@@ -32,6 +32,9 @@ function telegramConfig(): TelegramConfig | undefined {
   return { botToken, approverId };
 }
 const telegram = telegramConfig();
+
+// A pending mandate nobody answered becomes "denied" after 10 minutes (fail closed).
+const PENDING_TIMEOUT_MS = 10 * 60 * 1000;
 
 // --- small HTTP helpers ---
 
@@ -242,6 +245,16 @@ server.listen(PORT, HOST, () => {
   console.log(`Broker listening on http://${HOST}:${PORT}`);
   console.log(telegram ? "Approvals: Telegram" : "Approvals: this terminal (no TELEGRAM_BOT_TOKEN in .env)");
 });
+
+// Every 30 seconds: deny requests nobody answered, and fix their Telegram messages.
+setInterval(() => {
+  for (const mandate of denyStalePending(PENDING_TIMEOUT_MS)) {
+    console.log(`Mandate ${mandate.id}: no answer in 10 minutes, denied`);
+    if (telegram) {
+      notifyTimedOut(telegram, mandate).catch((error: Error) => console.error(`Telegram: ${error.message}`));
+    }
+  }
+}, 30_000);
 
 if (telegram) {
   startTelegramPolling(telegram).catch((error: Error) => {

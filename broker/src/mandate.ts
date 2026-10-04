@@ -22,6 +22,7 @@ export type Mandate = {
   limit: number; // max number of allowed actions
   used: number; // allowed actions so far
   revoked: boolean;
+  createdAt: number; // when the agent asked (milliseconds); used for the 10-minute pending timeout
 };
 
 // In-memory store: token -> mandate.
@@ -49,6 +50,7 @@ export function requestMandate(
     limit,
     used: 0,
     revoked: false,
+    createdAt: Date.now(),
   };
   mandates.set(mandate.token, mandate);
   return mandate;
@@ -73,6 +75,11 @@ export function findById(id: string): Mandate | undefined {
     if (mandate.id === id) return mandate;
   }
   return undefined;
+}
+
+// Pending mandates nobody answered for longer than maxAgeMs (the server uses 10 minutes).
+export function findStalePending(maxAgeMs: number, now: number = Date.now()): Mandate[] {
+  return [...mandates.values()].filter((mandate) => mandate.status === "pending" && now - mandate.createdAt > maxAgeMs);
 }
 
 // Human says yes. Only a pending mandate can be decided, and only once.
