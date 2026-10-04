@@ -1,18 +1,49 @@
 {
-  "name": "agentcollar-broker",
+  "name": "agentcollar",
   "version": "0.1.0",
-  "description": "AgentCollar broker: checks an agent's mandate before every action",
-  "private": true,
+  "description": "A small local broker between your AI agents and your accounts: short-lived, task-scoped mandates that you approve in Telegram, instead of passwords.",
+  "keywords": [
+    "ai-agents",
+    "mcp",
+    "security",
+    "gmail",
+    "telegram",
+    "claude-code",
+    "audit-log",
+    "least-privilege"
+  ],
+  "homepage": "https://ank8dev.github.io/agentcollar/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ank8dev/agentcollar.git",
+    "directory": "broker"
+  },
+  "bugs": {
+    "url": "https://github.com/ank8dev/agentcollar/issues"
+  },
+  "author": "ank8dev",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "bin": {
-    "agentcollar": "bin/agentcollar.mjs"
+    "agentcollar": "dist/cli.js",
+    "agcl": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
     "demo": "tsx src/demo.ts",
     "server": "tsx src/server.ts",
     "agent": "tsx src/agent.ts",
-    "setup": "tsx src/cli/run.ts setup",
-    "revoke": "tsx src/cli/run.ts revoke",
+    "setup": "tsx src/cli.ts setup",
+    "revoke": "tsx src/cli.ts revoke",
     "test": "AGENTCOLLAR_HOME=${TMPDIR:-/tmp}/agentcollar-test-home tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

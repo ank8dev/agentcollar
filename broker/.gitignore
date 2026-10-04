@@ -9,3 +9,9 @@ data/
 .env.*
 !.env.example
 *.pem
+
+# Build output (npm run build), recreated from src/
+dist/
+
+# npm pack output
+*.tgz

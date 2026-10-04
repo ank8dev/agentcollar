@@ -1,0 +1,14 @@
+{
+  // `npm run build`: TypeScript -> plain JavaScript in dist/, which is what npm users run.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    // our imports say "./x.ts"; in dist/ they must say "./x.js"
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": ["src"],
+  // dev-only scripts, not needed by users
+  "exclude": ["src/demo.ts", "src/agent.ts"]
+}
