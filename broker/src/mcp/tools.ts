@@ -5,7 +5,10 @@ import type { Tool, ToolResult } from "./protocol.ts";
 export type ToolsOptions = {
   brokerUrl: string; // http://127.0.0.1:8787
   agentName: () => string; // from MCP "initialize", e.g. "claude-code"
+  pollEveryMs?: number; // how often mandate_status asks the broker while waiting (tests use 1)
 };
+
+const MAX_WAIT_SECONDS = 120;
 
 type BrokerReply = { status: number; data: Record<string, unknown> };
 
@@ -15,6 +18,14 @@ function text(value: unknown): ToolResult {
 
 function failure(message: string): ToolResult {
   return { content: [{ type: "text", text: message }], isError: true };
+}
+
+function isPending(result: ToolResult): boolean {
+  try {
+    return (JSON.parse(result.content[0]?.text ?? "{}") as { status?: string }).status === "pending";
+  } catch {
+    return false;
+  }
 }
 
 const BROKER_DOWN = failure("The AgentCollar broker is not running. Ask the human to start it: agcl server");
@@ -100,9 +111,37 @@ export function createTools(options: ToolsOptions): Tool[] {
     },
     {
       name: "mandate_status",
-      description: "Current state of a mandate: pending / approved / denied, revoked, expiry, actions used.",
-      inputSchema: { type: "object", properties: { mandateId }, required: ["mandateId"] },
-      call: (args) => withMandate(args, "GET", "/mandate"),
+      description:
+        "Current state of a mandate: pending / approved / denied, revoked, expiry, actions used. " +
+        "Right after request_mandate, pass waitSeconds (e.g. 90): the call returns as soon as the human " +
+        "approves or denies in Telegram, so you do not need to call it again and again.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          mandateId,
+          waitSeconds: {
+            type: "number",
+            minimum: 0,
+            maximum: MAX_WAIT_SECONDS,
+            description: "Wait up to this many seconds while the mandate is still pending.",
+          },
+        },
+        required: ["mandateId"],
+      },
+      async call(args) {
+        // Long polling inside THIS process: the model makes one call, we ask the broker every
+        // 2 s until the human decides (or the time is up). The interval is ours, not the model's.
+        const waitSeconds = Math.min(Math.max(Number(args.waitSeconds) || 0, 0), MAX_WAIT_SECONDS);
+        const deadline = Date.now() + waitSeconds * 1000;
+        const every = options.pollEveryMs ?? 2000;
+
+        let result = await withMandate(args, "GET", "/mandate");
+        while (!result.isError && isPending(result) && Date.now() < deadline) {
+          await new Promise((resolve) => setTimeout(resolve, Math.min(every, Math.max(deadline - Date.now(), 0))));
+          result = await withMandate(args, "GET", "/mandate");
+        }
+        return result;
+      },
     },
     {
       name: "gmail_read_inbox",

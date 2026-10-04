@@ -33,7 +33,7 @@ const mandateCreated = {
 };
 
 function tools(): Record<string, Tool> {
-  const list = createTools({ brokerUrl: "http://127.0.0.1:8787", agentName: () => "claude-code" });
+  const list = createTools({ brokerUrl: "http://127.0.0.1:8787", agentName: () => "claude-code", pollEveryMs: 1 });
   return Object.fromEntries(list.map((tool) => [tool.name, tool]));
 }
 
@@ -111,4 +111,44 @@ test("broker not running -> a clear error for the model", async () => {
   const result = await tools().request_mandate!.call({ task: "t", actions: ["gmail.read"], expiresInSeconds: 60, limit: 1 });
   assert.equal(result.isError, true);
   assert.match(textOf(result), /agcl server/);
+});
+
+test("mandate_status with waitSeconds waits until the human decides, then answers once", async () => {
+  let checks = 0;
+  const requests = fakeBroker({ ...mandateCreated });
+  const t = tools();
+  await t.request_mandate!.call({ task: "t", actions: ["gmail.read"], expiresInSeconds: 300, limit: 5 });
+  // the broker says "pending" twice, then "approved"
+  const realFetch2 = globalThis.fetch;
+  globalThis.fetch = (async (url: string, init: { method: string; headers: Record<string, string> }) => {
+    if (new URL(url).pathname === "/mandate") {
+      checks++;
+      const status = checks < 3 ? "pending" : "approved";
+      return { status: 200, json: async () => ({ id: "a935774d", status }) };
+    }
+    return realFetch2(url, init as RequestInit);
+  }) as unknown as typeof fetch;
+
+  const result = await t.mandate_status!.call({ mandateId: "a935774d", waitSeconds: 10 });
+  assert.equal(result.isError, undefined);
+  assert.match(textOf(result), /"approved"/);
+  assert.equal(checks, 3);
+  assert.equal(requests.length, 1); // only the POST /mandates went to the first fake
+});
+
+test("mandate_status without waitSeconds answers immediately, even if pending", async () => {
+  fakeBroker({ ...mandateCreated, "GET /mandate": { status: 200, body: { id: "a935774d", status: "pending" } } });
+  const t = tools();
+  await t.request_mandate!.call({ task: "t", actions: ["gmail.read"], expiresInSeconds: 300, limit: 5 });
+  assert.match(textOf(await t.mandate_status!.call({ mandateId: "a935774d" })), /"pending"/);
+});
+
+test("mandate_status waiting gives up after waitSeconds and says it is still pending", async () => {
+  fakeBroker({ ...mandateCreated, "GET /mandate": { status: 200, body: { id: "a935774d", status: "pending" } } });
+  const t = tools();
+  await t.request_mandate!.call({ task: "t", actions: ["gmail.read"], expiresInSeconds: 300, limit: 5 });
+  const started = Date.now();
+  const result = await t.mandate_status!.call({ mandateId: "a935774d", waitSeconds: 0.05 });
+  assert.ok(Date.now() - started < 2000);
+  assert.match(textOf(result), /"pending"/);
 });

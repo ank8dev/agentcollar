@@ -26,7 +26,8 @@ const SERVER_INFO = { name: "agentcollar", version: "0.1.0" };
 
 const INSTRUCTIONS =
   "AgentCollar guards the human's accounts. First call request_mandate with only the actions you need; " +
-  "the human approves it in Telegram. Poll mandate_status until it is approved, then pass the mandateId " +
+  "the human approves it in Telegram. Then call mandate_status once with waitSeconds: 90 (it returns as soon " +
+  "as the human decides) and, if approved, pass the mandateId " +
   "to the gmail_* tools. Refusals are final: explain them to the human instead of retrying.";
 
 type Id = string | number | null;
