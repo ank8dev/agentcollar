@@ -19,7 +19,7 @@ export async function runStart(flags: Flags): Promise<number> {
   // Ask only a person at a terminal; a script or pipe goes straight to the server.
   const configured = (process.env.TELEGRAM_BOT_TOKEN ?? "") !== "";
   if (!configured && process.stdin.isTTY) {
-    const answer = await ask("Telegram ещё не настроен. Настроить сейчас? [Y/n] (n — одобрять запросы в этом терминале) ");
+    const answer = await ask("Telegram is not set up yet. Set it up now? [Y/n] (n = approve requests in this terminal) ");
     if (answer === "" || answer === "y") {
       const code = await (await import("./setup.ts")).runSetup();
       if (code !== 0) return code;

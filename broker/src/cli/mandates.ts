@@ -15,14 +15,14 @@ function duration(ms: number): string {
 
 // The same order as check(): the first thing that ends a mandate decides its name.
 export function mandateRow(m: SnapshotMandate, now: number = Date.now()): Row {
-  let state = "активен";
-  if (m.status === "pending") state = "ждёт решения";
-  else if (m.status === "denied") state = "отклонён";
-  else if (now > m.expiresAt) state = "истёк";
-  else if (m.revoked) state = "отозван";
-  else if (m.used >= m.limit) state = "лимит исчерпан";
+  let state = "active";
+  if (m.status === "pending") state = "waiting";
+  else if (m.status === "denied") state = "denied";
+  else if (now > m.expiresAt) state = "expired";
+  else if (m.revoked) state = "revoked";
+  else if (m.used >= m.limit) state = "limit used up";
 
-  const live = state === "активен";
+  const live = state === "active";
   return {
     id: m.id,
     agent: oneLine(m.agent, 24), // agent text: control characters removed before printing
@@ -44,25 +44,25 @@ function isRunning(pid: number): boolean {
   }
 }
 
-const COLUMNS = ["ID", "АГЕНТ", "ДЕЙСТВИЯ", "СТАТУС", "ОСТАЛОСЬ", "ЛИМИТ"] as const;
+const COLUMNS = ["ID", "AGENT", "ACTIONS", "STATE", "TIME LEFT", "USED"] as const;
 
 export async function runMandates(args: string[]): Promise<number> {
   if (args.length > 0) {
-    console.error(`agentcollar mandates не принимает аргументов: ${args.join(" ")}`);
+    console.error(`agcl mandates takes no arguments: ${args.join(" ")}`);
     return 1;
   }
 
   const snapshot = readMandatesSnapshot();
   if (snapshot === null) {
-    console.log("Брокер ещё не запускался. Запусти: agcl server");
+    console.log("The broker has not been started yet. Run: agcl server");
     return 0;
   }
   if (!isRunning(snapshot.pid)) {
-    console.log("Брокер не запущен. Мандаты живут в его памяти, поэтому после остановки их нет.");
+    console.log("The broker is not running. Mandates live in its memory, so they are gone once it stops.");
     return 0;
   }
   if (snapshot.mandates.length === 0) {
-    console.log("Мандатов пока нет.");
+    console.log("No mandates yet.");
     return 0;
   }
 
@@ -74,8 +74,8 @@ export async function runMandates(args: string[]): Promise<number> {
   console.log(styleText("dim", COLUMNS.map((title, i) => title.padEnd(widths[i]!)).join("  ")));
   for (const row of rows) {
     const line = cells(row).map((cell, i) => cell.padEnd(widths[i]!));
-    line[3] = row.live ? styleText("green", line[3]!) : row.state === "ждёт решения" ? styleText("yellow", line[3]!) : line[3]!;
-    console.log(row.live || row.state === "ждёт решения" ? line.join("  ") : styleText("dim", line.join("  ")));
+    line[3] = row.live ? styleText("green", line[3]!) : row.state === "waiting" ? styleText("yellow", line[3]!) : line[3]!;
+    console.log(row.live || row.state === "waiting" ? line.join("  ") : styleText("dim", line.join("  ")));
   }
   return 0;
 }

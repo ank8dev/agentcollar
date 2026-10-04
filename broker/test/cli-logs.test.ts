@@ -47,8 +47,8 @@ test("filters: --agent, --denied, --today (local date)", () => {
 
 test("parseLogsArgs: flags, and clear errors for unknown flags or a missing value", () => {
   assert.deepEqual(parseLogsArgs(["--agent", "digest-agent", "--denied"]), { agent: "digest-agent", denied: true, today: false });
-  assert.throws(() => parseLogsArgs(["--agent"]), /--agent <имя>/);
-  assert.throws(() => parseLogsArgs(["--everything"]), /Неизвестный флаг: --everything/);
+  assert.throws(() => parseLogsArgs(["--agent"]), /--agent <name>/);
+  assert.throws(() => parseLogsArgs(["--everything"]), /Unknown flag: --everything/);
 });
 
 test("agentcollar logs --denied prints only denied lines from the log file", () => {

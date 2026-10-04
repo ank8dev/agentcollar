@@ -34,7 +34,7 @@ test("on timeout the Telegram message says so and loses its buttons", async () =
   assert.ok(edit, "the message must be edited");
   assert.equal(edit.params.chat_id, 42);
   assert.equal(edit.params.message_id, 500);
-  assert.ok(String(edit.params.text).endsWith("⌛ Время вышло"));
+  assert.ok(String(edit.params.text).endsWith("⌛ Timed out: no answer in 10 minutes"));
   assert.deepEqual(edit.params.reply_markup, { inline_keyboard: [] });
 });
 
@@ -52,6 +52,6 @@ test("after a revoke from the terminal the Telegram message says so and loses it
 
   const edit = calls.find((c) => c.method === "editMessageText");
   assert.ok(edit, "the message must be edited");
-  assert.ok(String(edit.params.text).endsWith("🛑 Отозван"));
+  assert.ok(String(edit.params.text).endsWith("🛑 Revoked"));
   assert.deepEqual(edit.params.reply_markup, { inline_keyboard: [] });
 });

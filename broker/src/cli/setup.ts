@@ -24,7 +24,7 @@ async function ask(question: string): Promise<string> {
     // If the input ends before an answer (Ctrl+D, closed pipe), fail loudly instead of exiting silently.
     const answer = await new Promise<string>((resolve, reject) => {
       rl.question(question).then(resolve, reject);
-      rl.once("close", () => reject(new Error("ввод закончился, ничего не записано")));
+      rl.once("close", () => reject(new Error("input ended, nothing was written")));
     });
     return answer.trim();
   } finally {
@@ -75,20 +75,20 @@ export async function runSetup(): Promise<number> {
 }
 
 async function setup(): Promise<number> {
-  console.log("Настройка AgentCollar broker\n");
+  console.log("AgentCollar setup\n");
 
   // Older versions kept the data inside the code folder (broker/.env, broker/data/audit.log).
   const oldFiles = [legacyFiles.env, legacyFiles.audit].filter((file) => existsSync(file));
   if (oldFiles.length > 0) {
-    console.log(`Нашёл старые данные:\n${oldFiles.map((f) => `  ${f}`).join("\n")}`);
-    if (yes(await ask(`Перенести в ${homeDir}/ (папка доступна только тебе)? [y/N] `))) {
+    console.log(`Found data from an older version:\n${oldFiles.map((f) => `  ${f}`).join("\n")}`);
+    if (yes(await ask(`Move it to ${homeDir}/ (only you can open that folder)? [y/N] `))) {
       const moved = migrateLegacy();
-      console.log(moved.length > 0 ? `✓ Перенесено: ${moved.join(", ")}\n` : "Там уже есть свои файлы, старые оставил на месте.\n");
+      console.log(moved.length > 0 ? `✓ Moved: ${moved.join(", ")}\n` : "Files already exist there; the old ones stay where they are.\n");
     }
   }
 
-  if (existsSync(envFile) && !yes(await ask(`${envFile} уже есть. Перезаписать настройки Telegram? [y/N] `))) {
-    console.log("Ничего не меняю.");
+  if (existsSync(envFile) && !yes(await ask(`${envFile} already exists. Replace the Telegram settings? [y/N] `))) {
+    console.log("Nothing changed.");
     return 0;
   }
 
@@ -96,20 +96,20 @@ async function setup(): Promise<number> {
   let token = "";
   let username = "";
   while (username === "") {
-    token = await askHidden("Токен бота (от @BotFather, при вводе не виден): ");
+    token = await askHidden("Bot token (from @BotFather, hidden while you type): ");
     try {
       username = await getBotUsername(token);
     } catch (error) {
       console.log(`✗ ${(error as Error).message}\n`);
     }
   }
-  console.log(`✓ Бот найден: @${username}\n`);
+  console.log(`✓ Bot found: @${username}\n`);
 
   // 2. Start with a one-time code
   const code = newStartCode();
   let offset = await skipOldUpdates(token);
-  console.log(`Открой ссылку и нажми Start:  https://t.me/${username}?start=${code}`);
-  console.log("Жду (до 5 минут)...");
+  console.log(`Open this link and press Start:  https://t.me/${username}?start=${code}`);
+  console.log("Waiting (up to 5 minutes)...");
 
   let user: TelegramUser | undefined;
   const deadline = Date.now() + WAIT_MS;
@@ -120,13 +120,13 @@ async function setup(): Promise<number> {
   }
   await skipOldUpdates(token); // tell Telegram we handled these messages
   if (user === undefined) {
-    console.log("Время вышло. Запусти agcl setup ещё раз.");
+    console.log("Timed out. Run agcl setup again.");
     return 1;
   }
 
   const who = [user.firstName, user.username ? `@${user.username}` : "", `id ${user.id}`].filter(Boolean).join(", ");
-  if (!yes(await ask(`✓ Это ты? ${who} [y/N] `))) {
-    console.log("Ничего не записал. Запусти agcl setup ещё раз.");
+  if (!yes(await ask(`✓ Is this you? ${who} [y/N] `))) {
+    console.log("Nothing was written. Run agcl setup again.");
     return 1;
   }
 
@@ -134,9 +134,9 @@ async function setup(): Promise<number> {
   ensureHome();
   const existing = existsSync(envFile) ? readFileSync(envFile, "utf8") : "";
   writeEnvFile(envFile, buildEnv(existing, { TELEGRAM_BOT_TOKEN: token, TELEGRAM_USER_ID: String(user.id) }));
-  await sendText(token, user.id, "✅ Брокер настроен. Запросы мандатов будут приходить сюда.").catch(() => {});
+  await sendText(token, user.id, "✅ AgentCollar is set up. Mandate requests will arrive here.").catch(() => {});
 
-  console.log(`✓ Записано в ${envFile} (права 600: читать может только твой пользователь macOS)`);
-  console.log("Дальше: agcl server (или просто agcl)");
+  console.log(`✓ Saved to ${envFile} (mode 600: only your macOS user can read it)`);
+  console.log("Next: agcl server (or just agcl)");
   return 0;
 }

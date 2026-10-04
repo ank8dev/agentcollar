@@ -19,7 +19,7 @@ function fakeBroker(status: number, body: object): string[] {
 
 test("revokes through the local broker's HTTP kill switch", async () => {
   const urls = fakeBroker(200, { id: "a935774d", revoked: true });
-  assert.deepEqual(await revokeMandate("a935774d", 8787), { ok: true, message: "🛑 Мандат a935774d отозван" });
+  assert.deepEqual(await revokeMandate("a935774d", 8787), { ok: true, message: "🛑 Mandate a935774d revoked" });
   assert.deepEqual(urls, ["POST http://127.0.0.1:8787/mandates/a935774d/revoke"]);
 });
 
@@ -33,7 +33,7 @@ test("an id that is not 8 hex characters is refused without any request", async 
 
 test("an unknown mandate gives the broker's reason", async () => {
   fakeBroker(404, { error: "no such mandate" });
-  assert.deepEqual(await revokeMandate("deadbeef", 8787), { ok: false, message: "Не получилось: no such mandate" });
+  assert.deepEqual(await revokeMandate("deadbeef", 8787), { ok: false, message: "Could not revoke: no such mandate" });
 });
 
 test("broker not running gives a clear hint", async () => {
@@ -42,6 +42,6 @@ test("broker not running gives a clear hint", async () => {
   }) as unknown as typeof fetch;
   assert.deepEqual(await revokeMandate("deadbeef", 8787), {
     ok: false,
-    message: "Брокер не отвечает. Он запущен (agcl server)?",
+    message: "The broker is not answering. Is it running (agcl server)?",
   });
 });

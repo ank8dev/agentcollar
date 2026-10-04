@@ -9,5 +9,5 @@ if (existsSync(envFile)) {
   // Older setups kept it in broker/.env. Still works; `agcl setup` offers to move it.
   // (Not when AGENTCOLLAR_HOME is set: an explicit home means "look only there".)
   process.loadEnvFile(legacyFiles.env);
-  console.error("AgentCollar: настройки ещё в broker/.env — запусти agcl setup, чтобы перенести их в ~/.agentcollar/");
+  console.error("AgentCollar: settings are still in broker/.env, run agcl setup to move them to ~/.agentcollar/");
 }

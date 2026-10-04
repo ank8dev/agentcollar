@@ -13,9 +13,9 @@ export function parseLogsArgs(args: string[]): LogsFilter {
     else if (arg === "--today") filter.today = true;
     else if (arg === "--agent") {
       const name = args[++i];
-      if (name === undefined || name.startsWith("--")) throw new Error("После --agent нужно имя: --agent <имя>");
+      if (name === undefined || name.startsWith("--")) throw new Error("--agent needs a name: --agent <name>");
       filter.agent = name;
-    } else throw new Error(`Неизвестный флаг: ${arg}. Есть: --agent <имя>, --denied, --today`);
+    } else throw new Error(`Unknown flag: ${arg}. Available: --agent <name>, --denied, --today`);
   }
   return filter;
 }
@@ -40,7 +40,7 @@ export async function runLogs(args: string[]): Promise<number> {
 
   const entries = filterEntries(readAuditLog(auditLogFile), filter);
   if (entries.length === 0) {
-    console.log("Записей нет.");
+    console.log("No entries.");
     return 0;
   }
   for (const entry of entries) console.log(formatEntry(entry, { showDate: !filter.today }));

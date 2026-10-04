@@ -37,21 +37,21 @@ async function callApi(config: TelegramConfig, method: string, params: object): 
 function buttons(mandate: Mandate): InlineButton[][] {
   if (mandate.status === "pending") {
     return [[
-      { text: "✅ Одобрить", callback_data: `approve:${mandate.id}` },
-      { text: "❌ Отклонить", callback_data: `deny:${mandate.id}` },
+      { text: "✅ Approve", callback_data: `approve:${mandate.id}` },
+      { text: "❌ Deny", callback_data: `deny:${mandate.id}` },
     ]];
   }
   if (mandate.status === "approved" && !mandate.revoked) {
-    return [[{ text: "🛑 Отозвать", callback_data: `revoke:${mandate.id}` }]];
+    return [[{ text: "🛑 Revoke", callback_data: `revoke:${mandate.id}` }]];
   }
   return []; // denied or revoked: nothing left to press
 }
 
 function statusLine(mandate: Mandate): string {
-  if (mandate.revoked) return "🛑 Отозван";
-  if (mandate.status === "approved") return "✅ Одобрен";
-  if (mandate.status === "denied") return "❌ Отклонён";
-  return "⏳ Ждёт решения";
+  if (mandate.revoked) return "🛑 Revoked";
+  if (mandate.status === "approved") return "✅ Approved";
+  if (mandate.status === "denied") return "❌ Denied";
+  return "⏳ Waiting for your decision";
 }
 
 // Which Telegram message shows which mandate, so it can be edited later (e.g. on timeout).
@@ -62,7 +62,7 @@ const sentMessages = new Map<string, { chatId: number; messageId: number }>(); /
 export async function sendApprovalRequest(config: TelegramConfig, mandate: Mandate): Promise<void> {
   const message = (await callApi(config, "sendMessage", {
     chat_id: config.approverId, // in a private chat, chat id = user id
-    text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n${statusLine(mandate)}`,
+    text: `🔐 Mandate request\n\n${describe(mandate)}\n\n${statusLine(mandate)}`,
     reply_markup: { inline_keyboard: buttons(mandate) },
   })) as { message_id: number };
   sentMessages.set(mandate.id, { chatId: config.approverId, messageId: message.message_id });
@@ -76,19 +76,19 @@ async function closeMessage(config: TelegramConfig, mandate: Mandate, finalLine:
   await callApi(config, "editMessageText", {
     chat_id: sent.chatId,
     message_id: sent.messageId,
-    text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n${finalLine}`,
+    text: `🔐 Mandate request\n\n${describe(mandate)}\n\n${finalLine}`,
     reply_markup: { inline_keyboard: [] },
   });
 }
 
 // Nobody answered in time.
 export async function notifyTimedOut(config: TelegramConfig, mandate: Mandate): Promise<void> {
-  await closeMessage(config, mandate, "⌛ Время вышло");
+  await closeMessage(config, mandate, "⌛ Timed out: no answer in 10 minutes");
 }
 
 // Revoked from the terminal (npm run revoke) or over HTTP.
 export async function notifyRevoked(config: TelegramConfig, mandate: Mandate): Promise<void> {
-  await closeMessage(config, mandate, "🛑 Отозван");
+  await closeMessage(config, mandate, "🛑 Revoked");
 }
 
 // A button was pressed.
@@ -97,7 +97,7 @@ async function handleButton(config: TelegramConfig, query: CallbackQuery): Promi
   // Only the approver's presses count.
   if (query.from.id !== config.approverId) {
     console.log(`Telegram: ignored a button press from user ${query.from.id} (not the approver)`);
-    await callApi(config, "answerCallbackQuery", { callback_query_id: query.id, text: "Нет доступа" });
+    await callApi(config, "answerCallbackQuery", { callback_query_id: query.id, text: "No access" });
     return;
   }
 
@@ -109,15 +109,15 @@ async function handleButton(config: TelegramConfig, query: CallbackQuery): Promi
   // Telegram shows a spinner on the button until we answer.
   await callApi(config, "answerCallbackQuery", {
     callback_query_id: query.id,
-    text: mandate ? statusLine(mandate) : "Уже решено или мандат не найден",
+    text: mandate ? statusLine(mandate) : "Already decided, or the mandate is gone",
   });
 
-  // Update the message: new status line, new buttons (e.g. "Отозвать" after approval).
+  // Update the message: new status line, new buttons (e.g. "Revoke" after approval).
   if (mandate && query.message) {
     await callApi(config, "editMessageText", {
       chat_id: query.message.chat.id,
       message_id: query.message.message_id,
-      text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n${statusLine(mandate)}`,
+      text: `🔐 Mandate request\n\n${describe(mandate)}\n\n${statusLine(mandate)}`,
       reply_markup: { inline_keyboard: buttons(mandate) },
     });
   }

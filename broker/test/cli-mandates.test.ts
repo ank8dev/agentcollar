@@ -23,17 +23,17 @@ const base: SnapshotMandate = {
 
 test("an active mandate: time left as m:ss and the actions left", () => {
   const row = mandateRow(base, NOW);
-  assert.equal(row.state, "активен");
+  assert.equal(row.state, "active");
   assert.equal(row.timeLeft, "2:05");
   assert.equal(row.limit, "3/10");
 });
 
 test("every end state has its own name, and no time left", () => {
-  assert.equal(mandateRow({ ...base, status: "pending", expiresAt: 0 }, NOW).state, "ждёт решения");
-  assert.equal(mandateRow({ ...base, status: "denied" }, NOW).state, "отклонён");
-  assert.equal(mandateRow({ ...base, revoked: true }, NOW).state, "отозван");
-  assert.equal(mandateRow({ ...base, expiresAt: NOW - 1 }, NOW).state, "истёк");
-  assert.equal(mandateRow({ ...base, used: 10 }, NOW).state, "лимит исчерпан");
+  assert.equal(mandateRow({ ...base, status: "pending", expiresAt: 0 }, NOW).state, "waiting");
+  assert.equal(mandateRow({ ...base, status: "denied" }, NOW).state, "denied");
+  assert.equal(mandateRow({ ...base, revoked: true }, NOW).state, "revoked");
+  assert.equal(mandateRow({ ...base, expiresAt: NOW - 1 }, NOW).state, "expired");
+  assert.equal(mandateRow({ ...base, used: 10 }, NOW).state, "limit used up");
   assert.equal(mandateRow({ ...base, revoked: true }, NOW).timeLeft, "—");
 });
 
@@ -62,10 +62,10 @@ test("agentcollar mandates lists the mandates of the running broker", () => {
 test("broker not running -> says so instead of showing a stale list", () => {
   const result = runMandates({ pid: 999_999, writtenAt: Date.now(), mandates: [base] });
   assert.equal(result.status, 0);
-  assert.ok(result.stdout.includes("Брокер не запущен"));
+  assert.ok(result.stdout.includes("The broker is not running"));
   assert.equal(result.stdout.includes("a935774d"), false);
 });
 
 test("never started -> a hint", () => {
-  assert.ok(runMandates(null).stdout.includes("Брокер ещё не запускался"));
+  assert.ok(runMandates(null).stdout.includes("The broker has not been started yet"));
 });

@@ -88,14 +88,14 @@ async function call(token: string, method: string, params: object): Promise<unkn
   const data = (await response.json()) as { ok: boolean; result?: unknown; error_code?: number; description?: string };
   if (data.ok) return data.result;
 
-  if (data.error_code === 401) throw new Error("Telegram не узнал этот токен. Скопируй его заново у @BotFather (/mybots → бот → API Token).");
-  if (data.error_code === 409) throw new Error("Этого бота уже слушает другая программа. Останови agcl server и запусти agcl setup снова.");
+  if (data.error_code === 401) throw new Error("Telegram does not know this token. Copy it again from @BotFather (/mybots → your bot → API Token).");
+  if (data.error_code === 409) throw new Error("Another program is already listening to this bot. Stop agcl server, then run agcl setup again.");
   throw new Error(`Telegram ${method}: ${data.description}`);
 }
 
 // Checks the token for real (getMe) and returns the bot's @username.
 export async function getBotUsername(token: string): Promise<string> {
-  if (!isTokenFormat(token)) throw new Error("Это не похоже на токен бота (должно быть вида 123456789:AAH...).");
+  if (!isTokenFormat(token)) throw new Error("This does not look like a bot token (it looks like 123456789:AAH...).");
   const me = (await call(token, "getMe", {})) as { username: string };
   return me.username;
 }

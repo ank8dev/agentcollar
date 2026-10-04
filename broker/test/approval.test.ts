@@ -33,13 +33,13 @@ test("a fresh pending mandate is left alone", () => {
 
 test("terminal: 'y' approves a pending mandate", () => {
   const mandate = requestMandate("agent", "task", ["gmail.read"], 60, 1);
-  assert.equal(applyTerminalAnswer(mandate, "y"), "  ✅ одобрен");
+  assert.equal(applyTerminalAnswer(mandate, "y"), "  ✅ approved");
   assert.equal(mandate.status, "approved");
 });
 
 test("terminal: a late 'y' after the timeout says so and changes nothing", () => {
   const mandate = requestMandate("agent", "task", ["gmail.read"], 60, 1);
   denyStalePending(TEN_MINUTES, mandate.createdAt + TEN_MINUTES + 1);
-  assert.equal(applyTerminalAnswer(mandate, "y"), "  ⌛ уже решено (время вышло или ответили в Telegram), ответ не применён");
+  assert.equal(applyTerminalAnswer(mandate, "y"), "  ⌛ already decided (timed out or answered in Telegram), your answer was not applied");
   assert.equal(mandate.status, "denied");
 });

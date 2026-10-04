@@ -30,7 +30,7 @@ export function denyStalePending(maxAgeMs: number, now: number = Date.now()): Ma
 }
 
 // Text written by the agent (its name, the task) is shown to the human, so a bad agent
-// could try to fake lines like "Действия: gmail.read" with line breaks, or hide text with
+// could try to fake lines like "Actions: gmail.read" with line breaks, or hide text with
 // invisible / right-to-left characters. We squash it into one short, plain line.
 export function oneLine(text: string, max: number): string {
   const plain = text
@@ -46,14 +46,14 @@ export function oneLine(text: string, max: number): string {
 export function describe(mandate: Mandate): string {
   const lines: string[] = [];
   if (mandate.allowedActions.some((action) => action.endsWith(".send"))) {
-    lines.push("⚠️ Агент просит право ОТПРАВЛЯТЬ от твоего имени");
+    lines.push("⚠️ The agent asks for the right to SEND in your name");
   }
   lines.push(
-    `Действия: ${mandate.allowedActions.join(", ")}`,
-    `Срок: ${mandate.expiresInSeconds} с после одобрения, лимит ${mandate.limit}`,
+    `Actions: ${mandate.allowedActions.join(", ")}`,
+    `Lifetime: ${mandate.expiresInSeconds} s after approval, limit ${mandate.limit} actions`,
     `id: ${mandate.id}`,
-    `Агент: ${oneLine(mandate.agent, 64)}`,
-    `Задача (слова агента): «${oneLine(mandate.task, 200)}»`,
+    `Agent: ${oneLine(mandate.agent, 64)}`,
+    `Task (agent's own words): “${oneLine(mandate.task, 200)}”`,
   );
   return lines.join("\n");
 }
@@ -65,7 +65,7 @@ let queue: Promise<void> = Promise.resolve();
 export function askInTerminal(mandate: Mandate): void {
   queue = queue.then(async () => {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
-    const answer = await rl.question(`\nНовый запрос мандата:\n${describe(mandate)}\nОдобрить? [y/N] `);
+    const answer = await rl.question(`\nNew mandate request:\n${describe(mandate)}\nApprove? [y/N] `);
     rl.close();
 
     console.log(applyTerminalAnswer(mandate, answer));
@@ -78,7 +78,7 @@ export function askInTerminal(mandate: Mandate): void {
 export function applyTerminalAnswer(mandate: Mandate, answer: string): string {
   const decision = answer.trim().toLowerCase() === "y" ? "approve" : "deny";
   if (decide(mandate.id, decision, "terminal") === undefined) {
-    return "  ⌛ уже решено (время вышло или ответили в Telegram), ответ не применён";
+    return "  ⌛ already decided (timed out or answered in Telegram), your answer was not applied";
   }
-  return decision === "approve" ? "  ✅ одобрен" : "  ❌ отклонён";
+  return decision === "approve" ? "  ✅ approved" : "  ❌ denied";
 }

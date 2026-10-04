@@ -16,20 +16,20 @@ function print(entry: AuditEntry): void {
 
 export async function runWatch(args: string[]): Promise<number> {
   if (args.length > 0) {
-    console.error(`agentcollar watch не принимает аргументов: ${args.join(" ")}`);
+    console.error(`agcl watch takes no arguments: ${args.join(" ")}`);
     return 1;
   }
 
-  console.log(`${styleText("bold", "AgentCollar · watch")}   ${styleText("dim", "Ctrl+C — выход")}`);
-  console.log(styleText("dim", "проверки: 1 токен · 2 одобрен · 3 срок · 4 не отозван · 5 действие · 6 лимит"));
+  console.log(`${styleText("bold", "AgentCollar · watch")}   ${styleText("dim", "Ctrl+C to quit")}`);
+  console.log(styleText("dim", "checks: 1 token · 2 approved · 3 not expired · 4 not revoked · 5 action allowed · 6 limit"));
 
   const tail = createTail(auditLogFile);
   const past = tail.readNew().slice(-RECENT);
   if (past.length > 0) {
-    console.log(styleText("dim", "— последние события —"));
+    console.log(styleText("dim", "— recent —"));
     past.forEach(print);
   }
-  console.log(styleText("dim", "— дальше в реальном времени —"));
+  console.log(styleText("dim", "— live —"));
 
   // Watch the FOLDER, not the file: it also works before the log exists, and after it is replaced.
   const folder = dirname(auditLogFile);

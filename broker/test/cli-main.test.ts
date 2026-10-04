@@ -46,7 +46,7 @@ test("bin: --help lists every command, says agcl == agentcollar, and exits 0", (
 test("bin: an unknown command says so and exits 1", () => {
   const { code, out } = run("launch");
   assert.equal(code, 1);
-  assert.ok(out.includes("Неизвестная команда: launch"));
+  assert.ok(out.includes("Unknown command: launch"));
 });
 
 test("bin: revoke without an id shows its usage and exits 1", () => {

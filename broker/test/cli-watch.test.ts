@@ -73,7 +73,7 @@ test("agentcollar watch shows a new event live and exits cleanly on Ctrl+C", asy
   };
 
   try {
-    await waitFor("в реальном времени");
+    await waitFor("— live —");
     assert.ok(out.includes("gmail.read"), "recent events are shown first");
     appendFileSync(file, `2026-10-04T13:42:07.000Z | "digest-agent" | "gmail.send" | DENIED | "action not allowed" | action_not_allowed\n`);
     await waitFor("gmail.send");

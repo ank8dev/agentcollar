@@ -119,12 +119,12 @@ test("getBotUsername returns the bot's @username", async () => {
 
 test("a token Telegram does not know gives a clear error", async () => {
   fakeTelegram(() => ({ ok: false, error_code: 401, description: "Unauthorized" }));
-  await assert.rejects(getBotUsername(TOKEN), /Telegram не узнал этот токен/);
+  await assert.rejects(getBotUsername(TOKEN), /Telegram does not know this token/);
 });
 
 test("a badly shaped token is rejected before asking Telegram", async () => {
   const calls = fakeTelegram(() => ({ ok: true, result: { username: "x" } }));
-  await assert.rejects(getBotUsername("not-a-token"), /не похоже на токен/);
+  await assert.rejects(getBotUsername("not-a-token"), /does not look like a bot token/);
   assert.equal(calls.length, 0);
 });
 
