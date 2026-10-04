@@ -1,0 +1,58 @@
+# Publishes the broker (broker/) to npm as `agentcollar` when a version tag is pushed:
+#   cd broker && npm version 0.1.1 && git push --follow-tags   (tag must be v0.1.1)
+#
+# Auth: npm "trusted publishing" (OIDC). npm checks that the request comes from THIS repository
+# and THIS workflow file, so no long-lived NPM_TOKEN secret exists that could be stolen.
+# One-time setup on npmjs.com: package agentcollar → Settings → Trusted publishing →
+# GitHub Actions, repository ank8dev/agentcollar, workflow publish-broker.yml.
+#
+# Provenance: npm records a signed statement "this tarball was built by this workflow from this
+# commit" (Sigstore). It shows on the npm page and anyone can check it: npm audit signatures.
+name: Publish broker to npm
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # lets GitHub issue the OIDC token that npm trusts and Sigstore signs
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: broker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: broker/package-lock.json
+
+      # trusted publishing needs npm 11.5.1 or newer; Node 22 ships with npm 10
+      - run: npm install -g npm@latest
+
+      # never publish a version that does not match the tag (e.g. tag v0.2.0, package 0.1.0)
+      - name: Tag matches package.json version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$VERSION" != "$TAG" ]; then
+            echo "Tag $TAG does not match package.json version $VERSION"
+            exit 1
+          fi
+
+      - run: npm ci # also builds dist/ (the "prepare" script)
+      - run: npm run typecheck
+      - run: npm test
+
+      # what goes into the package, printed in the log for anyone to review
+      - run: npm pack --dry-run
+
+      - run: npm publish --provenance --access public
