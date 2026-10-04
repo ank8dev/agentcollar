@@ -1,5 +1,5 @@
 import { writeAudit } from "./audit.ts";
-import { mandates, type Action } from "./mandate.ts";
+import { mandates, mandatesChanged, type Action } from "./mandate.ts";
 
 // A short machine-readable name for each outcome.
 // The HTTP server turns it into a status code (401, 403, 429...).
@@ -77,5 +77,6 @@ function runChecks(token: string, action: Action): CheckResult {
 
   // All checks passed. Only allowed actions use up the limit.
   mandate.used += 1;
+  mandatesChanged();
   return { allowed: true, code: "ok", reason: "ok" };
 }

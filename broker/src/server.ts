@@ -6,7 +6,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { askInTerminal, decide, denyStalePending, oneLine } from "./approval.ts";
 import { check, type CheckCode } from "./check.ts";
 import { createDraft, listInbox, sendEmail } from "./gmail-fake.ts";
-import { mandates, requestMandate, type Mandate } from "./mandate.ts";
+import { mandates, onMandatesChanged, requestMandate, type Mandate } from "./mandate.ts";
+import { writeMandatesSnapshot } from "./snapshot.ts";
 import { notifyRevoked, notifyTimedOut, sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
 
 // --- configuration from broker/.env (loaded by env.ts) ---
@@ -26,6 +27,10 @@ function telegramConfig(): TelegramConfig | undefined {
   return { botToken, approverId };
 }
 const telegram = telegramConfig();
+
+// data/mandates.json for `agentcollar mandates`: fresh on start (memory is empty), then after every change.
+writeMandatesSnapshot();
+onMandatesChanged(() => writeMandatesSnapshot());
 
 // A pending mandate nobody answered becomes "denied" after 10 minutes (fail closed).
 const PENDING_TIMEOUT_MS = 10 * 60 * 1000;

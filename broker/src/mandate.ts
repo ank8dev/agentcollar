@@ -29,6 +29,17 @@ export type Mandate = {
 // It disappears when the program stops. That is fine for now.
 export const mandates = new Map<string, Mandate>();
 
+// Called after every change. The server uses it to write data/mandates.json for `agentcollar mandates`.
+let changeListener: () => void = () => {};
+
+export function onMandatesChanged(listener: () => void): void {
+  changeListener = listener;
+}
+
+export function mandatesChanged(): void {
+  changeListener();
+}
+
 // An agent asks for a mandate. It stays "pending" until a human decides.
 export function requestMandate(
   agent: string,
@@ -53,6 +64,7 @@ export function requestMandate(
     createdAt: Date.now(),
   };
   mandates.set(mandate.token, mandate);
+  mandatesChanged();
   return mandate;
 }
 
@@ -89,6 +101,7 @@ export function approve(id: string): Mandate | undefined {
 
   mandate.status = "approved";
   mandate.expiresAt = Date.now() + mandate.expiresInSeconds * 1000;
+  mandatesChanged();
   return mandate;
 }
 
@@ -98,6 +111,7 @@ export function deny(id: string): Mandate | undefined {
   if (mandate === undefined || mandate.status !== "pending") return undefined;
 
   mandate.status = "denied";
+  mandatesChanged();
   return mandate;
 }
 
@@ -110,5 +124,6 @@ export function revoke(id: string): Mandate | undefined {
   if (mandate === undefined) return undefined;
 
   mandate.revoked = true;
+  mandatesChanged();
   return mandate;
 }

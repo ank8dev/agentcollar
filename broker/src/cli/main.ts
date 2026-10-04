@@ -19,6 +19,11 @@ const COMMANDS: Record<string, Command> = {
     summary: "живой экран: запросы агентов в реальном времени и 6 проверок",
     run: async (args) => (await import("./watch.ts")).runWatch(args),
   },
+  mandates: {
+    usage: "agentcollar mandates",
+    summary: "мандаты запущенного брокера: статус, сколько осталось времени и действий",
+    run: async (args) => (await import("./mandates.ts")).runMandates(args),
+  },
   logs: {
     usage: "agentcollar logs [--agent <имя>] [--denied] [--today]",
     summary: "аудит-лог: кто, что, когда, разрешено или нет",
