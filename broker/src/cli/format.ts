@@ -13,6 +13,14 @@ export function checkMarks(entry: AuditEntry): string {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+export function isSameLocalDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+export function isToday(iso: string, now: Date = new Date()): boolean {
+  return isSameLocalDay(new Date(iso), now);
+}
+
 // Local time: "15:42:07", or "2026-10-04 15:42:07" when the date matters.
 export function localTime(iso: string, showDate: boolean): string {
   const d = new Date(iso);

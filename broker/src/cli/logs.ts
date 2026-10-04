@@ -1,7 +1,7 @@
 // agentcollar logs [--agent <name>] [--denied] [--today] — the audit log, readable and filtered.
 import { readAuditLog, type AuditEntry } from "../audit-log.ts";
 import { auditLogFile } from "../audit.ts";
-import { formatEntry } from "./format.ts";
+import { formatEntry, isSameLocalDay } from "./format.ts";
 
 export type LogsFilter = { agent: string | null; denied: boolean; today: boolean };
 
@@ -20,15 +20,12 @@ export function parseLogsArgs(args: string[]): LogsFilter {
   return filter;
 }
 
-const sameLocalDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-
 export function filterEntries(entries: AuditEntry[], filter: LogsFilter, now: Date = new Date()): AuditEntry[] {
   return entries.filter(
     (entry) =>
       (filter.agent === null || entry.agent === filter.agent) &&
       (!filter.denied || !entry.allowed) &&
-      (!filter.today || sameLocalDay(new Date(entry.time), now)),
+      (!filter.today || isSameLocalDay(new Date(entry.time), now)),
   );
 }
 

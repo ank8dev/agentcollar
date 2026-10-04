@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { auditLogFile, writeAudit } from "../src/audit.ts";
@@ -6,20 +7,26 @@ import { parseAuditLine } from "../src/audit-log.ts";
 import { check } from "../src/check.ts";
 import { approve, requestMandate } from "../src/mandate.ts";
 
-const lastLine = () => readFileSync(auditLogFile, "utf8").trimEnd().split("\n").at(-1) ?? "";
+// Test files run in parallel and share one temp log, so "the last line" may belong to another file.
+// Each test uses its own agent name and looks for ITS lines only.
+const uniqueAgent = () => `audit-test-${randomBytes(4).toString("hex")}`;
+const linesOf = (agent: string) => readFileSync(auditLogFile, "utf8").split("\n").filter((l) => l.includes(`"${agent}"`));
 
 test("check() writes which check decided, as a last column", () => {
-  const mandate = requestMandate("agent", "task", ["gmail.read"], 60, 1);
+  const agent = uniqueAgent();
+  const mandate = requestMandate(agent, "task", ["gmail.read"], 60, 1);
   approve(mandate.id);
   check(mandate.token, "gmail.send");
-  assert.ok(lastLine().endsWith(' | DENIED | "action \\"gmail.send\\" is not allowed" | action_not_allowed'), lastLine());
   check(mandate.token, "gmail.read");
-  assert.ok(lastLine().endsWith(' | ALLOWED | "ok" | ok'), lastLine());
+  const [denied, allowed] = linesOf(agent);
+  assert.ok(denied?.endsWith(' | DENIED | "action \\"gmail.send\\" is not allowed" | action_not_allowed'), denied);
+  assert.ok(allowed?.endsWith(' | ALLOWED | "ok" | ok'), allowed);
 });
 
 test("human decisions have no check column", () => {
-  writeAudit("agent", "mandate.approve", true, "approve by terminal, mandate a935774d");
-  assert.ok(lastLine().endsWith('| "mandate.approve" | ALLOWED | "approve by terminal, mandate a935774d"'));
+  const agent = uniqueAgent();
+  writeAudit(agent, "mandate.approve", true, "approve by terminal, mandate a935774d");
+  assert.ok(linesOf(agent)[0]?.endsWith('| "mandate.approve" | ALLOWED | "approve by terminal, mandate a935774d"'));
 });
 
 test("parses a line with a check code", () => {
