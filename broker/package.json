@@ -9,6 +9,7 @@
     "server": "tsx src/server.ts",
     "agent": "tsx src/agent.ts",
     "setup": "tsx src/cli/setup.ts",
+    "revoke": "tsx src/cli/revoke.ts",
     "test": "BROKER_AUDIT_LOG=${TMPDIR:-/tmp}/agentcollar-test-audit.log tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

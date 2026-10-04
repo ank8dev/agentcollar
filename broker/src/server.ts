@@ -1,21 +1,15 @@
 // Phase 2: the broker as a local HTTP server.
 // The agent talks to it over HTTP; every Gmail endpoint goes through check() first.
 // Run: npm run server
-import { existsSync } from "node:fs";
+import "./env.ts"; // first: loads broker/.env into process.env
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { join } from "node:path";
 import { askInTerminal, decide, denyStalePending, oneLine } from "./approval.ts";
 import { check, type CheckCode } from "./check.ts";
 import { createDraft, listInbox, sendEmail } from "./gmail-fake.ts";
 import { mandates, requestMandate, type Mandate } from "./mandate.ts";
-import { notifyTimedOut, sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
+import { notifyRevoked, notifyTimedOut, sendApprovalRequest, startTelegramPolling, type TelegramConfig } from "./telegram.ts";
 
-// --- configuration from broker/.env (secrets live there, never in the code) ---
-
-const envFile = join(import.meta.dirname, "..", ".env");
-if (existsSync(envFile)) {
-  process.loadEnvFile(envFile); // built into Node: puts the lines of .env into process.env
-}
+// --- configuration from broker/.env (loaded by env.ts) ---
 
 const HOST = "127.0.0.1"; // only programs on THIS computer can connect
 const PORT = Number(process.env.BROKER_PORT ?? 8787);
@@ -201,6 +195,10 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   if (method === "POST" && revokeMatch) {
     const mandate = decide(revokeMatch[1], "revoke", "http");
     if (mandate === undefined) throw new HttpError(404, "no such mandate");
+    if (telegram) {
+      // So the Telegram message does not keep showing "approved" with a live button.
+      notifyRevoked(telegram, mandate).catch((error: Error) => console.error(`Telegram: ${error.message}`));
+    }
     return sendJson(res, 200, publicView(mandate));
   }
 

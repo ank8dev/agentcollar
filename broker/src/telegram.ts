@@ -68,17 +68,27 @@ export async function sendApprovalRequest(config: TelegramConfig, mandate: Manda
   sentMessages.set(mandate.id, { chatId: config.approverId, messageId: message.message_id });
 }
 
-// Nobody answered in time: the message must not keep showing "waiting" with live buttons.
-export async function notifyTimedOut(config: TelegramConfig, mandate: Mandate): Promise<void> {
+// The mandate ended outside Telegram: the message must not keep showing live buttons.
+async function closeMessage(config: TelegramConfig, mandate: Mandate, finalLine: string): Promise<void> {
   const sent = sentMessages.get(mandate.id);
   if (sent === undefined) return; // this mandate was never shown in Telegram
   sentMessages.delete(mandate.id);
   await callApi(config, "editMessageText", {
     chat_id: sent.chatId,
     message_id: sent.messageId,
-    text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n⌛ Время вышло`,
+    text: `🔐 Запрос мандата\n\n${describe(mandate)}\n\n${finalLine}`,
     reply_markup: { inline_keyboard: [] },
   });
+}
+
+// Nobody answered in time.
+export async function notifyTimedOut(config: TelegramConfig, mandate: Mandate): Promise<void> {
+  await closeMessage(config, mandate, "⌛ Время вышло");
+}
+
+// Revoked from the terminal (npm run revoke) or over HTTP.
+export async function notifyRevoked(config: TelegramConfig, mandate: Mandate): Promise<void> {
+  await closeMessage(config, mandate, "🛑 Отозван");
 }
 
 // A button was pressed.
