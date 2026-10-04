@@ -13,12 +13,14 @@
 <p align="center">
   <a href="https://ank8dev.github.io/agentcollar/">Website</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="#the-agcl-command">CLI</a> ·
+  <a href="#use-it-from-claude-code-mcp">MCP</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#roadmap">Roadmap</a>
 </p>
 
-> **Status: early, building in public.** The broker works end to end with a **fake Gmail inbox**.
-> Real Gmail, persistence and MCP are next. Do not connect real accounts yet.
+> **Status: early, building in public.** The broker works end to end with a **fake Gmail inbox**,
+> a terminal CLI (`agcl`) and an MCP server for Claude Code. Real Gmail is next. Do not connect real accounts yet.
 >
 > **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
 
@@ -78,41 +80,66 @@ The clock starts **on approval**, not on request. Only allowed actions count tow
 Requires **Node.js 22+**.
 
 ```bash
-git clone https://github.com/ank8dev/agentcollar
-cd agentcollar/broker
-npm install
+npx agentcollar              # run without installing
+npm install -g agentcollar   # or install it: then the short name `agcl` works too
+agcl                         # intro → setup wizard (first time) → broker
 ```
 
-**1. The core, in one command** (no network, no Telegram):
+> The npm package is prepared but **not published yet**. Until the first release, run it from source:
+>
+> ```bash
+> git clone https://github.com/ank8dev/agentcollar
+> cd agentcollar/broker
+> npm install                # also builds dist/
+> npm link                   # puts `agcl` and `agentcollar` on your PATH
+> agcl
+> ```
+
+**The setup wizard** (`agcl setup`) connects **your own** Telegram bot without editing any file:
+paste the token from [@BotFather](https://t.me/BotFather) (hidden while you type, checked with
+Telegram), open the link it shows and press **Start** — it takes your user id from that message,
+using a one-time code so a stranger pressing Start at the same moment cannot become the approver.
+Settings go to `~/.agentcollar/.env` (readable only by you).
+
+**Try the whole flow with a pretend agent** (from `broker/`, two terminals):
 
 ```bash
-npm run demo
+agcl server        # terminal 1: the broker (approve in Telegram, or here with y)
+npm run agent      # terminal 2: asks for a mandate, waits for you, reads, drafts, tries to send
 ```
 
-You will see: a mandate is issued → read and draft are allowed → send is denied → the mandate expires → revoke.
+**Or just the core, in one command** (no network, no Telegram): `npm run demo`.
 
-**2. The broker as a server + a pretend agent** (two terminals):
+## The `agcl` command
+
+`agcl` is the short name of `agentcollar`: **`agcl watch` == `agentcollar watch`**.
+
+| Command | What it does |
+|---|---|
+| `agcl` | intro → setup (if not set up yet) → broker |
+| `agcl setup` | connect your Telegram bot (moves old `broker/.env` to `~/.agentcollar/` if found) |
+| `agcl server` | start the broker on `127.0.0.1:8787` |
+| `agcl watch` | live screen: every agent request as it happens, `✓ ✓ ✓ ✓ ✗ ·` = which of the 6 checks failed |
+| `agcl mandates` | mandates of the running broker: state, time left, actions left |
+| `agcl logs [--agent <name>] [--denied] [--today]` | the audit log, filtered |
+| `agcl revoke <id>` | kill switch: revoke a mandate instantly (works without internet) |
+| `agcl mcp` | MCP server over stdio for Claude Code and other agents |
+
+`--no-intro` skips the intro; it is also skipped automatically in pipes, CI and with `NO_COLOR`.
+`watch`, `logs` and `mandates` only **read** files in `~/.agentcollar/`: no extra HTTP endpoints.
+
+## Use it from Claude Code (MCP)
 
 ```bash
-# terminal 1
-npm run server        # asks you to approve in this terminal: answer y
-
-# terminal 2
-npm run agent         # asks for a mandate, waits for you, reads, drafts, tries to send
+claude mcp add agentcollar -- npx -y agentcollar mcp     # once published
+claude mcp add agentcollar -- agcl mcp                   # from source, after npm link
 ```
 
-**3. Approve in Telegram instead of the terminal:**
-
-```bash
-cp .env.example .env
-```
-
-- Create a bot with [@BotFather](https://t.me/BotFather) → put the token in `TELEGRAM_BOT_TOKEN`.
-- Get your numeric id from [@userinfobot](https://t.me/userinfobot) → put it in `TELEGRAM_USER_ID`.
-- Open your bot in Telegram and press **Start**, then run `npm run server` again.
-
-Mandate requests now arrive in Telegram with **Approve / Deny** buttons, and **Revoke** after approval.
-Only `TELEGRAM_USER_ID` can press them. `.env` is git-ignored.
+Then ask Claude: *"through agentcollar, read my inbox and draft a reply to the first email"*.
+Claude calls `request_mandate`, you approve in Telegram, then it uses `gmail_read_inbox` and
+`gmail_create_draft`. `gmail_send` is refused unless you approved sending. The mandate token stays
+inside the MCP server: the model only ever sees the mandate id, so a prompt injection in an email
+has no token to steal.
 
 ## API
 
@@ -137,9 +164,14 @@ What the broker already does, and why:
 - **Only your Telegram account can approve.** Presses from anyone else are ignored.
 - **No requests from browsers.** A web page can also reach `localhost`, so the broker checks the `Host` header (against DNS rebinding), refuses requests with an `Origin`, and accepts only `application/json`.
 - **Small, bounded input:** bodies up to 10 KB, at most 20 actions, at most 1 day per mandate.
-- **No runtime dependencies.** Only Node's built-ins: `http`, `crypto`, `fetch`.
+- **Approval is never possible over HTTP or through files.** Only in Telegram (only your user id) or in the broker's own terminal, so a local agent cannot approve itself. The CLI reads files the broker writes; the broker never reads commands from files.
+- **Fail closed:** a request nobody answers in 10 minutes is denied; the Telegram message and the terminal say so.
+- **Your data lives in `~/.agentcollar/`** (folder `700`, files `600`): `.env`, `audit.log`, `mandates.json`. The snapshot lists mandates without their tokens (an allowlist of fields).
+- **Terminal output is sanitized:** agent names and reasons are stripped of control characters before `agcl watch` / `logs` print them.
+- **No runtime dependencies.** Only Node's built-ins: `http`, `crypto`, `fetch`, `fs`. The MCP server is our own small JSON-RPC implementation.
+- **Published with npm provenance** from GitHub Actions (trusted publishing, no npm token stored anywhere): anyone can check which commit a release was built from with `npm audit signatures`.
 
-Known limits today: mandates live in memory (they disappear on restart), Gmail is fake, and there is no encryption at rest yet because there are no real secrets to store.
+Known limits today: mandates live in memory (they disappear when the broker stops), Gmail is fake, and there is no encryption at rest yet because there are no real secrets to store.
 
 ## Roadmap
 
@@ -148,15 +180,18 @@ Known limits today: mandates live in memory (they disappear on restart), Gmail i
 - [x] Human approval in the terminal and in Telegram
 - [ ] Real Gmail: Google OAuth with `gmail.readonly` + `gmail.compose`; `send` stays blocked by the broker
 - [ ] Refresh token encrypted at rest, key in the macOS Keychain
-- [ ] Mandates and audit log survive a restart
-- [ ] An MCP interface, so existing agents can use the broker
+- [x] An MCP interface, so existing agents can use the broker
+- [x] A terminal CLI: `agcl` (setup wizard, live watch, mandates, logs, revoke)
+- [x] One-command install from npm (`npx agentcollar`), published with provenance — *prepared, first release pending*
+- [ ] Mandates survive a restart
 - [ ] Morning report: what every agent did tonight
 
 ## Repository
 
 | Folder | What |
 |---|---|
-| [`broker/`](broker/) | The broker: TypeScript, runs on your own machine |
+| [`broker/`](broker/) | The broker and the `agcl` CLI: TypeScript, runs on your own machine; published to npm as `agentcollar` |
+| [`docs/`](docs/) | Learning guide (`docs/learn-by-running.md`) and parked ideas (`docs/ideas/`) |
 | [`landing/`](landing/) | The website (Vite + GSAP), deployed to GitHub Pages on every push to `main` that changes `landing/` |
 | [`brand/`](brand/) | Logos and hand-drawn illustrations |
 
