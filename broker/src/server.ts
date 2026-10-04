@@ -265,6 +265,16 @@ const server = createServer(async (req, res) => {
   }
 });
 
+// Port taken: most likely a broker is already running. Say so instead of a stack trace.
+server.on("error", (error: NodeJS.ErrnoException) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use: is another AgentCollar broker running? (check: agcl mandates)`);
+    console.error(`Stop it, or start this one on another port: BROKER_PORT=8788 agcl server`);
+    process.exit(1);
+  }
+  throw error;
+});
+
 server.listen(PORT, HOST, () => {
   console.log(`Broker listening on http://${HOST}:${PORT}`);
   const gmail = readGmailInfo();

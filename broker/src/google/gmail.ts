@@ -72,9 +72,10 @@ export function createGmailMailbox(client: GoogleClient, refreshToken: string): 
       const draft = await api("POST", "/drafts", { message: { raw: buildRawEmail(to, subject, body) } });
       return { id: String(draft.id), to, subject, body };
     },
-    async sendEmail(to: string, subject: string, body: string): Promise<Draft> {
-      const sent = await api("POST", "/messages/send", { raw: buildRawEmail(to, subject, body) });
-      return { id: String(sent.id), to, subject, body };
+    // AgentCollar asks Google only for read + create drafts, so this connection cannot send.
+    // Even a mandate with gmail.send ends here: the email stays a draft for you to send yourself.
+    async sendEmail(): Promise<Draft> {
+      throw new Error("This Gmail connection cannot send: AgentCollar only has read + create-drafts access. Create a draft instead; the human sends it.");
     },
   };
 }

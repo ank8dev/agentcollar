@@ -37,8 +37,8 @@ test("reads a Desktop-app client file and refuses a Web-app one", () => {
   assert.throws(() => parseClientJson("not json"), /client_secret/);
 });
 
-test("asks Google only for read + compose (drafts); never full mail access", () => {
-  assert.deepEqual(SCOPES, ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.compose"]);
+test("asks Google only for reading + creating drafts: this connection cannot send at all", () => {
+  assert.deepEqual(SCOPES, ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.drafts.create"]);
 });
 
 test("PKCE: the challenge is the base64url SHA-256 of the verifier", () => {

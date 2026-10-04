@@ -23,7 +23,7 @@ const COMMANDS: Record<string, Command> = {
   },
   gmail: {
     usage: "agcl gmail connect|status|disconnect",
-    summary: "connect your real Gmail (read + drafts; send stays blocked by the broker)",
+    summary: "connect your real Gmail (read + create drafts; cannot send)",
     run: async (args) => (await import("./gmail.ts")).runGmail(args),
   },
   server: {

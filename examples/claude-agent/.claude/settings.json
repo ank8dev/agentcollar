@@ -1,0 +1,7 @@
+{
+  "enabledMcpjsonServers": ["agentcollar"],
+  "permissions": {
+    "allow": ["mcp__agentcollar"],
+    "deny": ["Bash", "Read", "Write", "Edit", "NotebookEdit", "WebFetch", "WebSearch"]
+  }
+}

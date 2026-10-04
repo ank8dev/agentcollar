@@ -177,7 +177,7 @@ Known limits today: mandates live in memory (they disappear when the broker stop
 - [x] Mandates, the 6 checks, revoke, audit log
 - [x] Local HTTP server and a pretend agent
 - [x] Human approval in the terminal and in Telegram
-- [ ] Real Gmail: Google OAuth with `gmail.readonly` + `gmail.compose`; `send` stays blocked by the broker
+- [x] Real Gmail: `agcl gmail connect` (OAuth with PKCE, scopes `gmail.readonly` + `gmail.drafts.create`, refresh token in the macOS Keychain). The connection cannot send at all: sending is blocked by the broker **and** by Google
 - [ ] Refresh token encrypted at rest, key in the macOS Keychain
 - [x] An MCP interface, so existing agents can use the broker
 - [x] A terminal CLI: `agcl` (setup wizard, live watch, mandates, logs, revoke)

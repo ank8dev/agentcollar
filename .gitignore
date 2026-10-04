@@ -3,3 +3,6 @@ dist/
 design-reference/
 .DS_Store
 .claude/
+
+# ...except the example agent settings (they are part of the example)
+!examples/claude-agent/.claude/

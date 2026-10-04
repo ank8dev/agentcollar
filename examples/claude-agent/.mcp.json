@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agentcollar": {
+      "command": "agcl",
+      "args": ["mcp"]
+    }
+  }
+}

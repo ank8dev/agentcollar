@@ -7,9 +7,9 @@ import { createServer } from "node:http";
 export type GoogleClient = { clientId: string; clientSecret: string };
 export type Tokens = { accessToken: string; refreshToken: string; expiresAt: number };
 
-// Read + drafts only. Google has no "drafts but never send" permission: gmail.compose also allows
-// sending. That is exactly why the BROKER blocks gmail.send unless you approved it in a mandate.
-export const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.compose"];
+// Read + create drafts, nothing more. gmail.drafts.create cannot send: so sending is blocked twice,
+// by the broker (no mandate, no send) AND by Google (this connection has no right to send at all).
+export const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.drafts.create"];
 
 const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";

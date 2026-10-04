@@ -56,7 +56,7 @@ async function connect(args: string[]): Promise<number> {
   }
 
   // 2. Sign in with Google in the browser
-  console.log("Opening Google in your browser. Allow: read email + manage drafts.");
+  console.log("Opening Google in your browser. Allow: read your email + create drafts.");
   const { code, verifier, redirectUri } = await authorizeInBrowser(client, (url) => {
     console.log(styleText("dim", `If the browser did not open: ${url}`));
     execFile("open", [url], () => {});
@@ -71,7 +71,7 @@ async function connect(args: string[]): Promise<number> {
 
   saveConnection({ email, connectedAt: new Date().toISOString() }, tokens.refreshToken);
   console.log(`\n${styleText("green", "✓")} Gmail connected: ${styleText("bold", email)}`);
-  console.log("  Read + drafts. Sending stays blocked by the broker unless you approve it in a mandate.");
+  console.log("  Read + create drafts. This connection cannot send at all: Google itself blocks it.");
   console.log("  Refresh token: macOS Keychain. Access token: memory only.");
   console.log(styleText("yellow", "  Testing mode: Google ends this sign-in after 7 days. Then run agcl gmail connect again."));
   if (file !== googleClientFile) console.log(styleText("dim", `  You can delete ${file} now (a copy is in ${googleClientFile}).`));

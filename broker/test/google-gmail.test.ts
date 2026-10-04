@@ -73,6 +73,12 @@ test("listInbox reads the inbox with a fresh access token, and the token is reus
   assert.ok(calls.filter((c) => c.url.includes("gmail")).every((c) => c.auth === "Bearer AT"));
 });
 
+test("sendEmail refuses before calling Google: AgentCollar never asks Google for the right to send", async () => {
+  const calls = fakeGoogle();
+  await assert.rejects(createGmailMailbox(client, "RT").sendEmail("a@b.co", "s", "b"), /cannot send/);
+  assert.equal(calls.length, 0);
+});
+
 test("createDraft creates a Gmail draft (not a sent email)", async () => {
   const calls = fakeGoogle();
   const draft = await createGmailMailbox(client, "RT").createDraft("anna@example.com", "Re: Lunch", "Yes");
