@@ -1,3 +1,6 @@
+> **Идея на будущее, не в планах. Вернёмся, если проект вырастет.**
+> (2026-10-04: AgentCollar решено делать open-source и только локальным: каждый запускает брокер со своим ботом, без общего сервера.)
+
 # AgentCollar Relay v1 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
