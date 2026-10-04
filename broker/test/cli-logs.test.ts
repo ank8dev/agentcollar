@@ -52,7 +52,8 @@ test("parseLogsArgs: flags, and clear errors for unknown flags or a missing valu
 });
 
 test("agentcollar logs --denied prints only denied lines from the log file", () => {
-  const file = join(mkdtempSync(join(tmpdir(), "logs-")), "audit.log");
+  const home = mkdtempSync(join(tmpdir(), "logs-"));
+  const file = join(home, "audit.log");
   writeFileSync(
     file,
     [
@@ -64,7 +65,7 @@ test("agentcollar logs --denied prints only denied lines from the log file", () 
   const bin = join(import.meta.dirname, "..", "bin", "agentcollar.mjs");
   const result = spawnSync(process.execPath, [bin, "logs", "--denied"], {
     encoding: "utf8",
-    env: { ...process.env, BROKER_AUDIT_LOG: file, NO_COLOR: "1" },
+    env: { ...process.env, AGENTCOLLAR_HOME: home, NO_COLOR: "1" },
   });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes("gmail.send"));

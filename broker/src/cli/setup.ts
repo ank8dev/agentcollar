@@ -1,10 +1,10 @@
 // agentcollar setup (or npm run setup) — connects the broker to YOUR Telegram bot, without editing files by hand.
 // 1) asks for the bot token and checks it with Telegram,
 // 2) you press Start in the bot: we take your user id from that message,
-// 3) writes broker/.env readable only by you (600).
+// 3) writes ~/.agentcollar/.env readable only by you (600).
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
+import { ensureHome, envFile, homeDir, legacyFiles, migrateLegacy } from "../paths.ts";
 import {
   buildEnv,
   getBotUsername,
@@ -16,7 +16,6 @@ import {
   type TelegramUser,
 } from "../setup.ts";
 
-const envFile = join(import.meta.dirname, "..", "..", ".env");
 const WAIT_MS = 5 * 60 * 1000;
 
 async function ask(question: string): Promise<string> {
@@ -78,7 +77,17 @@ export async function runSetup(): Promise<number> {
 async function setup(): Promise<number> {
   console.log("Настройка AgentCollar broker\n");
 
-  if (existsSync(envFile) && !yes(await ask("broker/.env уже есть. Перезаписать настройки Telegram? [y/N] "))) {
+  // Older versions kept the data inside the code folder (broker/.env, broker/data/audit.log).
+  const oldFiles = [legacyFiles.env, legacyFiles.audit].filter((file) => existsSync(file));
+  if (oldFiles.length > 0) {
+    console.log(`Нашёл старые данные:\n${oldFiles.map((f) => `  ${f}`).join("\n")}`);
+    if (yes(await ask(`Перенести в ${homeDir}/ (папка доступна только тебе)? [y/N] `))) {
+      const moved = migrateLegacy();
+      console.log(moved.length > 0 ? `✓ Перенесено: ${moved.join(", ")}\n` : "Там уже есть свои файлы, старые оставил на месте.\n");
+    }
+  }
+
+  if (existsSync(envFile) && !yes(await ask(`${envFile} уже есть. Перезаписать настройки Telegram? [y/N] `))) {
     console.log("Ничего не меняю.");
     return 0;
   }
@@ -121,12 +130,13 @@ async function setup(): Promise<number> {
     return 1;
   }
 
-  // 3. broker/.env, readable only by you
+  // 3. ~/.agentcollar/.env, readable only by you
+  ensureHome();
   const existing = existsSync(envFile) ? readFileSync(envFile, "utf8") : "";
   writeEnvFile(envFile, buildEnv(existing, { TELEGRAM_BOT_TOKEN: token, TELEGRAM_USER_ID: String(user.id) }));
   await sendText(token, user.id, "✅ Брокер настроен. Запросы мандатов будут приходить сюда.").catch(() => {});
 
-  console.log("✓ Записано в broker/.env (права 600: читать может только твой пользователь macOS)");
+  console.log(`✓ Записано в ${envFile} (права 600: читать может только твой пользователь macOS)`);
   console.log("Дальше: npm run server");
   return 0;
 }

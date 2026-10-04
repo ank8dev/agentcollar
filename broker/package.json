@@ -13,7 +13,7 @@
     "agent": "tsx src/agent.ts",
     "setup": "tsx src/cli/run.ts setup",
     "revoke": "tsx src/cli/run.ts revoke",
-    "test": "BROKER_AUDIT_LOG=${TMPDIR:-/tmp}/agentcollar-test-audit.log tsx --test test/*.test.ts",
+    "test": "AGENTCOLLAR_HOME=${TMPDIR:-/tmp}/agentcollar-test-home tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

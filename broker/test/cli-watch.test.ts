@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { appendFileSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { createTail } from "../src/cli/tail.ts";
 
@@ -63,7 +63,7 @@ test("agentcollar watch shows a new event live and exits cleanly on Ctrl+C", asy
   const file = tempLog();
   writeFileSync(file, line("gmail.read"));
   const bin = join(import.meta.dirname, "..", "bin", "agentcollar.mjs");
-  const child = spawn(process.execPath, [bin, "watch"], { env: { ...process.env, BROKER_AUDIT_LOG: file, NO_COLOR: "1" } });
+  const child = spawn(process.execPath, [bin, "watch"], { env: { ...process.env, AGENTCOLLAR_HOME: dirname(file), NO_COLOR: "1" } });
   let out = "";
   child.stdout.on("data", (chunk) => (out += chunk));
 
@@ -72,13 +72,17 @@ test("agentcollar watch shows a new event live and exits cleanly on Ctrl+C", asy
     assert.ok(out.includes(text), `expected "${text}" in:\n${out}`);
   };
 
-  await waitFor("в реальном времени");
-  assert.ok(out.includes("gmail.read"), "recent events are shown first");
-  appendFileSync(file, `2026-10-04T13:42:07.000Z | "digest-agent" | "gmail.send" | DENIED | "action not allowed" | action_not_allowed\n`);
-  await waitFor("gmail.send");
-  assert.ok(out.includes("✓ ✓ ✓ ✓ ✗ ·"));
+  try {
+    await waitFor("в реальном времени");
+    assert.ok(out.includes("gmail.read"), "recent events are shown first");
+    appendFileSync(file, `2026-10-04T13:42:07.000Z | "digest-agent" | "gmail.send" | DENIED | "action not allowed" | action_not_allowed\n`);
+    await waitFor("gmail.send");
+    assert.ok(out.includes("✓ ✓ ✓ ✓ ✗ ·"));
 
-  const exited = new Promise<number | null>((resolve) => child.on("exit", resolve));
-  child.kill("SIGINT");
-  assert.equal(await exited, 0);
+    const exited = new Promise<number | null>((resolve) => child.on("exit", resolve));
+    child.kill("SIGINT");
+    assert.equal(await exited, 0);
+  } finally {
+    child.kill("SIGKILL"); // never leave a watcher running if an assertion failed
+  }
 });

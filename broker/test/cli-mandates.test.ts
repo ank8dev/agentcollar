@@ -47,7 +47,7 @@ function runMandates(snapshot: object | null) {
   const bin = join(import.meta.dirname, "..", "bin", "agentcollar.mjs");
   return spawnSync(process.execPath, [bin, "mandates"], {
     encoding: "utf8",
-    env: { ...process.env, BROKER_AUDIT_LOG: join(folder, "audit.log"), NO_COLOR: "1" },
+    env: { ...process.env, AGENTCOLLAR_HOME: folder, NO_COLOR: "1" },
   });
 }
 

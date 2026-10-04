@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { applyTerminalAnswer, denyStalePending } from "../src/approval.ts";
+import { auditLogFile } from "../src/paths.ts";
 import { check } from "../src/check.ts";
 import { requestMandate } from "../src/mandate.ts";
 
@@ -20,7 +21,7 @@ test("nobody answered in 10 minutes -> the mandate is denied (fail closed)", () 
 test("the timeout is written to the audit log", () => {
   const mandate = requestMandate("agent", "task", ["gmail.read"], 60, 1);
   denyStalePending(TEN_MINUTES, mandate.createdAt + TEN_MINUTES + 1);
-  const log = readFileSync(process.env.BROKER_AUDIT_LOG as string, "utf8");
+  const log = readFileSync(auditLogFile, "utf8");
   assert.ok(log.includes(`"deny by timeout, mandate ${mandate.id}"`));
 });
 
