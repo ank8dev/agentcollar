@@ -4,12 +4,15 @@
   "description": "AgentCollar broker: checks an agent's mandate before every action",
   "private": true,
   "type": "module",
+  "bin": {
+    "agentcollar": "bin/agentcollar.mjs"
+  },
   "scripts": {
     "demo": "tsx src/demo.ts",
     "server": "tsx src/server.ts",
     "agent": "tsx src/agent.ts",
-    "setup": "tsx src/cli/setup.ts",
-    "revoke": "tsx src/cli/revoke.ts",
+    "setup": "tsx src/cli/run.ts setup",
+    "revoke": "tsx src/cli/run.ts revoke",
     "test": "BROKER_AUDIT_LOG=${TMPDIR:-/tmp}/agentcollar-test-audit.log tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

@@ -27,7 +27,7 @@ test("an id that is not 8 hex characters is refused without any request", async 
   const urls = fakeBroker(200, {});
   const result = await revokeMandate("../../x", 8787);
   assert.equal(result.ok, false);
-  assert.match(result.message, /npm run revoke -- <id/);
+  assert.match(result.message, /agentcollar revoke <id>/);
   assert.deepEqual(urls, []);
 });
 

@@ -1,4 +1,4 @@
-// npm run setup — connects the broker to YOUR Telegram bot, without editing files by hand.
+// agentcollar setup (or npm run setup) — connects the broker to YOUR Telegram bot, without editing files by hand.
 // 1) asks for the bot token and checks it with Telegram,
 // 2) you press Start in the bot: we take your user id from that message,
 // 3) writes broker/.env readable only by you (600).
@@ -66,12 +66,21 @@ function askHidden(question: string): Promise<string> {
   });
 }
 
-async function main(): Promise<void> {
+export async function runSetup(): Promise<number> {
+  try {
+    return await setup();
+  } catch (error) {
+    console.error(`\n✗ ${(error as Error).message}`);
+    return 1;
+  }
+}
+
+async function setup(): Promise<number> {
   console.log("Настройка AgentCollar broker\n");
 
   if (existsSync(envFile) && !yes(await ask("broker/.env уже есть. Перезаписать настройки Telegram? [y/N] "))) {
     console.log("Ничего не меняю.");
-    return;
+    return 0;
   }
 
   // 1. Token
@@ -102,16 +111,14 @@ async function main(): Promise<void> {
   }
   await skipOldUpdates(token); // tell Telegram we handled these messages
   if (user === undefined) {
-    console.log("Время вышло. Запусти npm run setup ещё раз.");
-    process.exitCode = 1;
-    return;
+    console.log("Время вышло. Запусти agentcollar setup ещё раз.");
+    return 1;
   }
 
   const who = [user.firstName, user.username ? `@${user.username}` : "", `id ${user.id}`].filter(Boolean).join(", ");
   if (!yes(await ask(`✓ Это ты? ${who} [y/N] `))) {
-    console.log("Ничего не записал. Запусти npm run setup ещё раз.");
-    process.exitCode = 1;
-    return;
+    console.log("Ничего не записал. Запусти agentcollar setup ещё раз.");
+    return 1;
   }
 
   // 3. broker/.env, readable only by you
@@ -121,9 +128,5 @@ async function main(): Promise<void> {
 
   console.log("✓ Записано в broker/.env (права 600: читать может только твой пользователь macOS)");
   console.log("Дальше: npm run server");
+  return 0;
 }
-
-main().catch((error: Error) => {
-  console.error(`\n✗ ${error.message}`);
-  process.exit(1);
-});

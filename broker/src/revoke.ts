@@ -5,7 +5,7 @@ export type RevokeResult = { ok: boolean; message: string };
 export async function revokeMandate(id: string, port: number): Promise<RevokeResult> {
   // Mandate ids are 8 hex characters; anything else never reaches the network.
   if (!/^[0-9a-f]{8}$/.test(id)) {
-    return { ok: false, message: "Как использовать: npm run revoke -- <id мандата из 8 символов>" };
+    return { ok: false, message: "Как использовать: agentcollar revoke <id>   (id мандата: 8 символов, есть в сообщении Telegram)" };
   }
 
   let response: Response;
