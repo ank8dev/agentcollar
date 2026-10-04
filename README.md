@@ -19,6 +19,8 @@
 
 > **Status: early, building in public.** The broker works end to end with a **fake Gmail inbox**.
 > Real Gmail, persistence and MCP are next. Do not connect real accounts yet.
+>
+> **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
 
 ---
 
@@ -150,8 +152,6 @@ Known limits today: mandates live in memory (they disappear on restart), Gmail i
 - [ ] An MCP interface, so existing agents can use the broker
 - [ ] Morning report: what every agent did tonight
 
-> **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
-
 ## Repository
 
 | Folder | What |
@@ -161,6 +161,10 @@ Known limits today: mandates live in memory (they disappear on restart), Gmail i
 | [`brand/`](brand/) | Logos and hand-drawn illustrations |
 
 Run the website locally: `cd landing && npm install && npm run dev`.
+
+## License
+
+Code: [MIT](LICENSE). Brand assets in `brand/` (logos, illustrations): © ank8dev, all rights reserved.
 
 ## Author
 
