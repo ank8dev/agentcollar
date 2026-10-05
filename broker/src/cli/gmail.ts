@@ -36,17 +36,23 @@ function loadClient(): GoogleClient {
 
 async function connect(args: string[]): Promise<number> {
   // 1. The Desktop-app client file from Google Cloud
-  let file = args[0] ?? null;
+  let file: string | null = args[0] ?? null;
   if (file === null) {
     const found = findDownloadedClient();
     if (found !== null && (await ask(`Use ${found}? [Y/n] `)) !== "n") file = found;
   }
+  if (file === null && existsSync(googleClientFile)) file = googleClientFile;
   if (file === null) {
-    if (existsSync(googleClientFile)) file = googleClientFile;
-    else {
-      console.error("Give the client file from Google Cloud: agcl gmail connect ~/Downloads/client_secret_….json");
+    // No OAuth client yet: walk the person through Google Cloud, page by page.
+    if (!process.stdin.isTTY) {
+      console.error("No Google client yet. Run agcl gmail connect in a terminal for the guided setup,");
+      console.error("or pass the file: agcl gmail connect ~/Downloads/client_secret_….json");
       return 1;
     }
+    if ((await ask("No Google client found. Set one up now, step by step? [Y/n] ")) === "n") return 1;
+    file = await (await import("./gmail-guide.ts")).runGuide(join(homedir(), "Downloads"));
+    if (file === null) return 1;
+    console.log(`${styleText("green", "✓")} Found ${file}\n`);
   }
   const client = parseClientJson(readFileSync(file, "utf8")); // fails early if it is the wrong file
   ensureHome();

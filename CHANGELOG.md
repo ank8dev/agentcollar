@@ -11,6 +11,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   `127.0.0.1` loopback; the refresh token is stored in the macOS Keychain, the access token only in
   memory. Inbox and drafts go through the Gmail API behind the same mailbox interface as the fake
   inbox; Gmail errors reach the agent as `502` (30cf066, f4421e1).
+- Guided Google Cloud setup inside `agcl gmail connect`: when there is no OAuth client yet, it opens
+  the 6 console pages one by one, says what to click on each, and picks up the downloaded
+  `client_secret_….json` by itself.
 - MCP: `mandate_status` can wait for the human's decision (`waitSeconds`, up to 120 s); the polling
   interval is set by the server, not by the model (a90b9b9).
 - Adaptive terminal output: `agcl watch` and `agcl logs` lines adapt to wide, medium and narrow
