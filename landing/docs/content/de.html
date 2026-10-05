@@ -1,0 +1,320 @@
+<!--meta
+title: AgentCollar Dokumentation
+description: AgentCollar installieren und nutzen: ein kleiner lokaler Broker, der KI-Agenten kurzlebige, auf eine Aufgabe beschränkte Mandate gibt, die du in Telegram freigibst.
+-->
+<div class="hero">
+  <div>
+    <h1><span class="hl">Lass Agenten arbeiten.</span><br><span class="hl">Behalte die Schlüssel.</span></h1>
+    <p class="lead">AgentCollar ist ein kleiner Broker, der auf deinem Computer läuft. Dein KI-Agent bittet ihn um einen kurzen Passierschein für genau eine Aufgabe. Du gibst ihn in Telegram frei. Der Agent sieht nie dein Passwort.</p>
+    <div class="install">{{hero-install}}</div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 Laufzeit-Abhängigkeiten</span><span class="chip warn">früh · Nutzung auf eigenes Risiko</span></div>
+  </div>
+  <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar-Logo: ein Halsband mit AC-Marke" width="220" height="220">
+</div>
+
+<div class="note warn"><b class="t">Hobbyprojekt. Nutzung auf eigenes Risiko.</b><p>AgentCollar ist jung. Verbinde keine Konten, deren Verlust du dir nicht leisten kannst.</p></div>
+
+<section id="start">
+  <h2 class="sec"><span class="mark">Erste Schritte</span></h2>
+  <p>Von null zu einem laufenden Broker in etwa drei Minuten. Du brauchst <strong>Node.js 22 oder neuer</strong> und ein Telegram-Konto. Prüfe zuerst Node:</p>
+  {{node-version}}
+
+  <div class="steps">
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-1-task-dark-ink.webp" alt="">
+      <div>
+        <h4>1. Installieren</h4>
+        <p>Starte es einmal ohne Installation, oder installiere es, um den kurzen Befehl <code>agcl</code> zu bekommen.</p>
+        {{install}}
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-2-approve-dark-ink.webp" alt="">
+      <div>
+        <h4>2. Deinen Telegram-Bot verbinden</h4>
+        <p>Erstelle einen Bot mit <a href="https://t.me/BotFather">@BotFather</a> (<code>/newbot</code>) und kopiere sein Token. Starte dann <code>agcl</code>. Beim ersten Mal startet es den Einrichtungsassistenten von selbst.</p>
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-3-results-dark-ink.webp" alt="">
+      <div>
+        <h4>3. Einen Agenten hereinlassen</h4>
+        <p>Verbinde Claude Code über <a href="#mcp">MCP</a>, oder rufe die <a href="#api">HTTP-API</a> aus deinem eigenen Skript auf. Ab jetzt geht jede Anfrage über dich.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="wizard">Der Einrichtungsassistent, Schritt für Schritt</h3>
+  <p>Das siehst du. Zeilen, die mit <code>$</code> beginnen, tippst du selbst.</p>
+  {{setup}}
+  <p>Was passiert ist, Zeile für Zeile:</p>
+  <ol>
+    <li><strong>Das Token bleibt verborgen</strong>, während du tippst, und wird bei Telegram geprüft. Ein falsches Token führt zu einer klaren Fehlermeldung, nicht zu einem Absturz.</li>
+    <li><strong>Der Link enthält einen Einmalcode</strong> (<code>K7P2M9QX</code>). Nur ein <code>/start</code> mit genau diesem Code in einem privaten Chat zählt. Ein Fremder, der im selben Moment in deinem Bot auf Start drückt, kann nicht zu deinem Freigeber werden.</li>
+    <li><strong>„Is this you?"</strong> („Bist du das?") lässt dich den Namen mit eigenen Augen prüfen.</li>
+    <li>Deine Einstellungen landen in <code>~/.agentcollar/.env</code>. Nur dein macOS-Benutzer kann die Datei lesen. Der Bot schreibt dir außerdem: „AgentCollar is set up".</li>
+  </ol>
+  <div class="note"><b class="t">Kein Telegram? Kein Problem.</b><p>Antworte bei der ersten Frage mit <code>n</code>. Der Broker bittet dich dann direkt im Terminal um Freigabe, mit <code>y</code> oder <code>N</code>.</p></div>
+</section>
+
+<section id="concepts">
+  <h2 class="sec"><span class="mark">So funktioniert es</span></h2>
+  <p>Drei Beteiligte, eine Regel: <strong>Der Agent spricht nur mit dem Broker</strong>, und der Broker handelt erst, wenn alle Prüfungen bestanden sind.</p>
+  {{sequence}}
+
+  <h3 id="mandate">Mandate</h3>
+  <p>Ein <strong>Mandat</strong> ist eine Erlaubnis für genau eine Aufgabe. Der Agent fragt danach, du gibst es frei, und es läuft von selbst ab. Es enthält:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Feld</th><th>Beispiel</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td><code>agent</code></td><td><code>claude-code</code></td><td>Wer fragt. Wird dir angezeigt.</td></tr>
+      <tr><td><code>task</code></td><td>"Draft replies to new mail"</td><td>Warum, in den eigenen Worten des Agenten. Wird zuletzt angezeigt, in Anführungszeichen.</td></tr>
+      <tr><td><code>allowedActions</code></td><td><code>gmail.read, gmail.draft</code></td><td>Genau das, was erlaubt ist. Immer <code>app.verb</code>.</td></tr>
+      <tr><td><code>expiresInSeconds</code></td><td><code>300</code></td><td>Wie lange es <em>nach</em> deiner Freigabe gilt. Höchstens 1 Tag.</td></tr>
+      <tr><td><code>limit</code></td><td><code>10</code></td><td>Die Höchstzahl erlaubter Aktionen. Höchstens 1000.</td></tr>
+      <tr><td><code>id</code></td><td><code>8329b843</code></td><td>Öffentlicher Name. Kann gefahrlos angezeigt und in <code>agcl revoke</code> eingetippt werden.</td></tr>
+      <tr><td><code>token</code></td><td>64 Hex-Zeichen</td><td>Das Geheimnis. Nur der Agent (oder der MCP-Server) hat es. Wird nie protokolliert.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Ein Mandat durchläuft diese Zustände:</p>
+  {{lifecycle}}
+  <p>Die Uhr startet <strong>mit deiner Freigabe</strong>, nicht mit der Anfrage des Agenten. Antwortet 10 Minuten lang niemand, wird die Anfrage abgelehnt. Das nennt man <strong>fail closed</strong>: Im Zweifel lautet die Antwort Nein.</p>
+
+  <h3 id="checks">Die 6 Prüfungen</h3>
+  <p>Jede Anfrage durchläuft diese Prüfungen <strong>in dieser Reihenfolge</strong>. Die erste, die fehlschlägt, stoppt alles, und der Grund landet im Audit-Log.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Frage</th><th>Wenn nein</th><th>HTTP</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Kennen wir dieses Token?</td><td>unknown token</td><td><span class="pill no">401</span></td></tr>
+      <tr><td class="num">2</td><td>Hat ein Mensch es freigegeben?</td><td>waiting / denied</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">3</td><td>Ist es noch innerhalb seiner Zeit?</td><td>expired</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">4</td><td>Wurde es nicht widerrufen?</td><td>revoked</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">5</td><td>Steht diese Aktion im Mandat?</td><td>action not allowed</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">6</td><td>Ist das Limit noch nicht erreicht?</td><td>limit reached</td><td><span class="pill warn">429</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Das ist das Herz des Codes, <code>broker/src/check.ts</code>. Es ist absichtlich kurz:</p>
+  {{check-ts}}
+  <p>Achte auf das Muster: Jede Prüfung kann nur <strong>Nein</strong> sagen. Das „Ja" steht ein einziges Mal, ganz unten. Ingenieure nennen das <strong>deny by default</strong> (standardmäßig ablehnen).</p>
+
+  <h3 id="approval">Freigabe in Telegram</h3>
+  <p>Wenn ein Agent fragt, kommt diese Nachricht bei deinem Bot an:</p>
+  {{telegram}}
+  <ul>
+    <li><strong>Erst die Fakten, zuletzt die Worte des Agenten.</strong> „Actions" und „Lifetime" sind das, was der Broker durchsetzt. Die Aufgabe ist nur die Geschichte des Agenten, auf eine Zeile zusammengedrückt, damit er keine zusätzliche Zeile „Actions:" fälschen kann.</li>
+    <li>Fragt der Agent nach <code>*.send</code>, kommt zuerst eine Warnung: „The agent asks for the right to SEND in your name" (der Agent möchte in deinem Namen SENDEN dürfen).</li>
+    <li>Nach deiner Freigabe werden die Knöpfe zu <span class="pill no">🛑 Revoke</span> (widerrufen).</li>
+    <li>Nur <strong>deine</strong> Telegram-Benutzer-ID kann drücken. Alle anderen bekommen „No access".</li>
+  </ul>
+
+  <h3 id="audit">Das Audit-Log</h3>
+  <p>Jede Prüfung und jede menschliche Entscheidung wird zu einer Zeile in <code>~/.agentcollar/audit.log</code>. Zeilen werden nur angehängt, nie verändert. Das ist die Rohdatei:</p>
+  {{audit-raw}}
+  <p>Text von Agenten steht in Anführungszeichen (<code>JSON.stringify</code>), damit ein Agent keinen Zeilenumbruch in seinen Namen schmuggeln und eine falsche Zeile fälschen kann. Das Token wird hier nie geschrieben. Die letzte Spalte zeigt, welche Prüfung entschieden hat. <code>agcl logs</code> macht daraus etwas Lesbares (siehe unten).</p>
+</section>
+
+<section id="gmail">
+  <h2 class="sec"><span class="mark">Gmail verbinden</span></h2>
+  <p>Von Haus aus nutzt der Broker ein <strong>gefälschtes Postfach</strong>, damit du alles gefahrlos ausprobieren kannst. Wenn du bereit bist, verbinde dein echtes Gmail. Die Verbindung kann Mails <strong>lesen</strong> und <strong>Entwürfe anlegen</strong>. Senden kann sie nie: Der Broker blockiert es, und Google ebenfalls, weil das Senden nie angefragt wurde.</p>
+  <ol>
+    <li>Lege in Google Cloud einen OAuth-Client vom Typ <strong>Desktop app</strong> an und lade seine JSON-Datei herunter.</li>
+    <li>Führe den Befehl unten aus. Dein Browser öffnet sich. Erlaube „read your email" und „create drafts".</li>
+    <li>Starte den Broker neu.</li>
+  </ol>
+  {{gmail-connect}}
+  <p>Das Refresh-Token landet im <strong>macOS-Schlüsselbund</strong>, nie in einer Datei. Das kurzlebige Access-Token lebt nur im Arbeitsspeicher. Prüfe oder entferne die Verbindung jederzeit:</p>
+  {{gmail-status}}
+  <div class="note"><b class="t">Der Testmodus hält 7 Tage</b><p>Solange deine Google-App im Testmodus ist, beendet Google die Anmeldung nach 7 Tagen. Führe einfach erneut <code>agcl gmail connect</code> aus.</p></div>
+</section>
+
+<section id="cli">
+  <h2 class="sec"><span class="mark">Der Befehl <code class="plain">agcl</code></span></h2>
+  <p><code>agcl</code> ist der Kurzname von <code>agentcollar</code>. Es ist dasselbe Programm: <code>agcl watch</code> = <code>agentcollar watch</code>. Der Kurzname funktioniert nach <code>npm install -g agentcollar</code>. Mit <code>npx</code> nimm den langen Namen: <code>npx agentcollar watch</code>.</p>
+  {{help}}
+
+  <div class="cmd"><h3 id="cmd-agcl"><code>agcl</code></h3>
+    <p>Der „mach einfach, dass es läuft"-Befehl. Zeigt das Intro, startet den Assistenten, wenn Telegram noch nicht eingerichtet ist, und startet dann den Broker. In einem Skript (niemand am Terminal) überspringt er die Fragen und startet den Broker.</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-setup"><code>agcl setup</code></h3>
+    <p>Verbindet <strong>deinen eigenen</strong> Telegram-Bot. Siehe die <a href="#wizard">vollständige Anleitung</a>. Kann gefahrlos erneut ausgeführt werden: Es fragt, bevor es eine vorhandene <code>.env</code> ersetzt, und behält andere Zeilen (zum Beispiel <code>BROKER_PORT</code>).</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-server"><code>agcl server</code></h3>
+    <p>Startet den Broker. Er lauscht nur auf <code>127.0.0.1:8787</code>: Programme auf anderen Computern erreichen ihn nicht. Beende ihn mit <kbd>Ctrl+C</kbd>.</p>
+    {{server}}
+    <dl class="opts"><dt>BROKER_PORT=9000</dt><dd>Einen anderen Port nutzen. Trag ihn in <code>~/.agentcollar/.env</code> ein.</dd></dl>
+    <div class="note"><b class="t">Mandate leben im Arbeitsspeicher</b><p>Wenn du den Broker stoppst, verschwinden alle Mandate. Agenten fragen einfach erneut. Das Audit-Log bleibt.</p></div>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-watch"><code>agcl watch</code></h3>
+    <p>Ein Live-Bildschirm. Öffne ihn in einem zweiten Terminal und sieh jede Anfrage in dem Moment, in dem sie passiert. Er <strong>liest</strong> nur das Audit-Log: Er kann nichts verändern.</p>
+    {{watch}}
+    <p>So liest du <code>✓ ✓ ✓ ✓ ✗ ·</code>: Die sechs Zeichen sind die sechs Prüfungen. <code>✓</code> bestanden, <code>✗</code> die fehlgeschlagene, <code>·</code> nie ausgeführt (die Anfrage war schon gestoppt). Gelbe Zeilen sind menschliche Entscheidungen.</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mandates"><code>agcl mandates</code></h3>
+    <p>Was der laufende Broker gerade weiß: wer, was, Zustand, verbleibende Zeit und Aktionen. Er liest eine Snapshot-Datei, die der Broker nach jeder Änderung schreibt. Der Snapshot enthält <strong>keine Tokens</strong>.</p>
+    {{mandates}}
+    <p>Zustände: <span class="pill warn">waiting</span> <span class="pill ok">active</span> <span class="pill no">denied</span> <span class="pill no">expired</span> <span class="pill no">revoked</span> <span class="pill no">limit used up</span></p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-logs"><code>agcl logs</code></h3>
+    <p>Das Audit-Log, gefiltert und farbig.</p>
+    <dl class="opts">
+      <dt>--agent &lt;name&gt;</dt><dd>nur dieser Agent</dd>
+      <dt>--denied</dt><dd>nur Ablehnungen (der interessante Teil)</dd>
+      <dt>--today</dt><dd>nur heute</dd>
+    </dl>
+    {{logs}}
+    <p>Filter lassen sich kombinieren. Lieber die Rohdatei? <code>tail -f ~/.agentcollar/audit.log</code>.</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-revoke"><code>agcl revoke &lt;id&gt;</code></h3>
+    <p>Der Not-Aus-Schalter. Das Mandat hört bei der nächsten Anfrage auf zu funktionieren. Geht ohne Internet. Die Telegram-Nachricht wird ebenfalls aktualisiert.</p>
+    {{revoke}}
+    <p>Die ID steht in der Telegram-Nachricht und in <code>agcl mandates</code>. Widerrufen braucht nie ein Token: Es kann Zugriff nur wegnehmen, nie geben.</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mcp"><code>agcl mcp</code></h3>
+    <p>Startet den MCP-Server, den Claude Code und andere Agenten nutzen. Normalerweise startest du ihn nicht von Hand: Das macht der Agent. Siehe den <a href="#mcp">nächsten Abschnitt</a>.</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-intro">Das Intro</h3>
+    <p>Das drehende Medaillon ist das Logo, gezeichnet mit Braille-Zeichen (<code>⣿⡇⠟</code>). Jedes enthält 8 Punkte, deshalb wird das Bild detailreicher als mit normalen Buchstaben. Es dauert etwa 1,7 Sekunden, jede Taste überspringt es, und es erscheint nie in Pipes, in CI, mit <code>NO_COLOR</code> oder mit <code>--no-intro</code>.</p>
+  </div>
+</section>
+
+<section id="mcp">
+  <h2 class="sec"><span class="mark">Mit Claude Code nutzen</span></h2>
+  <p><strong>MCP</strong> (Model Context Protocol) ist eine gemeinsame Sprache zwischen einem KI-Agenten und seinen Werkzeugen. AgentCollar spricht sie, also kann Claude Code den Broker selbstständig nutzen. Ein Befehl fügt ihn hinzu:</p>
+  {{mcp-add}}
+  <p>Lass <code>agcl server</code> in einem anderen Terminal laufen. Dann bitte Claude einfach:</p>
+  {{mcp-prompt}}
+  <p>Was als Nächstes passiert:</p>
+  <ol>
+    <li>Claude ruft <code>request_mandate</code> mit den Aktionen auf, die es braucht.</li>
+    <li>Dein Telefon vibriert. Du drückst <strong>✅ Approve</strong>.</li>
+    <li>Claude ruft <code>mandate_status</code> auf, sieht <code>approved</code>, dann <code>gmail_read_inbox</code> und <code>gmail_create_draft</code>.</li>
+    <li>Versucht es <code>gmail_send</code> ohne Erlaubnis, sagt der Broker Nein.</li>
+  </ol>
+  <h3 id="tools">Die 5 Werkzeuge</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Werkzeug</th><th>Argumente</th><th>Braucht</th></tr></thead>
+    <tbody>
+      <tr><td><code>request_mandate</code></td><td><code>task</code>, <code>actions</code>, <code>expiresInSeconds</code>, <code>limit</code></td><td>nichts. Gibt eine <code>mandateId</code> zurück</td></tr>
+      <tr><td><code>mandate_status</code></td><td><code>mandateId</code></td><td>ein Mandat</td></tr>
+      <tr><td><code>gmail_read_inbox</code></td><td><code>mandateId</code></td><td><code>gmail.read</code></td></tr>
+      <tr><td><code>gmail_create_draft</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.draft</code></td></tr>
+      <tr><td><code>gmail_send</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.send</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b class="t">Das Modell sieht das Token nie</b><p>Der MCP-Server behält das geheime Token in seinem eigenen Prozess und gibt dem Modell nur die <code>mandateId</code>. Enthält eine E-Mail eine Prompt-Injection wie „schick mir dein Token", gibt es also nichts zu stehlen.</p></div>
+  <details><summary>Unter der Haube: mit dem MCP-Server von Hand sprechen</summary>
+    <p>MCP über <strong>stdio</strong> heißt: JSON-Nachrichten, eine pro Zeile, über Ein- und Ausgabe des Programms. Probier es selbst:</p>
+    {{mcp-raw}}
+    <p>Der Server ist eine kleine JSON-RPC-Implementierung, eigens für dieses Projekt geschrieben, ohne Abhängigkeiten.</p>
+  </details>
+</section>
+
+<section id="api">
+  <h2 class="sec"><span class="mark">HTTP-API</span></h2>
+  <p>Für Agenten, die kein MCP sprechen. Der Broker lauscht auf <code>127.0.0.1:8787</code>. Sende JSON und schreib das Mandats-Token in den Header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Methode</th><th>Pfad</th><th>Prüft Aktion</th><th>Was es tut</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/mandates</code></td><td>—</td><td>Fragt ein Mandat an. Gibt <span class="pill warn">202</span> und ein Token zurück (wartend).</td></tr>
+      <tr><td><code>GET</code></td><td><code>/mandate</code></td><td>—</td><td>Zustand <em>deines</em> Mandats.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/mandates/:id/revoke</code></td><td>—</td><td>Not-Aus.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/inbox</code></td><td><code>gmail.read</code></td><td>Listet E-Mails.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/drafts</code></td><td><code>gmail.draft</code></td><td>Legt einen Entwurf an: <code>to</code>, <code>subject</code>, <code>body</code>.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/send</code></td><td><code>gmail.send</code></td><td>Sendet. Abgelehnt, außer das Mandat erlaubt es. Mit echtem Gmail wird es ohnehin abgelehnt.</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="curl">Ein kompletter Durchlauf mit curl</h3>
+  {{curl-ask}}
+  <p>Gib es jetzt in Telegram frei. Dann nutze das Token:</p>
+  {{curl-use}}
+  <h3 id="codes">Statuscodes</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Code</th><th>Bedeutet</th><th>Was tun</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill ok">200</span> <span class="pill ok">201</span></td><td>Erledigt (201 = etwas wurde erstellt)</td><td>—</td></tr>
+      <tr><td><span class="pill warn">202</span></td><td>Angenommen, wartet auf den Menschen</td><td><code>GET /mandate</code> alle paar Sekunden abfragen</td></tr>
+      <tr><td><span class="pill no">401</span></td><td>„Wer bist du?" Kein gültiges Token</td><td>Zuerst ein Mandat anfragen</td></tr>
+      <tr><td><span class="pill no">403</span></td><td>„Ich kenne dich, aber nein"</td><td><code>error</code> lesen: nicht freigegeben, abgelaufen, widerrufen oder Aktion nicht erlaubt</td></tr>
+      <tr><td><span class="pill warn">429</span></td><td>Limit erreicht</td><td>Ein neues Mandat anfragen</td></tr>
+      <tr><td><span class="pill no">400</span> <span class="pill no">413</span> <span class="pill no">415</span></td><td>Ungültige Eingabe / zu groß (über 10 KB) / kein JSON</td><td>Anfrage korrigieren</td></tr>
+      <tr><td><span class="pill no">502</span></td><td>Gmail hat mit einem Fehler geantwortet</td><td><code>agcl gmail status</code> prüfen</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b class="t">Browser werden absichtlich abgewiesen</b><p>Auch eine Webseite kann Anfragen an <code>localhost</code> schicken. Deshalb weist der Broker jede Anfrage mit <code>Origin</code>-Header ab, prüft <code>Host</code> (gegen DNS-Rebinding) und akzeptiert nur <code>application/json</code>. Programme wie curl und Agenten sind nicht betroffen.</p></div>
+</section>
+
+<section id="data">
+  <h2 class="sec"><span class="mark">Wo deine Daten liegen</span></h2>
+  <p>Alles liegt in einem Ordner in deinem Home-Verzeichnis, nicht im Code-Ordner: Den ersetzt npm bei jedem Update.</p>
+  {{data-tree}}
+  <dl class="opts">
+    <dt>TELEGRAM_BOT_TOKEN</dt><dd>von @BotFather. Wird von <code>agcl setup</code> geschrieben.</dd>
+    <dt>TELEGRAM_USER_ID</dt><dd>die einzige Person, die freigeben darf. Wird von <code>agcl setup</code> geschrieben.</dd>
+    <dt>BROKER_PORT</dt><dd>optional, Standard <code>8787</code>.</dd>
+    <dt>AGENTCOLLAR_HOME</dt><dd>verlegt den ganzen Ordner woandershin (die Tests nutzen das).</dd>
+  </dl>
+  <p><code>700</code> und <code>600</code> sind <strong>Dateirechte</strong>: Nur dein macOS-Benutzer kann sie öffnen, nicht andere Benutzer desselben Computers.</p>
+</section>
+
+<section id="security">
+  <h2 class="sec"><span class="mark">Sicherheit</span></h2>
+  <div class="traits">
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-1-short-lived-hourglass.webp" alt=""><div><h4>Kurzlebig</h4><p>Mandate laufen von selbst ab. Unbeantwortete Anfragen sterben nach 10 Minuten.</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-2-one-task-target.webp" alt=""><div><h4>Nur eine Aufgabe</h4><p>Nur die aufgeführten Aktionen. Aus einem Entwurf wird kein Versand.</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-3-revoke-hand.webp" alt=""><div><h4>Jederzeit widerrufbar</h4><p>Ein Tipp in Telegram oder <code>agcl revoke</code>. Wirkt bei der nächsten Anfrage.</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-4-logged-scroll.webp" alt=""><div><h4>Lückenlos protokolliert</h4><p>Jede Prüfung, jede Entscheidung, je eine Zeile. Tokens nie.</p></div></div>
+  </div>
+  <h3 id="protects">Wovor der Broker schützt</h3>
+  <ul>
+    <li><strong>Ein gestohlenes Mandats-Token:</strong> eine Aufgabe, kurze Zeit, widerrufbar. Nicht dein ganzes Postfach für immer.</li>
+    <li><strong>Ein Agent, der durchdreht:</strong> Das Limit stoppt ihn, das Log zeigt, wann es losging.</li>
+    <li><strong>Prompt-Injection in einer E-Mail:</strong> Der Agent glaubt sie vielleicht, aber die Aktion steht nicht im Mandat, und über MCP ist das Token nicht einmal sichtbar.</li>
+    <li><strong>Eine gefälschte Freigabenachricht:</strong> Aktionen müssen wie <code>app.verb</code> aussehen, und der Text des Agenten ist eine einzige bereinigte Zeile, ganz am Ende.</li>
+    <li><strong>Ein Agent, der sich selbst freigibt:</strong> Freigabe ist <em>nie</em> über HTTP oder über Dateien möglich. Nur in Telegram (deine ID) oder im eigenen Terminal des Brokers.</li>
+    <li><strong>Eine Webseite, die localhost angreift:</strong> Browser-Anfragen werden abgewiesen.</li>
+    <li><strong>Senden in deinem Namen:</strong> Die Gmail-Verbindung hat nur Lese- und Entwurfsrechte. Selbst ein Fehler im Broker könnte keine E-Mail senden.</li>
+    <li><strong>Ein manipuliertes npm-Paket:</strong> Releases werden mit <strong>Provenance</strong> (nachprüfbarer Herkunft) veröffentlicht. Prüfe mit <code>npm audit signatures</code>.</li>
+  </ul>
+  <h3 id="limits">Wovor er (noch) nicht schützt</h3>
+  <ul>
+    <li>Schadsoftware, die bereits unter deinem Benutzer läuft, kann <code>~/.agentcollar/</code> lesen.</li>
+    <li>Mandate gehen verloren, wenn der Broker stoppt.</li>
+  </ul>
+</section>
+
+<section id="trouble">
+  <h2 class="sec"><span class="mark">Fehlerbehebung</span></h2>
+  <details><summary>In Telegram kommt nichts an</summary><p>Öffne deinen Bot und drück mindestens einmal <strong>Start</strong>: Bots können dir nicht als Erste schreiben. Prüfe, ob <code>agcl server</code> <code>Approvals: Telegram</code> anzeigt. Steht dort <code>this terminal</code>, führe <code>agcl setup</code> aus.</p></details>
+  <details><summary>Der Assistent meldet „Another program is already listening to this bot"</summary><p>(Ein anderes Programm hört diesen Bot bereits ab.) Meist ist es dein eigener <code>agcl server</code>. Beende ihn mit <kbd>Ctrl+C</kbd> und führe <code>agcl setup</code> erneut aus.</p></details>
+  <details><summary>Der Agent sagt, der Broker läuft nicht</summary><p>Starte ihn: <code>agcl server</code>. Broker und Agent müssen auf demselben Computer laufen.</p></details>
+  <details><summary><code>agcl mandates</code> meldet „The broker is not running"</summary><p>Mandate leben in seinem Arbeitsspeicher, nach dem Stoppen gibt es also nichts anzuzeigen. Starte ihn und lass den Agenten erneut fragen.</p></details>
+  <details><summary>Gmail funktioniert nach einer Woche nicht mehr</summary><p>Deine Google-App ist im Testmodus, und Google hat die Anmeldung beendet. Führe <code>agcl gmail connect</code> erneut aus.</p></details>
+  <details><summary><code>agcl: command not found</code></summary><p>Der Kurzname braucht eine Installation: <code>npm install -g agentcollar</code>. Ohne Installation nimm <code>npx agentcollar</code>.</p></details>
+  <details><summary>Port 8787 ist belegt</summary><p>Vielleicht läuft schon ein anderer Broker (prüfe mit <code>agcl mandates</code>). Oder starte diesen auf einem anderen Port: <code>BROKER_PORT=8788 agcl server</code>, und gib deinem Agenten die neue Adresse.</p></details>
+  <details><summary>„Unsupported engine" oder Syntaxfehler beim Start</summary><p>Dein Node.js ist zu alt. AgentCollar braucht Version 22 oder neuer: <code>node --version</code>.</p></details>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec"><span class="mark">Fahrplan</span></h2>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td><span class="pill ok">done</span></td><td>Mandate, die 6 Prüfungen, Widerruf, Audit-Log nur zum Anhängen</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Lokaler HTTP-Broker, Freigabe in Telegram oder im Terminal, fail closed</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Die <code>agcl</code>-CLI: Assistent, watch, mandates, logs, revoke, Intro</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>MCP-Server für Claude Code und andere Agenten</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Echtes Gmail: nur Lesen und Entwürfe, Refresh-Token im macOS-Schlüsselbund</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Installation aus npm mit einem Befehl, mit Provenance</td></tr>
+      <tr><td><span class="pill">later</span></td><td>Refresh-Token verschlüsselt gespeichert</td></tr>
+      <tr><td><span class="pill">later</span></td><td>Mandate überstehen einen Neustart</td></tr>
+      <tr><td><span class="pill">later</span></td><td>Morgenbericht: was jeder Agent heute Nacht getan hat</td></tr>
+    </tbody>
+  </table></div>
+</section>
