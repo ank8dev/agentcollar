@@ -1,0 +1,37 @@
+# Type-checks and tests the broker (broker/) on every push and pull request that changes it.
+# The same two commands every contributor runs locally: npm run typecheck && npm test
+name: Test broker
+
+on:
+  push:
+    paths: ['broker/**', '.github/workflows/test-broker.yml']
+  pull_request:
+    paths: ['broker/**', '.github/workflows/test-broker.yml']
+
+# Least privilege: this job only needs to read the code.
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the older run pointless: cancel it.
+concurrency:
+  group: test-broker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: broker
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: broker/package-lock.json
+
+      - run: npm ci # exact versions from package-lock.json; also builds dist/
+      - run: npm run typecheck
+      - run: npm test

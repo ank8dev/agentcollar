@@ -20,6 +20,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Example agent in `examples/claude-agent/`: Claude Code that can reach the mailbox only through
   AgentCollar (shell, file and web tools denied) (f4421e1).
 - `SECURITY.md`, `CONTRIBUTING.md` and this changelog.
+- CI: `npm run typecheck` and `npm test` on every push and pull request that changes `broker/`.
 
 ### Changed
 - All user-facing text is in English: CLI, setup wizard, Telegram bot, terminal approval (3e9f58e).

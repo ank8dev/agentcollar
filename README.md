@@ -5,6 +5,10 @@
 <h1 align="center">AgentCollar</h1>
 
 <p align="center">
+  <a href="https://github.com/ank8dev/agentcollar/actions/workflows/test-broker.yml"><img src="https://github.com/ank8dev/agentcollar/actions/workflows/test-broker.yml/badge.svg" alt="Tests" /></a>
+</p>
+
+<p align="center">
   <strong>Let agents work. Keep the keys.</strong><br />
   A small broker between your AI agents and your accounts.<br />
   Agents get a short-lived pass for one task — never your password.
@@ -196,9 +200,12 @@ Known limits today: mandates live in memory (they disappear when the broker stop
 
 Run the website locally: `cd landing && npm install && npm run dev`.
 
+Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md). Found a security problem? Report it privately, see [SECURITY.md](SECURITY.md). Changes per version: [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 Code: [MIT](LICENSE). Brand assets in `brand/` (logos, illustrations): © ank8dev, all rights reserved.
+Security policy: [SECURITY.md](SECURITY.md) · Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Author
 
