@@ -1,0 +1,224 @@
+<!--
+  Shared blocks for every language: code, terminal output and diagrams.
+  Code is always English. A content page uses a block with {{id}}; build-docs.mjs
+  swaps it in. Each block starts with a line "<!-- @code id -->".
+-->
+
+<!-- @code hero-install -->
+<div class="code term"><pre><span class="p">$ </span>npx agentcollar</pre><button class="copy" data-copy="npx agentcollar">copy</button></div>
+
+<!-- @code node-version -->
+<div class="code term"><pre><span class="p">$ </span>node --version
+<span class="c">v22.23.2</span>          <span class="c"># 22 or higher is fine</span></pre><button class="copy" data-copy="node --version">copy</button></div>
+
+<!-- @code install -->
+<div class="code term"><pre><span class="p">$ </span>npx agentcollar             <span class="c"># try it, nothing installed</span>
+<span class="p">$ </span>npm install -g agentcollar  <span class="c"># install: now `agcl` works</span></pre><button class="copy" data-copy="npm install -g agentcollar">copy</button></div>
+
+<!-- @code setup -->
+<div class="code term"><span class="label">terminal</span><pre><span class="p">$ </span>agcl
+<span class="c">  (spinning medallion, "AgentCollar" types itself — about 1.7 s, any key skips)</span>
+Telegram is not set up yet. Set it up now? [Y/n] <span class="c">(n = approve requests in this terminal)</span> <span class="b">y</span>
+
+AgentCollar setup
+
+Bot token (from @BotFather, hidden while you type): <span class="c">********</span>
+<span class="g">✓ Bot found: @ank_collar_bot</span>
+
+Open this link and press Start:  https://t.me/ank_collar_bot?start=K7P2M9QX
+Waiting (up to 5 minutes)...
+<span class="g">✓ Is this you? Ank, @ank, id 123456789</span> [y/N] <span class="b">y</span>
+<span class="g">✓ Saved to ~/.agentcollar/.env</span> (mode 600: only your macOS user can read it)
+Next: agcl server (or just agcl)
+
+Broker listening on http://127.0.0.1:8787
+Mailbox: fake inbox (connect your Gmail: agcl gmail connect)
+Approvals: Telegram</pre></div>
+
+<!-- @code sequence -->
+<div class="flow seq" role="img" aria-label="Agent, broker, you and Gmail: the agent asks for a mandate, you approve it in Telegram, the broker checks every request, reads the inbox, and refuses a send">
+  <svg viewBox="0 0 720 470">
+    <g class="who">
+      <rect class="bx" x="10" y="8" width="150" height="40" rx="12"/><text x="85" y="33" text-anchor="middle">Agent</text>
+      <rect class="bx wait" x="200" y="8" width="150" height="40" rx="12"/><text x="275" y="33" text-anchor="middle">Broker</text>
+      <rect class="bx good" x="390" y="8" width="150" height="40" rx="12"/><text x="465" y="33" text-anchor="middle">You · Telegram</text>
+      <rect class="bx" x="580" y="8" width="130" height="40" rx="12"/><text x="645" y="33" text-anchor="middle">Gmail</text>
+    </g>
+    <g class="life"><path d="M85 48 V460"/><path d="M275 48 V460"/><path d="M465 48 V460"/><path d="M645 48 V460"/></g>
+    <g class="msg">
+      <path class="ln" d="M85 86 H271"/><text x="92" y="78">gmail.read + gmail.draft, 5 min, max 10</text>
+      <path class="ln back" d="M275 122 H89"/><text x="102" y="114">202 · token (pending)</text>
+      <path class="ln" d="M275 158 H461"/><text x="284" y="150">🔐 Mandate request</text>
+      <path class="ln back" d="M465 194 H279"/><text x="290" y="186">✅ Approve</text>
+      <path class="ln" d="M85 230 H271"/><text x="92" y="222">GET /inbox + token</text>
+      <path class="ln self" d="M275 252 h40 v24 h-36"/><text x="322" y="270">6 checks → audit log</text>
+      <path class="ln" d="M275 316 H641"/><text x="440" y="308">list messages</text>
+      <path class="ln back" d="M275 352 H89"/><text x="102" y="344">200 · messages</text>
+      <path class="ln" d="M85 392 H271"/><text x="92" y="384">POST /send + token</text>
+      <path class="ln back bad" d="M275 428 H89"/><text class="no" x="96" y="420">403 · "gmail.send" is not allowed</text>
+    </g>
+  </svg>
+</div>
+
+<!-- @code lifecycle -->
+<div class="flow" role="img" aria-label="Mandate lifecycle: pending, then approved, denied or timed out; approved ends as expired, revoked or limit reached">
+  <svg viewBox="0 0 700 220">
+    <rect class="bx wait" x="10" y="85" width="120" height="44" rx="14"/><text x="70" y="112" text-anchor="middle">pending</text>
+    <rect class="bx good" x="230" y="20" width="130" height="44" rx="14"/><text x="295" y="47" text-anchor="middle">approved</text>
+    <rect class="bx bad" x="230" y="96" width="130" height="44" rx="14"/><text x="295" y="123" text-anchor="middle">denied</text>
+    <rect class="bx bad" x="230" y="160" width="130" height="44" rx="14"/><text x="295" y="187" text-anchor="middle">timed out</text>
+    <rect class="bx" x="470" y="6" width="210" height="34" rx="12"/><text x="575" y="28" text-anchor="middle">expired</text>
+    <rect class="bx" x="470" y="48" width="210" height="34" rx="12"/><text x="575" y="70" text-anchor="middle">revoked</text>
+    <rect class="bx" x="470" y="90" width="210" height="34" rx="12"/><text x="575" y="112" text-anchor="middle">limit reached</text>
+    <path class="ln" d="M130 100 C 180 100, 180 42, 228 42"/><text class="lab" x="140" y="62">you: ✅</text>
+    <path class="ln" d="M130 112 L 228 118"/><text class="lab" x="150" y="106">you: ❌</text>
+    <path class="ln" d="M130 122 C 180 122, 180 182, 228 182"/><text class="lab" x="118" y="172">10 min, no answer</text>
+    <path class="ln" d="M360 36 L 468 23"/><path class="ln" d="M360 42 L 468 65"/><path class="ln" d="M360 50 C 420 60, 420 107, 468 107"/>
+    <text class="lab" x="470" y="160">every end state = denied</text>
+    <text class="lab" x="470" y="178">for all future requests</text>
+  </svg>
+</div>
+
+<!-- @code check-ts -->
+<div class="code src"><span class="label">broker/src/check.ts</span><pre><span class="c">// Runs the checks in order. The first failed check stops everything (early return).</span>
+<span class="k">function</span> runChecks(token, action) {
+  <span class="k">const</span> mandate = mandates.get(token);
+  <span class="k">if</span> (mandate === undefined) <span class="k">return</span> deny(<span class="s">"unknown_token"</span>, <span class="s">"unknown token"</span>);
+  <span class="k">if</span> (mandate.status !== <span class="s">"approved"</span>) <span class="k">return</span> deny(<span class="s">"not_approved"</span>, …);
+  <span class="k">if</span> (Date.now() &gt; mandate.expiresAt) <span class="k">return</span> deny(<span class="s">"expired"</span>, <span class="s">"mandate expired"</span>);
+  <span class="k">if</span> (mandate.revoked) <span class="k">return</span> deny(<span class="s">"revoked"</span>, <span class="s">"mandate revoked"</span>);
+  <span class="k">if</span> (!mandate.allowedActions.includes(action)) <span class="k">return</span> deny(<span class="s">"action_not_allowed"</span>, …);
+  <span class="k">if</span> (mandate.used &gt;= mandate.limit) <span class="k">return</span> deny(<span class="s">"limit_reached"</span>, …);
+
+  mandate.used += 1;        <span class="c">// only allowed actions use up the limit</span>
+  <span class="k">return</span> { allowed: <span class="k">true</span>, code: <span class="s">"ok"</span>, reason: <span class="s">"ok"</span> };   <span class="c">// "yes" only at the very end</span>
+}</pre></div>
+
+<!-- @code telegram -->
+<div class="code term"><span class="label">Telegram</span><pre>🔐 Mandate request
+
+Actions: gmail.read, gmail.draft
+Lifetime: 300 s after approval, limit 10 actions
+id: 8329b843
+Agent: digest-agent
+Task (agent's own words): “Read the inbox and prepare reply drafts”
+
+⏳ Waiting for your decision
+
+   <span class="g b">[ ✅ Approve ]</span>   <span class="r b">[ ❌ Deny ]</span></pre></div>
+
+<!-- @code audit-raw -->
+<div class="code src"><span class="label">~/.agentcollar/audit.log</span><pre>2026-10-05T13:37:52.346Z | "digest-agent" | "gmail.read" | ALLOWED | "ok" | ok
+2026-10-05T13:37:52.347Z | "digest-agent" | "gmail.send" | DENIED | "action \"gmail.send\" is not allowed" | action_not_allowed
+2026-10-05T13:37:56.352Z | "digest-agent" | "gmail.read" | DENIED | "mandate expired" | expired</pre></div>
+
+<!-- @code gmail-connect -->
+<div class="code term"><pre><span class="p">$ </span>agcl gmail connect ~/Downloads/client_secret_….json
+Opening Google in your browser. Allow: read your email + create drafts.
+
+<span class="g">✓</span> Gmail connected: <span class="b">you@gmail.com</span>
+  Read + create drafts. This connection cannot send at all: Google itself blocks it.
+  Refresh token: macOS Keychain. Access token: memory only.
+<span class="y">  Testing mode: Google ends this sign-in after 7 days. Then run agcl gmail connect again.</span>
+  Restart the broker to use it: agcl server</pre><button class="copy" data-copy="agcl gmail connect">copy</button></div>
+
+<!-- @code gmail-status -->
+<div class="code term"><pre><span class="p">$ </span>agcl gmail status
+<span class="g">✓</span> Gmail: you@gmail.com, connected 2026-10-05, access works.
+
+<span class="p">$ </span>agcl gmail disconnect
+Gmail disconnected: the Keychain entry is deleted and Google access is revoked.</pre></div>
+
+<!-- @code help -->
+<div class="code term"><span class="label">agcl --help</span><pre><span class="p">$ </span>agcl --help
+<span class="b">AgentCollar</span> — let agents work, keep the keys.
+
+  <span class="y">agcl</span>                                    intro → setup wizard (first time only) → broker
+  <span class="y">agcl setup</span>                              connect your own Telegram bot (setup wizard)
+  <span class="y">agcl gmail connect|status|disconnect</span>    connect your real Gmail (read + create drafts; cannot send)
+  <span class="y">agcl server</span>                             start the broker on 127.0.0.1
+  <span class="y">agcl watch</span>                              live screen: agent requests as they happen, with the 6 checks
+  <span class="y">agcl mandates</span>                           mandates of the running broker: state, time and actions left
+  <span class="y">agcl logs [--agent &lt;name&gt;] [--denied] [--today]</span>
+                                          the audit log: who, what, when, allowed or not
+  <span class="y">agcl revoke &lt;id&gt;</span>                        revoke a mandate instantly (kill switch)
+  <span class="y">agcl mcp</span>                                MCP server for Claude Code and other agents (stdio)
+
+  <span class="y">--no-intro</span>                              skip the intro
+  <span class="y">-h, --help</span>                              this help</pre><button class="copy" data-copy="agcl --help">copy</button></div>
+
+<!-- @code server -->
+<div class="code term"><pre><span class="p">$ </span>agcl server
+Broker listening on http://127.0.0.1:8787
+Mailbox: Gmail (you@gmail.com)
+Approvals: Telegram
+Telegram: bot @ank_collar_bot is listening, approver user id 123456789</pre></div>
+
+<!-- @code watch -->
+<div class="code term"><pre><span class="p">$ </span>agcl watch
+<span class="b">AgentCollar · watch</span>   <span class="c">Ctrl+C to quit</span>
+<span class="c">checks: 1 token · 2 approved · 3 not expired · 4 not revoked · 5 action allowed · 6 limit</span>
+<span class="c">— live —</span>
+<span class="c">16:37:52</span>  digest-agent      gmail.read          <span class="g">ALLOWED</span>  ✓ ✓ ✓ ✓ ✓ ✓  <span class="c">ok</span>
+<span class="c">16:37:52</span>  digest-agent      gmail.send          <span class="r">DENIED </span>  ✓ ✓ ✓ ✓ ✗ ·  <span class="c">action "gmail.send" is not allowed</span>
+<span class="c">16:37:56</span>  digest-agent      gmail.read          <span class="r">DENIED </span>  ✓ ✓ ✗ · · ·  <span class="c">mandate expired</span>
+<span class="c">16:38:10</span>  <span class="y">digest-agent      mandate.revoke      revoke by telegram, mandate ee7e76c0</span></pre></div>
+
+<!-- @code mandates -->
+<div class="code term"><pre><span class="p">$ </span>agcl mandates
+<span class="c">ID        AGENT         ACTIONS                  STATE     TIME LEFT  USED</span>
+8329b843  digest-agent  gmail.read, gmail.draft  active    4:12       7/10
+<span class="c">ee7e76c0  digest-agent  gmail.read               revoked   —          1/5</span></pre></div>
+
+<!-- @code logs -->
+<div class="code term"><pre><span class="p">$ </span>agcl logs --denied --today
+<span class="c">2026-10-05 16:37:52</span>  digest-agent  gmail.send   <span class="r">DENIED </span>  ✓ ✓ ✓ ✓ ✗ ·  <span class="c">action "gmail.send" is not allowed</span>
+<span class="c">2026-10-05 16:37:56</span>  digest-agent  gmail.read   <span class="r">DENIED </span>  ✓ ✓ ✗ · · ·  <span class="c">mandate expired</span></pre><button class="copy" data-copy="agcl logs --denied --today">copy</button></div>
+
+<!-- @code revoke -->
+<div class="code term"><pre><span class="p">$ </span>agcl revoke 8329b843
+🛑 Mandate 8329b843 revoked</pre></div>
+
+<!-- @code mcp-add -->
+<div class="code term"><pre><span class="p">$ </span>claude mcp add agentcollar -- npx -y agentcollar mcp</pre><button class="copy" data-copy="claude mcp add agentcollar -- npx -y agentcollar mcp">copy</button></div>
+
+<!-- @code mcp-prompt -->
+<div class="code src"><span class="label">prompt</span><pre>Through agentcollar, read my inbox and draft a reply to the first email.</pre></div>
+
+<!-- @code mcp-raw -->
+<div class="code term"><pre><span class="p">$ </span>printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","clientInfo":{"name":"me","version":"1"},"capabilities":{}}}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | agcl mcp
+<span class="c">{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","serverInfo":{"name":"agentcollar","version":"0.1.1"},…}}
+{"jsonrpc":"2.0","id":2,"result":{"tools":[{"name":"request_mandate",…},…]}}</span></pre></div>
+
+<!-- @code curl-ask -->
+<div class="code term"><span class="label">1 · ask</span><pre><span class="p">$ </span>curl -s 127.0.0.1:8787/mandates -H 'content-type: application/json' -d '{
+    "agent": "my-script",
+    "task": "Read the inbox",
+    "allowedActions": ["gmail.read"],
+    "expiresInSeconds": 300,
+    "limit": 5
+  }'
+<span class="c">{"token":"9f2c…(64 chars)","id":"a935774d","status":"pending","revoked":false,
+ "allowedActions":["gmail.read"],"expiresAt":null,"used":0,"limit":5}</span></pre></div>
+
+<!-- @code curl-use -->
+<div class="code term"><span class="label">2 · use</span><pre><span class="p">$ </span>TOKEN=9f2c…
+<span class="p">$ </span>curl -s 127.0.0.1:8787/inbox -H "authorization: Bearer $TOKEN"
+<span class="g">{"messages":[{"id":"m1","from":"anna@example.com","subject":"Lunch on Friday?",…}]}</span>
+
+<span class="p">$ </span>curl -s 127.0.0.1:8787/send -H "authorization: Bearer $TOKEN" \
+    -H 'content-type: application/json' -d '{"to":"a@b.c","subject":"Hi","body":"Hi"}'
+<span class="r">{"error":"action \"gmail.send\" is not allowed"}</span>   <span class="c"># 403</span></pre></div>
+
+<!-- @code data-tree -->
+<div class="code src"><span class="label">~/.agentcollar/  (700)</span><pre>~/.agentcollar/
+├── .env                <span class="c"># bot token + your Telegram id           · 600</span>
+├── audit.log           <span class="c"># every check and decision, forever       · 600</span>
+├── mandates.json       <span class="c"># snapshot for `agcl mandates`, no tokens · 600</span>
+├── google-client.json  <span class="c"># your Google Cloud "Desktop app" client  · 600</span>
+└── gmail.json          <span class="c"># which Gmail is connected, no secrets    · 600</span>
+
+macOS Keychain          <span class="c"># Gmail refresh token (never in a file)</span></pre></div>

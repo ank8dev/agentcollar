@@ -1,0 +1,320 @@
+<!--meta
+title: AgentCollar 文档
+description: 如何安装和使用 AgentCollar：一个在本机运行的小型代理（broker），为 AI 智能体发放短时、限定任务的授权，由你在 Telegram 中批准。
+-->
+<div class="hero">
+  <div>
+    <h1><span class="hl">让智能体干活。</span><br><span class="hl">钥匙留在你手里。</span></h1>
+    <p class="lead">AgentCollar 是一个在你电脑上运行的小型代理（broker）。你的 AI 智能体向它申请一张只用于一项任务的短期通行证，你在 Telegram 中批准。智能体永远看不到你的密码。</p>
+    <div class="install">{{hero-install}}</div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 个运行时依赖</span><span class="chip warn">早期版本 · 风险自负</span></div>
+  </div>
+  <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar 标志：带 AC 吊牌的项圈" width="220" height="220">
+</div>
+
+<div class="note warn"><b class="t">个人业余项目，风险自负。</b><p>AgentCollar 还很年轻。不要连接你输不起的账户。</p></div>
+
+<section id="start">
+  <h2 class="sec"><span class="mark">快速开始</span></h2>
+  <p>大约三分钟，从零到一个能用的代理。你需要 <strong>Node.js 22 或更高版本</strong>和一个 Telegram 账号。先检查 Node：</p>
+  {{node-version}}
+
+  <div class="steps">
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-1-task-dark-ink.webp" alt="">
+      <div>
+        <h4>1. 安装</h4>
+        <p>可以不安装直接运行一次，也可以安装后使用短命令 <code>agcl</code>。</p>
+        {{install}}
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-2-approve-dark-ink.webp" alt="">
+      <div>
+        <h4>2. 连接你的 Telegram 机器人</h4>
+        <p>用 <a href="https://t.me/BotFather">@BotFather</a> 创建一个机器人（<code>/newbot</code>）并复制它的 token。然后运行 <code>agcl</code>。第一次运行时，它会自动启动设置向导。</p>
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-3-results-dark-ink.webp" alt="">
+      <div>
+        <h4>3. 让智能体进来</h4>
+        <p>通过 <a href="#mcp">MCP</a> 连接 Claude Code，或者在你自己的脚本里调用 <a href="#api">HTTP API</a>。从现在起，每个请求都要经过你。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="wizard">设置向导，逐步说明</h3>
+  <p>这就是你会看到的内容。以 <code>$</code> 开头的行是你输入的。</p>
+  {{setup}}
+  <p>逐行解释发生了什么：</p>
+  <ol>
+    <li>输入时 <strong>token 是隐藏的</strong>，并会向 Telegram 验证。错误的 token 会得到清楚的错误提示，而不是程序崩溃。</li>
+    <li><strong>链接里带有一次性代码</strong>（<code>K7P2M9QX</code>）。只有在私聊中带着这个代码的 <code>/start</code> 才算数。陌生人在同一时刻按下你机器人的 Start，也无法成为批准人。</li>
+    <li><strong>"Is this you?"（这是你吗？）</strong>让你亲眼核对名字。</li>
+    <li>设置保存在 <code>~/.agentcollar/.env</code>，只有你的 macOS 用户能读取。机器人也会发消息给你："AgentCollar is set up"。</li>
+  </ol>
+  <div class="note"><b class="t">没有 Telegram？也没关系。</b><p>第一个问题回答 <code>n</code>。之后代理会直接在终端里请你批准，输入 <code>y</code> 或 <code>N</code>。</p></div>
+</section>
+
+<section id="concepts">
+  <h2 class="sec"><span class="mark">工作原理</span></h2>
+  <p>三方参与，一条规则：<strong>智能体只和代理对话</strong>，代理只在检查全部通过后才行动。</p>
+  {{sequence}}
+
+  <h3 id="mandate">授权（Mandate）</h3>
+  <p><strong>授权</strong>是只针对一项任务的许可。智能体申请，你批准，然后它会自己失效。它包含：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>字段</th><th>示例</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>agent</code></td><td><code>claude-code</code></td><td>谁在申请。会显示给你。</td></tr>
+      <tr><td><code>task</code></td><td>"Draft replies to new mail"</td><td>原因，用智能体自己的话说。最后显示，并加引号。</td></tr>
+      <tr><td><code>allowedActions</code></td><td><code>gmail.read, gmail.draft</code></td><td>具体允许做什么。格式总是 <code>app.verb</code>。</td></tr>
+      <tr><td><code>expiresInSeconds</code></td><td><code>300</code></td><td>在你批准<em>之后</em>有效多久。最长 1 天。</td></tr>
+      <tr><td><code>limit</code></td><td><code>10</code></td><td>最多允许的操作次数。最多 1000。</td></tr>
+      <tr><td><code>id</code></td><td><code>8329b843</code></td><td>公开名称。可以安全地展示，也可以在 <code>agcl revoke</code> 中输入。</td></tr>
+      <tr><td><code>token</code></td><td>64 个十六进制字符</td><td>秘密。只有智能体（或 MCP 服务器）持有。永远不会写入日志。</td></tr>
+    </tbody>
+  </table></div>
+  <p>授权会经历这些状态：</p>
+  {{lifecycle}}
+  <p>计时<strong>从你批准时</strong>开始，而不是从智能体申请时开始。如果 10 分钟内没人回应，请求会被拒绝。这叫<strong>失败即关闭（fail closed）</strong>：拿不准时，答案就是"不"。</p>
+
+  <h3 id="checks">6 项检查</h3>
+  <p>每个请求都会<strong>按这个顺序</strong>经过这些检查。第一个失败的检查会终止一切，原因写入审计日志。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>问题</th><th>若否</th><th>HTTP</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>我们认识这个 token 吗？</td><td>unknown token</td><td><span class="pill no">401</span></td></tr>
+      <tr><td class="num">2</td><td>有人批准了吗？</td><td>waiting / denied</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">3</td><td>还在有效期内吗？</td><td>expired</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">4</td><td>没有被撤销吗？</td><td>revoked</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">5</td><td>这个操作在授权范围内吗？</td><td>action not allowed</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">6</td><td>还没达到上限吗？</td><td>limit reached</td><td><span class="pill warn">429</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>这是代码的核心，<code>broker/src/check.ts</code>。它刻意写得很短：</p>
+  {{check-ts}}
+  <p>注意这个模式：每项检查都只能说<strong>"不"</strong>。"是"只在最底部写一次。工程师把这叫做<strong>默认拒绝（deny by default）</strong>。</p>
+
+  <h3 id="approval">在 Telegram 中批准</h3>
+  <p>当智能体申请时，你的机器人会收到这条消息：</p>
+  {{telegram}}
+  <ul>
+    <li><strong>事实在前，智能体的话在后。</strong>"Actions"和"Lifetime"是代理强制执行的内容。任务只是智能体的说法，被压成一行，所以它无法伪造一行额外的"Actions:"。</li>
+    <li>如果智能体申请 <code>*.send</code>，会先出现一条警告："The agent asks for the right to SEND in your name"（智能体请求以你的名义发送的权限）。</li>
+    <li>你批准后，按钮会变成 <span class="pill no">🛑 Revoke</span>（撤销）。</li>
+    <li>只有<strong>你的</strong> Telegram 用户 id 可以按。其他人会看到"No access"。</li>
+  </ul>
+
+  <h3 id="audit">审计日志</h3>
+  <p>每项检查、每个人工决定都会成为 <code>~/.agentcollar/audit.log</code> 中的一行。行只会追加，从不修改。这是原始文件：</p>
+  {{audit-raw}}
+  <p>来自智能体的文本带引号（<code>JSON.stringify</code>），所以智能体无法在名字里放换行来伪造一行。token 永远不会写在这里。最后一列说明是哪项检查做出的决定。<code>agcl logs</code> 会把它变得易读（见下文）。</p>
+</section>
+
+<section id="gmail">
+  <h2 class="sec"><span class="mark">连接 Gmail</span></h2>
+  <p>默认情况下，代理使用一个<strong>模拟收件箱</strong>，你可以安全地试用一切。准备好后，连接你真实的 Gmail。这个连接可以<strong>读取</strong>邮件和<strong>创建草稿</strong>。它永远不能发送：代理会阻止，Google 也会阻止，因为从未申请过发送权限。</p>
+  <ol>
+    <li>在 Google Cloud 中创建一个 <strong>Desktop app</strong> 类型的 OAuth 客户端，并下载它的 JSON 文件。</li>
+    <li>运行下面的命令。浏览器会打开。允许"read your email"和"create drafts"。</li>
+    <li>重启代理。</li>
+  </ol>
+  {{gmail-connect}}
+  <p>刷新 token 存放在 <strong>macOS 钥匙串</strong>里，从不写入文件。短期访问 token 只存在于内存中。你可以随时检查或移除连接：</p>
+  {{gmail-status}}
+  <div class="note"><b class="t">测试模式只持续 7 天</b><p>当你的 Google 应用处于测试模式时，Google 会在 7 天后结束登录。重新运行 <code>agcl gmail connect</code> 即可。</p></div>
+</section>
+
+<section id="cli">
+  <h2 class="sec"><span class="mark"><code class="plain">agcl</code> 命令</span></h2>
+  <p><code>agcl</code> 是 <code>agentcollar</code> 的简称。它们是同一个程序：<code>agcl watch</code> = <code>agentcollar watch</code>。短名称在 <code>npm install -g agentcollar</code> 之后可用。使用 <code>npx</code> 时，请用长名称：<code>npx agentcollar watch</code>。</p>
+  {{help}}
+
+  <div class="cmd"><h3 id="cmd-agcl"><code>agcl</code></h3>
+    <p>"直接让它跑起来"的命令。显示开场动画，如果 Telegram 还没设置就运行设置向导，然后启动代理。在脚本中（终端前没有人）它会跳过提问，直接启动代理。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-setup"><code>agcl setup</code></h3>
+    <p>连接<strong>你自己的</strong> Telegram 机器人。见<a href="#wizard">完整说明</a>。可以安全地重复运行：替换现有 <code>.env</code> 前会先询问，并保留其他行（例如 <code>BROKER_PORT</code>）。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-server"><code>agcl server</code></h3>
+    <p>启动代理。它只监听 <code>127.0.0.1:8787</code>：其他电脑上的程序无法访问它。按 <kbd>Ctrl+C</kbd> 停止。</p>
+    {{server}}
+    <dl class="opts"><dt>BROKER_PORT=9000</dt><dd>使用其他端口。写在 <code>~/.agentcollar/.env</code> 中。</dd></dl>
+    <div class="note"><b class="t">授权保存在内存中</b><p>停止代理后，所有授权都会消失。智能体会重新申请。审计日志会保留。</p></div>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-watch"><code>agcl watch</code></h3>
+    <p>实时屏幕。在第二个终端打开它，实时观看每个请求。它只<strong>读取</strong>审计日志：无法改变任何东西。</p>
+    {{watch}}
+    <p>如何看懂 <code>✓ ✓ ✓ ✓ ✗ ·</code>：六个标记就是六项检查。<code>✓</code> 通过，<code>✗</code> 是失败的那一项，<code>·</code> 没有运行（请求已经停止）。黄色行是人工决定。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mandates"><code>agcl mandates</code></h3>
+    <p>运行中的代理此刻记住的内容：谁、什么、状态、剩余时间和次数。它读取代理在每次变化后写入的快照文件。快照里<strong>没有 token</strong>。</p>
+    {{mandates}}
+    <p>状态：<span class="pill warn">waiting</span> <span class="pill ok">active</span> <span class="pill no">denied</span> <span class="pill no">expired</span> <span class="pill no">revoked</span> <span class="pill no">limit used up</span></p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-logs"><code>agcl logs</code></h3>
+    <p>审计日志，经过筛选并带颜色。</p>
+    <dl class="opts">
+      <dt>--agent &lt;name&gt;</dt><dd>只看这个智能体</dd>
+      <dt>--denied</dt><dd>只看拒绝（最有意思的部分）</dd>
+      <dt>--today</dt><dd>只看今天</dd>
+    </dl>
+    {{logs}}
+    <p>筛选条件可以组合。想看原始文件？<code>tail -f ~/.agentcollar/audit.log</code>。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-revoke"><code>agcl revoke &lt;id&gt;</code></h3>
+    <p>紧急开关。授权在下一个请求时就失效。无需联网。Telegram 消息也会更新。</p>
+    {{revoke}}
+    <p>id 在 Telegram 消息和 <code>agcl mandates</code> 中都能看到。撤销从不需要 token：它只能收回权限，永远不能授予权限。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mcp"><code>agcl mcp</code></h3>
+    <p>启动 Claude Code 和其他智能体使用的 MCP 服务器。通常你不需要手动运行它：智能体会启动它。见<a href="#mcp">下一节</a>。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-intro">开场动画</h3>
+    <p>旋转的徽章是用盲文字符（<code>⣿⡇⠟</code>）画出的标志。每个字符包含 8 个点，所以图像比普通字母更细致。它持续约 1.7 秒，按任意键可跳过，并且在管道、CI、<code>NO_COLOR</code> 或 <code>--no-intro</code> 下从不显示。</p>
+  </div>
+</section>
+
+<section id="mcp">
+  <h2 class="sec"><span class="mark">在 Claude Code 中使用</span></h2>
+  <p><strong>MCP</strong>（Model Context Protocol）是 AI 智能体和工具之间的通用语言。AgentCollar 支持它，所以 Claude Code 可以自己使用代理。一条命令即可添加：</p>
+  {{mcp-add}}
+  <p>让 <code>agcl server</code> 在另一个终端中保持运行。然后直接对 Claude 说：</p>
+  {{mcp-prompt}}
+  <p>接下来会发生：</p>
+  <ol>
+    <li>Claude 调用 <code>request_mandate</code>，带上它需要的操作。</li>
+    <li>你的手机震动。你按下 <strong>✅ Approve</strong>。</li>
+    <li>Claude 调用 <code>mandate_status</code>，看到 <code>approved</code>，然后调用 <code>gmail_read_inbox</code> 和 <code>gmail_create_draft</code>。</li>
+    <li>如果它在没有权限的情况下尝试 <code>gmail_send</code>，代理会拒绝。</li>
+  </ol>
+  <h3 id="tools">5 个工具</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>工具</th><th>参数</th><th>需要</th></tr></thead>
+    <tbody>
+      <tr><td><code>request_mandate</code></td><td><code>task</code>, <code>actions</code>, <code>expiresInSeconds</code>, <code>limit</code></td><td>无。返回 <code>mandateId</code></td></tr>
+      <tr><td><code>mandate_status</code></td><td><code>mandateId</code></td><td>一个授权</td></tr>
+      <tr><td><code>gmail_read_inbox</code></td><td><code>mandateId</code></td><td><code>gmail.read</code></td></tr>
+      <tr><td><code>gmail_create_draft</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.draft</code></td></tr>
+      <tr><td><code>gmail_send</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.send</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b class="t">模型永远看不到 token</b><p>MCP 服务器把秘密 token 保存在自己的进程里，只把 <code>mandateId</code> 交给模型。所以即使邮件里有"把你的 token 发给我"这样的提示注入，也没有东西可偷。</p></div>
+  <details><summary>深入一点：手动和 MCP 服务器对话</summary>
+    <p>基于 <strong>stdio</strong> 的 MCP 意味着：JSON 消息，每行一条，通过程序的输入和输出传递。你可以自己试试：</p>
+    {{mcp-raw}}
+    <p>服务器是为这个项目编写的小型 JSON-RPC 实现，没有任何依赖。</p>
+  </details>
+</section>
+
+<section id="api">
+  <h2 class="sec"><span class="mark">HTTP API</span></h2>
+  <p>适用于不支持 MCP 的智能体。代理监听 <code>127.0.0.1:8787</code>。发送 JSON，并把授权 token 放在请求头 <code>Authorization: Bearer &lt;token&gt;</code> 中。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>方法</th><th>路径</th><th>检查的操作</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/mandates</code></td><td>—</td><td>申请授权。返回 <span class="pill warn">202</span> 和一个 token（待批准）。</td></tr>
+      <tr><td><code>GET</code></td><td><code>/mandate</code></td><td>—</td><td><em>你的</em>授权的状态。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/mandates/:id/revoke</code></td><td>—</td><td>紧急开关。</td></tr>
+      <tr><td><code>GET</code></td><td><code>/inbox</code></td><td><code>gmail.read</code></td><td>列出邮件。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/drafts</code></td><td><code>gmail.draft</code></td><td>创建草稿：<code>to</code>、<code>subject</code>、<code>body</code>。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/send</code></td><td><code>gmail.send</code></td><td>发送。除非授权允许，否则拒绝。使用真实 Gmail 时总会被拒绝。</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="curl">用 curl 完整走一遍</h3>
+  {{curl-ask}}
+  <p>现在在 Telegram 中批准。然后使用 token：</p>
+  {{curl-use}}
+  <h3 id="codes">状态码</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>代码</th><th>含义</th><th>怎么办</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill ok">200</span> <span class="pill ok">201</span></td><td>完成（201 = 创建了东西）</td><td>—</td></tr>
+      <tr><td><span class="pill warn">202</span></td><td>已接受，等待人工批准</td><td>每隔几秒轮询 <code>GET /mandate</code></td></tr>
+      <tr><td><span class="pill no">401</span></td><td>"你是谁？"没有有效 token</td><td>先申请授权</td></tr>
+      <tr><td><span class="pill no">403</span></td><td>"我认识你，但不行"</td><td>看 <code>error</code>：未批准、已过期、已撤销或操作不允许</td></tr>
+      <tr><td><span class="pill warn">429</span></td><td>达到上限</td><td>申请新的授权</td></tr>
+      <tr><td><span class="pill no">400</span> <span class="pill no">413</span> <span class="pill no">415</span></td><td>输入错误 / 太大（超过 10 KB）/ 不是 JSON</td><td>修正请求</td></tr>
+      <tr><td><span class="pill no">502</span></td><td>Gmail 返回了错误</td><td>检查 <code>agcl gmail status</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b class="t">浏览器请求会被故意拒绝</b><p>网页也能向 <code>localhost</code> 发送请求。所以代理会拒绝任何带 <code>Origin</code> 请求头的请求，检查 <code>Host</code>（防御 DNS 重绑定），并且只接受 <code>application/json</code>。curl 和智能体这类程序不受影响。</p></div>
+</section>
+
+<section id="data">
+  <h2 class="sec"><span class="mark">你的数据存在哪里</span></h2>
+  <p>一切都在你主目录下的一个文件夹里，而不是代码文件夹：npm 每次更新都会替换后者。</p>
+  {{data-tree}}
+  <dl class="opts">
+    <dt>TELEGRAM_BOT_TOKEN</dt><dd>来自 @BotFather。由 <code>agcl setup</code> 写入。</dd>
+    <dt>TELEGRAM_USER_ID</dt><dd>唯一能批准的人。由 <code>agcl setup</code> 写入。</dd>
+    <dt>BROKER_PORT</dt><dd>可选，默认 <code>8787</code>。</dd>
+    <dt>AGENTCOLLAR_HOME</dt><dd>把整个文件夹移到别处（测试会用到）。</dd>
+  </dl>
+  <p><code>700</code> 和 <code>600</code> 是<strong>文件权限</strong>：只有你的 macOS 用户能打开它们，同一台电脑上的其他用户不行。</p>
+</section>
+
+<section id="security">
+  <h2 class="sec"><span class="mark">安全</span></h2>
+  <div class="traits">
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-1-short-lived-hourglass.webp" alt=""><div><h4>短时有效</h4><p>授权会自动过期。无人回应的请求 10 分钟后失效。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-2-one-task-target.webp" alt=""><div><h4>只限一项任务</h4><p>只允许列出的操作。草稿不会变成发送。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-3-revoke-hand.webp" alt=""><div><h4>随时撤销</h4><p>在 Telegram 中点一下，或使用 <code>agcl revoke</code>。下一个请求即生效。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-4-logged-scroll.webp" alt=""><div><h4>完整记录</h4><p>每项检查、每个决定，各占一行。从不记录 token。</p></div></div>
+  </div>
+  <h3 id="protects">代理能防御什么</h3>
+  <ul>
+    <li><strong>授权 token 被盗：</strong>一项任务、短时间、可撤销。而不是永远开放你的整个邮箱。</li>
+    <li><strong>失控的智能体：</strong>上限会让它停下，日志会显示它何时开始。</li>
+    <li><strong>邮件中的提示注入：</strong>智能体也许会相信，但该操作不在授权内；通过 MCP 时，token 甚至不可见。</li>
+    <li><strong>伪造的批准消息：</strong>操作必须形如 <code>app.verb</code>，智能体的文字被清理成一行，并放在最后。</li>
+    <li><strong>智能体自己批准自己：</strong>批准<em>永远</em>不能通过 HTTP 或文件完成。只能在 Telegram（你的 id）或代理自己的终端中进行。</li>
+    <li><strong>网页攻击 localhost：</strong>浏览器请求会被拒绝。</li>
+    <li><strong>以你的名义发送：</strong>Gmail 连接只有读取和草稿权限。即使代理出错，也无法发出邮件。</li>
+    <li><strong>被篡改的 npm 包：</strong>发布版本带有 <strong>provenance（来源证明）</strong>。用 <code>npm audit signatures</code> 检查。</li>
+  </ul>
+  <h3 id="limits">它（暂时）不能防御什么</h3>
+  <ul>
+    <li>已经以你的用户身份运行的恶意软件可以读取 <code>~/.agentcollar/</code>。</li>
+    <li>代理停止时，授权会丢失。</li>
+  </ul>
+</section>
+
+<section id="trouble">
+  <h2 class="sec"><span class="mark">故障排除</span></h2>
+  <details><summary>Telegram 里什么都没收到</summary><p>打开你的机器人，至少按一次 <strong>Start</strong>：机器人不能先给你发消息。检查 <code>agcl server</code> 是否显示 <code>Approvals: Telegram</code>。如果显示 <code>this terminal</code>，请运行 <code>agcl setup</code>。</p></details>
+  <details><summary>设置提示"Another program is already listening to this bot"</summary><p>（另一个程序已经在监听这个机器人。）通常就是你自己的 <code>agcl server</code>。用 <kbd>Ctrl+C</kbd> 停止它，再运行 <code>agcl setup</code>。</p></details>
+  <details><summary>智能体说代理没有运行</summary><p>启动它：<code>agcl server</code>。代理和智能体必须在同一台电脑上运行。</p></details>
+  <details><summary><code>agcl mandates</code> 提示"The broker is not running"</summary><p>授权保存在代理的内存中，所以它停止后就没有可显示的内容。启动它，让智能体重新申请。</p></details>
+  <details><summary>一周后 Gmail 不能用了</summary><p>你的 Google 应用处于测试模式，Google 结束了登录。重新运行 <code>agcl gmail connect</code>。</p></details>
+  <details><summary><code>agcl: command not found</code></summary><p>短名称需要安装：<code>npm install -g agentcollar</code>。不安装的话，请使用 <code>npx agentcollar</code>。</p></details>
+  <details><summary>端口 8787 被占用</summary><p>可能已有另一个代理在运行（用 <code>agcl mandates</code> 检查）。或者换个端口启动：<code>BROKER_PORT=8788 agcl server</code>，并把新地址告诉你的智能体。</p></details>
+  <details><summary>启动时出现"Unsupported engine"或语法错误</summary><p>你的 Node.js 太旧了。AgentCollar 需要 22 或更高版本：<code>node --version</code>。</p></details>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec"><span class="mark">路线图</span></h2>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td><span class="pill ok">done</span></td><td>授权、6 项检查、撤销、只追加的审计日志</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>本地 HTTP 代理，在 Telegram 或终端中批准，失败即关闭</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td><code>agcl</code> 命令行：设置向导、watch、mandates、logs、revoke、开场动画</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>供 Claude Code 和其他智能体使用的 MCP 服务器</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>真实 Gmail：只能读取和创建草稿，刷新 token 存在 macOS 钥匙串</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>从 npm 一条命令安装，带 provenance</td></tr>
+      <tr><td><span class="pill">later</span></td><td>刷新 token 静态加密</td></tr>
+      <tr><td><span class="pill">later</span></td><td>授权在重启后仍然保留</td></tr>
+      <tr><td><span class="pill">later</span></td><td>晨报：每个智能体昨晚做了什么</td></tr>
+    </tbody>
+  </table></div>
+</section>
