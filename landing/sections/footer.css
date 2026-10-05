@@ -167,71 +167,71 @@
 
 /* ---------- Footer line: three small badges + tiny copyright, over the Earth ---------- */
 .site-footer__line {
+  /* full screen width, also when the footer frame is wider or narrower than the screen */
   position: absolute;
-  left: 50%;
-  bottom: calc(30 * var(--u));
-  translate: -50% 0;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  bottom: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: max(calc(10 * var(--u)), 6px);
+  gap: 10px;
+  padding: 120px 16px max(22px, env(safe-area-inset-bottom));
+  /* the darkening: clear at the top, night at the bottom, over the Earth */
+  background: linear-gradient(to top, var(--ink) 0%, var(--ink) 38%, rgb(4 8 15 / 0.75) 62%, rgb(4 8 15 / 0) 100%);
+  pointer-events: none;
 }
 
-.site-footer__badges {
+.site-footer__links {
   display: flex;
-  gap: max(calc(18 * var(--u)), 10px);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 26px;
+  pointer-events: auto;
+  font-family: var(--font-display);
+  font-size: 17px;
 }
 
-/* round ink badge with a slightly wobbly paper rim (hand-drawn), glyph in paper */
-.site-footer__badge {
-  display: grid;
-  place-items: center;
-  width: max(calc(64 * var(--u)), 40px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--ink);
+.site-footer__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   color: var(--paper);
-  box-shadow: 0 0 0 max(calc(3 * var(--u)), 2px) var(--paper);
-  transition: scale 0.25s ease-out;
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--raspberry);
+  padding-bottom: 1px;
+  transition: color 0.2s ease-out;
 }
 
-.site-footer__badge svg {
-  width: 46%;
-  height: 46%;
-  fill: currentColor;
+.site-footer__links a:hover {
+  color: var(--sand);
 }
 
-/* owner's pixel-art avatar fills its badge; keep the pixels crisp */
-.site-footer__badge--me img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  image-rendering: pixelated;
-}
-
-.site-footer__badge:hover {
-  scale: 1.08;
-}
-
-.site-footer__badge:focus-visible {
+.site-footer__links a:focus-visible {
   outline: 2px dashed var(--paper);
   outline-offset: 4px;
 }
 
-.site-footer__copy {
-  margin: 0;
-  font-size: max(calc(14 * var(--u)), 11px);
-  color: var(--paper);
-  opacity: 0.75;
-  text-shadow: 0 0 6px var(--ink), 0 0 2px var(--ink); /* readable over the bright Earth */
-  white-space: nowrap;
+.site-footer__icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .site-footer__badge {
-    transition: none;
-  }
+.site-footer__me img {
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  image-rendering: pixelated;
+}
+
+.site-footer__copy {
+  margin: 0;
+  font-size: 13px;
+  color: var(--paper);
+  opacity: 0.6;
+  white-space: nowrap;
 }
 
 /* ---------- Phones: bigger footer + a sticky phase for the CTA flight ---------- */
@@ -377,9 +377,10 @@
     left: calc(50% - var(--sky-w) / 2);
   }
 
-  /* badges stay above the bottom toolbar */
+  /* the dark bar runs to the very bottom (under the browser toolbar); links sit above it */
   .site-footer .site-footer__line {
-    bottom: calc(30 * var(--fu) + var(--below));
+    bottom: 0;
+    padding-bottom: calc(var(--below) + 18px);
   }
 
   /* With motion (footer.js sets data-motion): the footer gets --stick of extra height and
