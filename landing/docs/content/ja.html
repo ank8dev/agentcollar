@@ -1,0 +1,320 @@
+<!--meta
+title: AgentCollar ドキュメント
+description: AgentCollar のインストールと使い方。AI エージェントに、1 つのタスク専用の短命な権限（マンデート）を与えるローカルの小さなブローカーです。承認は Telegram で行います。
+-->
+<div class="hero">
+  <div>
+    <h1><span class="hl">エージェントには働いてもらう。</span><br><span class="hl">鍵は自分で持つ。</span></h1>
+    <p class="lead">AgentCollar は、あなたのコンピューターで動く小さなブローカーです。AI エージェントは、1 つのタスクのための短い通行証をブローカーに求めます。あなたはそれを Telegram で承認します。エージェントがあなたのパスワードを見ることはありません。</p>
+    <div class="install">{{hero-install}}</div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">実行時の依存関係 0</span><span class="chip warn">初期版 · 自己責任で</span></div>
+  </div>
+  <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar のロゴ：AC のタグが付いた首輪" width="220" height="220">
+</div>
+
+<div class="note warn"><b class="t">個人の趣味プロジェクトです。自己責任でお使いください。</b><p>AgentCollar はまだ若いプロジェクトです。失って困るアカウントは接続しないでください。</p></div>
+
+<section id="start">
+  <h2 class="sec"><span class="mark">はじめに</span></h2>
+  <p>ゼロから動くブローカーまで、約 3 分です。<strong>Node.js 22 以降</strong>と Telegram アカウントが必要です。まず Node を確認します：</p>
+  {{node-version}}
+
+  <div class="steps">
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-1-task-dark-ink.webp" alt="">
+      <div>
+        <h4>1. インストール</h4>
+        <p>インストールせずに一度だけ実行することも、インストールして短いコマンド <code>agcl</code> を使うこともできます。</p>
+        {{install}}
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-2-approve-dark-ink.webp" alt="">
+      <div>
+        <h4>2. Telegram ボットを接続する</h4>
+        <p><a href="https://t.me/BotFather">@BotFather</a> でボットを作成し（<code>/newbot</code>）、そのトークンをコピーします。それから <code>agcl</code> を実行します。初回は自動でセットアップウィザードが始まります。</p>
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-3-results-dark-ink.webp" alt="">
+      <div>
+        <h4>3. エージェントを迎え入れる</h4>
+        <p><a href="#mcp">MCP</a> で Claude Code を接続するか、自分のスクリプトから <a href="#api">HTTP API</a> を呼び出します。これで、すべてのリクエストがあなたを通るようになります。</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="wizard">セットアップウィザード、ステップごとに</h3>
+  <p>実際に表示される内容です。<code>$</code> で始まる行はあなたが入力するものです。</p>
+  {{setup}}
+  <p>何が起きたのか、1 行ずつ：</p>
+  <ol>
+    <li>入力中、<strong>トークンは表示されません</strong>。そして Telegram で確認されます。間違ったトークンでも、クラッシュではなく分かりやすいエラーになります。</li>
+    <li><strong>リンクには一度だけ使えるコードが付いています</strong>（<code>K7P2M9QX</code>）。このコードが付いた、個人チャットでの <code>/start</code> だけが有効です。同じ瞬間に見知らぬ人があなたのボットで Start を押しても、承認者にはなれません。</li>
+    <li><strong>「Is this you?」</strong>（あなたですか？）で、名前を自分の目で確認できます。</li>
+    <li>設定は <code>~/.agentcollar/.env</code> に保存されます。読めるのはあなたの macOS ユーザーだけです。ボットからも「AgentCollar is set up」というメッセージが届きます。</li>
+  </ol>
+  <div class="note"><b class="t">Telegram がなくても大丈夫。</b><p>最初の質問に <code>n</code> と答えてください。するとブローカーは、ターミナル上で <code>y</code> か <code>N</code> による承認を求めます。</p></div>
+</section>
+
+<section id="concepts">
+  <h2 class="sec"><span class="mark">仕組み</span></h2>
+  <p>登場人物は 3 者、ルールは 1 つ：<strong>エージェントはブローカーとだけ話す</strong>。そしてブローカーは、チェックを通過してから初めて動きます。</p>
+  {{sequence}}
+
+  <h3 id="mandate">マンデート</h3>
+  <p><strong>マンデート</strong>は、1 つのタスクのための許可です。エージェントが求め、あなたが承認し、時間が来れば自動で失効します。次の項目があります：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>フィールド</th><th>例</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><code>agent</code></td><td><code>claude-code</code></td><td>誰が求めているか。あなたに表示されます。</td></tr>
+      <tr><td><code>task</code></td><td>"Draft replies to new mail"</td><td>理由。エージェント自身の言葉で。最後に、引用符付きで表示されます。</td></tr>
+      <tr><td><code>allowedActions</code></td><td><code>gmail.read, gmail.draft</code></td><td>許可される操作そのもの。形式は常に <code>app.verb</code>。</td></tr>
+      <tr><td><code>expiresInSeconds</code></td><td><code>300</code></td><td>承認<em>後</em>の有効期間。最大 1 日。</td></tr>
+      <tr><td><code>limit</code></td><td><code>10</code></td><td>許可される操作の最大回数。最大 1000。</td></tr>
+      <tr><td><code>id</code></td><td><code>8329b843</code></td><td>公開の名前。表示しても、<code>agcl revoke</code> に入力しても安全です。</td></tr>
+      <tr><td><code>token</code></td><td>16 進数 64 文字</td><td>秘密の値。持っているのはエージェント（または MCP サーバー）だけ。ログには一切書かれません。</td></tr>
+    </tbody>
+  </table></div>
+  <p>マンデートは次の状態を経ます：</p>
+  {{lifecycle}}
+  <p>時計が動き出すのは<strong>あなたが承認したとき</strong>で、エージェントが求めたときではありません。10 分以内に誰も答えなければ、リクエストは拒否されます。これを <strong>fail closed</strong>（失敗時は閉じる）と呼びます。迷ったら答えは「いいえ」です。</p>
+
+  <h3 id="checks">6 つのチェック</h3>
+  <p>すべてのリクエストは、これらのチェックを<strong>この順番で</strong>通ります。最初に失敗したチェックがすべてを止め、その理由が監査ログに記録されます。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>質問</th><th>いいえの場合</th><th>HTTP</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>このトークンを知っているか？</td><td>unknown token</td><td><span class="pill no">401</span></td></tr>
+      <tr><td class="num">2</td><td>人が承認したか？</td><td>waiting / denied</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">3</td><td>まだ有効期間内か？</td><td>expired</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">4</td><td>取り消されていないか？</td><td>revoked</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">5</td><td>この操作はマンデートに含まれているか？</td><td>action not allowed</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">6</td><td>上限に達していないか？</td><td>limit reached</td><td><span class="pill warn">429</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>これがコードの心臓部、<code>broker/src/check.ts</code> です。わざと短くしてあります：</p>
+  {{check-ts}}
+  <p>パターンに注目してください。どのチェックも<strong>「いいえ」</strong>しか言えません。「はい」は一番下で一度だけ書かれます。エンジニアはこれを <strong>deny by default</strong>（デフォルトで拒否）と呼びます。</p>
+
+  <h3 id="approval">Telegram での承認</h3>
+  <p>エージェントが求めると、あなたのボットにこのメッセージが届きます：</p>
+  {{telegram}}
+  <ul>
+    <li><strong>事実が先、エージェントの言葉は最後。</strong>「Actions」と「Lifetime」はブローカーが強制する内容です。タスクはエージェントの説明にすぎず、1 行に押し込まれるので、余分な「Actions:」行を偽装できません。</li>
+    <li>エージェントが <code>*.send</code> を求めると、まず警告が出ます：「The agent asks for the right to SEND in your name」（エージェントがあなたの名前で送信する権利を求めています）。</li>
+    <li>承認すると、ボタンは <span class="pill no">🛑 Revoke</span>（取り消し）に変わります。</li>
+    <li>押せるのは<strong>あなたの</strong> Telegram ユーザー id だけです。ほかの人には「No access」と表示されます。</li>
+  </ul>
+
+  <h3 id="audit">監査ログ</h3>
+  <p>すべてのチェックと人の判断は、<code>~/.agentcollar/audit.log</code> の 1 行になります。行は追加されるだけで、変更されることはありません。これが生のファイルです：</p>
+  {{audit-raw}}
+  <p>エージェントからのテキストは引用符で囲まれる（<code>JSON.stringify</code>）ので、エージェントが名前に改行を入れて偽の行を作ることはできません。トークンはここには書かれません。最後の列は、どのチェックが判断したかを示します。<code>agcl logs</code> を使えば読みやすくなります（下記参照）。</p>
+</section>
+
+<section id="gmail">
+  <h2 class="sec"><span class="mark">Gmail を接続する</span></h2>
+  <p>初期状態では、ブローカーは<strong>偽の受信トレイ</strong>を使うので、すべてを安全に試せます。準備ができたら、本物の Gmail を接続しましょう。この接続でできるのはメールの<strong>読み取り</strong>と<strong>下書きの作成</strong>です。送信は決してできません。ブローカーが止め、Google も止めます。そもそも送信の権限を求めていないからです。</p>
+  <ol>
+    <li>Google Cloud で、種類が <strong>Desktop app</strong> の OAuth クライアントを作成し、その JSON ファイルをダウンロードします。</li>
+    <li>下のコマンドを実行します。ブラウザーが開くので、「read your email」と「create drafts」を許可します。</li>
+    <li>ブローカーを再起動します。</li>
+  </ol>
+  {{gmail-connect}}
+  <p>リフレッシュトークンはファイルではなく <strong>macOS のキーチェーン</strong>に保存されます。短命のアクセストークンはメモリ上にしかありません。接続はいつでも確認・削除できます：</p>
+  {{gmail-status}}
+  <div class="note"><b class="t">テストモードは 7 日間</b><p>Google アプリがテストモードの間は、7 日後に Google がサインインを終了します。<code>agcl gmail connect</code> をもう一度実行するだけです。</p></div>
+</section>
+
+<section id="cli">
+  <h2 class="sec"><span class="mark"><code class="plain">agcl</code> コマンド</span></h2>
+  <p><code>agcl</code> は <code>agentcollar</code> の短い名前です。同じプログラムです：<code>agcl watch</code> = <code>agentcollar watch</code>。短い名前は <code>npm install -g agentcollar</code> の後で使えます。<code>npx</code> では長い名前を使います：<code>npx agentcollar watch</code>。</p>
+  {{help}}
+
+  <div class="cmd"><h3 id="cmd-agcl"><code>agcl</code></h3>
+    <p>「とにかく動かす」コマンドです。イントロを表示し、Telegram が未設定ならセットアップウィザードを実行し、それからブローカーを起動します。スクリプト内（ターミナルの前に人がいない）では質問を飛ばしてブローカーを起動します。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-setup"><code>agcl setup</code></h3>
+    <p><strong>あなた自身の</strong> Telegram ボットを接続します。<a href="#wizard">詳しい手順</a>を参照してください。何度実行しても安全です。既存の <code>.env</code> を置き換える前に確認し、ほかの行（たとえば <code>BROKER_PORT</code>）は残します。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-server"><code>agcl server</code></h3>
+    <p>ブローカーを起動します。待ち受けるのは <code>127.0.0.1:8787</code> だけなので、ほかのコンピューターのプログラムからは届きません。<kbd>Ctrl+C</kbd> で停止します。</p>
+    {{server}}
+    <dl class="opts"><dt>BROKER_PORT=9000</dt><dd>別のポートを使います。<code>~/.agentcollar/.env</code> に書いてください。</dd></dl>
+    <div class="note"><b class="t">マンデートはメモリ上にある</b><p>ブローカーを止めると、すべてのマンデートは消えます。エージェントはもう一度求めるだけです。監査ログは残ります。</p></div>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-watch"><code>agcl watch</code></h3>
+    <p>ライブ画面です。2 つ目のターミナルで開くと、すべてのリクエストを発生と同時に見られます。監査ログを<strong>読む</strong>だけなので、何も変更できません。</p>
+    {{watch}}
+    <p><code>✓ ✓ ✓ ✓ ✗ ·</code> の読み方：6 つの記号が 6 つのチェックです。<code>✓</code> は合格、<code>✗</code> は失敗したもの、<code>·</code> は実行されなかったもの（リクエストはすでに止まっていた）。黄色の行は人の判断です。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mandates"><code>agcl mandates</code></h3>
+    <p>動いているブローカーが今覚えていること：誰が、何を、状態、残り時間と残り回数。ブローカーが変更のたびに書き出すスナップショットファイルを読みます。スナップショットに<strong>トークンは含まれません</strong>。</p>
+    {{mandates}}
+    <p>状態：<span class="pill warn">waiting</span> <span class="pill ok">active</span> <span class="pill no">denied</span> <span class="pill no">expired</span> <span class="pill no">revoked</span> <span class="pill no">limit used up</span></p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-logs"><code>agcl logs</code></h3>
+    <p>監査ログを、絞り込みと色付きで。</p>
+    <dl class="opts">
+      <dt>--agent &lt;name&gt;</dt><dd>このエージェントだけ</dd>
+      <dt>--denied</dt><dd>拒否だけ（いちばん面白い部分）</dd>
+      <dt>--today</dt><dd>今日だけ</dd>
+    </dl>
+    {{logs}}
+    <p>フィルターは組み合わせられます。生のファイルを見たいなら：<code>tail -f ~/.agentcollar/audit.log</code>。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-revoke"><code>agcl revoke &lt;id&gt;</code></h3>
+    <p>緊急停止スイッチです。マンデートは次のリクエストから使えなくなります。インターネットがなくても動きます。Telegram のメッセージも更新されます。</p>
+    {{revoke}}
+    <p>id は Telegram のメッセージと <code>agcl mandates</code> にあります。取り消しにトークンは不要です。アクセスを奪うことしかできず、与えることは決してできないからです。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mcp"><code>agcl mcp</code></h3>
+    <p>Claude Code などのエージェントが使う MCP サーバーを起動します。通常は手動で実行しません。エージェントが起動します。<a href="#mcp">次のセクション</a>を参照してください。</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-intro">イントロ</h3>
+    <p>回転するメダルは、点字の文字（<code>⣿⡇⠟</code>）で描いたロゴです。1 文字に 8 つの点があるので、普通の文字より細かく描けます。長さは約 1.7 秒で、どのキーでもスキップでき、パイプ、CI、<code>NO_COLOR</code>、<code>--no-intro</code> のときは表示されません。</p>
+  </div>
+</section>
+
+<section id="mcp">
+  <h2 class="sec"><span class="mark">Claude Code で使う</span></h2>
+  <p><strong>MCP</strong>（Model Context Protocol）は、AI エージェントとそのツールの間の共通言語です。AgentCollar はこれを話せるので、Claude Code は自分でブローカーを使えます。コマンド 1 つで追加できます：</p>
+  {{mcp-add}}
+  <p><code>agcl server</code> を別のターミナルで動かしたままにします。あとは Claude に頼むだけです：</p>
+  {{mcp-prompt}}
+  <p>その後に起きること：</p>
+  <ol>
+    <li>Claude が、必要な操作を指定して <code>request_mandate</code> を呼びます。</li>
+    <li>スマートフォンが震えます。<strong>✅ Approve</strong> を押します。</li>
+    <li>Claude が <code>mandate_status</code> を呼んで <code>approved</code> を確認し、続いて <code>gmail_read_inbox</code> と <code>gmail_create_draft</code> を呼びます。</li>
+    <li>許可なしに <code>gmail_send</code> を試みると、ブローカーは拒否します。</li>
+  </ol>
+  <h3 id="tools">5 つのツール</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>ツール</th><th>引数</th><th>必要なもの</th></tr></thead>
+    <tbody>
+      <tr><td><code>request_mandate</code></td><td><code>task</code>, <code>actions</code>, <code>expiresInSeconds</code>, <code>limit</code></td><td>なし。<code>mandateId</code> を返す</td></tr>
+      <tr><td><code>mandate_status</code></td><td><code>mandateId</code></td><td>マンデート</td></tr>
+      <tr><td><code>gmail_read_inbox</code></td><td><code>mandateId</code></td><td><code>gmail.read</code></td></tr>
+      <tr><td><code>gmail_create_draft</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.draft</code></td></tr>
+      <tr><td><code>gmail_send</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.send</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b class="t">モデルはトークンを見ない</b><p>MCP サーバーは秘密のトークンを自分のプロセスの中に保持し、モデルには <code>mandateId</code> だけを渡します。だからメールに「トークンを送って」のようなプロンプトインジェクションがあっても、盗めるものはありません。</p></div>
+  <details><summary>内部の仕組み：MCP サーバーと手で話す</summary>
+    <p><strong>stdio</strong> 上の MCP とは：JSON メッセージを 1 行に 1 つずつ、プログラムの入出力でやり取りすることです。自分で試せます：</p>
+    {{mcp-raw}}
+    <p>サーバーはこのプロジェクトのために書いた小さな JSON-RPC 実装で、依存関係はありません。</p>
+  </details>
+</section>
+
+<section id="api">
+  <h2 class="sec"><span class="mark">HTTP API</span></h2>
+  <p>MCP を話さないエージェント向けです。ブローカーは <code>127.0.0.1:8787</code> で待ち受けます。JSON を送り、マンデートのトークンをヘッダー <code>Authorization: Bearer &lt;token&gt;</code> に入れてください。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>メソッド</th><th>パス</th><th>チェックする操作</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/mandates</code></td><td>—</td><td>マンデートを求めます。<span class="pill warn">202</span> とトークン（保留中）を返します。</td></tr>
+      <tr><td><code>GET</code></td><td><code>/mandate</code></td><td>—</td><td><em>あなたの</em>マンデートの状態。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/mandates/:id/revoke</code></td><td>—</td><td>緊急停止。</td></tr>
+      <tr><td><code>GET</code></td><td><code>/inbox</code></td><td><code>gmail.read</code></td><td>メールの一覧。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/drafts</code></td><td><code>gmail.draft</code></td><td>下書きを作成：<code>to</code>、<code>subject</code>、<code>body</code>。</td></tr>
+      <tr><td><code>POST</code></td><td><code>/send</code></td><td><code>gmail.send</code></td><td>送信。マンデートで許可されていなければ拒否。本物の Gmail ではいずれにせよ拒否されます。</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="curl">curl で一通り試す</h3>
+  {{curl-ask}}
+  <p>ここで Telegram で承認します。それからトークンを使います：</p>
+  {{curl-use}}
+  <h3 id="codes">ステータスコード</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>コード</th><th>意味</th><th>どうするか</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill ok">200</span> <span class="pill ok">201</span></td><td>完了（201 = 何かが作成された）</td><td>—</td></tr>
+      <tr><td><span class="pill warn">202</span></td><td>受け付け済み、人の判断待ち</td><td>数秒ごとに <code>GET /mandate</code> を確認する</td></tr>
+      <tr><td><span class="pill no">401</span></td><td>「あなたは誰？」有効なトークンがない</td><td>まずマンデートを求める</td></tr>
+      <tr><td><span class="pill no">403</span></td><td>「知っているけど、だめ」</td><td><code>error</code> を読む：未承認、期限切れ、取り消し済み、または許可されていない操作</td></tr>
+      <tr><td><span class="pill warn">429</span></td><td>上限に到達</td><td>新しいマンデートを求める</td></tr>
+      <tr><td><span class="pill no">400</span> <span class="pill no">413</span> <span class="pill no">415</span></td><td>入力が不正 / 大きすぎる（10 KB 超）/ JSON でない</td><td>リクエストを直す</td></tr>
+      <tr><td><span class="pill no">502</span></td><td>Gmail がエラーを返した</td><td><code>agcl gmail status</code> を確認する</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b class="t">ブラウザーは意図的に拒否されます</b><p>Web ページも <code>localhost</code> にリクエストを送れます。そこでブローカーは、<code>Origin</code> ヘッダー付きのリクエストをすべて拒否し、<code>Host</code> を確認し（DNS リバインディング対策）、<code>application/json</code> だけを受け付けます。curl やエージェントのようなプログラムには影響しません。</p></div>
+</section>
+
+<section id="data">
+  <h2 class="sec"><span class="mark">データの保存場所</span></h2>
+  <p>すべてはホームディレクトリの 1 つのフォルダーにあり、コードのフォルダーではありません。そちらは npm が更新のたびに置き換えるからです。</p>
+  {{data-tree}}
+  <dl class="opts">
+    <dt>TELEGRAM_BOT_TOKEN</dt><dd>@BotFather から。<code>agcl setup</code> が書き込みます。</dd>
+    <dt>TELEGRAM_USER_ID</dt><dd>承認できる唯一の人。<code>agcl setup</code> が書き込みます。</dd>
+    <dt>BROKER_PORT</dt><dd>任意、デフォルトは <code>8787</code>。</dd>
+    <dt>AGENTCOLLAR_HOME</dt><dd>フォルダー全体を別の場所に移します（テストで使用）。</dd>
+  </dl>
+  <p><code>700</code> と <code>600</code> は<strong>ファイルのアクセス権</strong>です。開けるのはあなたの macOS ユーザーだけで、同じコンピューターのほかのユーザーは開けません。</p>
+</section>
+
+<section id="security">
+  <h2 class="sec"><span class="mark">セキュリティ</span></h2>
+  <div class="traits">
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-1-short-lived-hourglass.webp" alt=""><div><h4>短命</h4><p>マンデートは自動で失効します。答えのないリクエストは 10 分で消えます。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-2-one-task-target.webp" alt=""><div><h4>1 つのタスクだけ</h4><p>リストにある操作だけ。下書きが送信に変わることはありません。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-3-revoke-hand.webp" alt=""><div><h4>いつでも取り消し</h4><p>Telegram でワンタップ、または <code>agcl revoke</code>。次のリクエストから有効です。</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-4-logged-scroll.webp" alt=""><div><h4>すべて記録</h4><p>すべてのチェック、すべての判断を 1 行ずつ。トークンは決して記録しません。</p></div></div>
+  </div>
+  <h3 id="protects">ブローカーが防ぐもの</h3>
+  <ul>
+    <li><strong>盗まれたマンデートのトークン：</strong>1 つのタスク、短い時間、取り消し可能。メールボックス全体を永遠に、ではありません。</li>
+    <li><strong>暴走するエージェント：</strong>上限が止め、ログがいつ始まったかを示します。</li>
+    <li><strong>メール内のプロンプトインジェクション：</strong>エージェントが信じてしまっても、その操作はマンデートに含まれていません。MCP 経由ならトークンは見えもしません。</li>
+    <li><strong>偽の承認メッセージ：</strong>操作は <code>app.verb</code> の形でなければならず、エージェントのテキストは整えられた 1 行で、最後に表示されます。</li>
+    <li><strong>自分で自分を承認するエージェント：</strong>承認は HTTP やファイルでは<em>決して</em>できません。Telegram（あなたの id）かブローカー自身のターミナルだけです。</li>
+    <li><strong>localhost を攻撃する Web ページ：</strong>ブラウザーからのリクエストは拒否されます。</li>
+    <li><strong>あなたの名前での送信：</strong>Gmail の接続には読み取りと下書きの権限しかありません。ブローカーにミスがあってもメールは送れません。</li>
+    <li><strong>改ざんされた npm パッケージ：</strong>リリースは <strong>provenance</strong>（検証できる出所）付きで公開されます。<code>npm audit signatures</code> で確認できます。</li>
+  </ul>
+  <h3 id="limits">（まだ）防げないもの</h3>
+  <ul>
+    <li>すでにあなたのユーザーとして動いているマルウェアは <code>~/.agentcollar/</code> を読めます。</li>
+    <li>ブローカーが止まると、マンデートは失われます。</li>
+  </ul>
+</section>
+
+<section id="trouble">
+  <h2 class="sec"><span class="mark">トラブルシューティング</span></h2>
+  <details><summary>Telegram に何も届かない</summary><p>ボットを開いて、少なくとも一度は <strong>Start</strong> を押してください。ボットからあなたに先にメッセージを送ることはできません。<code>agcl server</code> に <code>Approvals: Telegram</code> と表示されているか確認します。<code>this terminal</code> と出ているなら、<code>agcl setup</code> を実行してください。</p></details>
+  <details><summary>セットアップで「Another program is already listening to this bot」と出る</summary><p>（別のプログラムがすでにこのボットを待ち受けています。）たいていは自分の <code>agcl server</code> です。<kbd>Ctrl+C</kbd> で止めて、もう一度 <code>agcl setup</code> を実行してください。</p></details>
+  <details><summary>エージェントがブローカーは動いていないと言う</summary><p>起動してください：<code>agcl server</code>。ブローカーとエージェントは同じコンピューターで動いている必要があります。</p></details>
+  <details><summary><code>agcl mandates</code> が「The broker is not running」と言う</summary><p>マンデートはブローカーのメモリ上にあるので、止まった後は表示するものがありません。起動して、エージェントにもう一度求めさせてください。</p></details>
+  <details><summary>1 週間後に Gmail が使えなくなった</summary><p>Google アプリがテストモードで、Google がサインインを終了しました。もう一度 <code>agcl gmail connect</code> を実行してください。</p></details>
+  <details><summary><code>agcl: command not found</code></summary><p>短い名前にはインストールが必要です：<code>npm install -g agentcollar</code>。インストールしない場合は <code>npx agentcollar</code> を使ってください。</p></details>
+  <details><summary>ポート 8787 が使用中</summary><p>別のブローカーがすでに動いているかもしれません（<code>agcl mandates</code> で確認）。または別のポートで起動します：<code>BROKER_PORT=8788 agcl server</code>。新しいアドレスをエージェントに伝えてください。</p></details>
+  <details><summary>起動時に「Unsupported engine」や構文エラーが出る</summary><p>Node.js が古すぎます。AgentCollar には 22 以降が必要です：<code>node --version</code>。</p></details>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec"><span class="mark">ロードマップ</span></h2>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td><span class="pill ok">done</span></td><td>マンデート、6 つのチェック、取り消し、追記のみの監査ログ</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>ローカル HTTP ブローカー、Telegram またはターミナルでの承認、fail closed</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td><code>agcl</code> CLI：セットアップウィザード、watch、mandates、logs、revoke、イントロ</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Claude Code などのエージェント向け MCP サーバー</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>本物の Gmail：読み取りと下書きのみ、リフレッシュトークンは macOS のキーチェーン</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>npm からコマンド 1 つでインストール、provenance 付き</td></tr>
+      <tr><td><span class="pill">later</span></td><td>リフレッシュトークンの保存時暗号化</td></tr>
+      <tr><td><span class="pill">later</span></td><td>再起動してもマンデートが残る</td></tr>
+      <tr><td><span class="pill">later</span></td><td>朝のレポート：各エージェントが昨夜何をしたか</td></tr>
+    </tbody>
+  </table></div>
+</section>
