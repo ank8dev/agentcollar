@@ -1,0 +1,320 @@
+<!--meta
+title: AgentCollar दस्तावेज़
+description: AgentCollar को इंस्टॉल और इस्तेमाल करना सीखें: एक छोटा लोकल ब्रोकर जो AI एजेंटों को सिर्फ़ एक काम के लिए छोटी अवधि के मैंडेट देता है, जिन्हें आप Telegram में मंज़ूरी देते हैं।
+-->
+<div class="hero">
+  <div>
+    <h1><span class="hl">एजेंटों को काम करने दें।</span><br><span class="hl">चाबियाँ अपने पास रखें।</span></h1>
+    <p class="lead">AgentCollar एक छोटा ब्रोकर है जो आपके कंप्यूटर पर चलता है। आपका AI एजेंट उससे सिर्फ़ एक काम के लिए एक छोटा पास माँगता है। आप उसे Telegram में मंज़ूरी देते हैं। एजेंट आपका पासवर्ड कभी नहीं देखता।</p>
+    <div class="install">{{hero-install}}</div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 रनटाइम डिपेंडेंसी</span><span class="chip warn">शुरुआती संस्करण · अपने जोखिम पर</span></div>
+  </div>
+  <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar लोगो: AC टैग वाला एक पट्टा" width="220" height="220">
+</div>
+
+<div class="note warn"><b class="t">शौक़िया प्रोजेक्ट। अपने जोखिम पर इस्तेमाल करें।</b><p>AgentCollar अभी नया है। ऐसे खाते न जोड़ें जिन्हें खोना आप बर्दाश्त नहीं कर सकते।</p></div>
+
+<section id="start">
+  <h2 class="sec"><span class="mark">शुरुआत करें</span></h2>
+  <p>शून्य से चलते हुए ब्रोकर तक, लगभग तीन मिनट में। आपको <strong>Node.js 22 या नया</strong> और एक Telegram खाता चाहिए। पहले Node जाँच लें:</p>
+  {{node-version}}
+
+  <div class="steps">
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-1-task-dark-ink.webp" alt="">
+      <div>
+        <h4>1. इंस्टॉल करें</h4>
+        <p>बिना इंस्टॉल किए एक बार चलाएँ, या इंस्टॉल करें ताकि छोटा कमांड <code>agcl</code> मिल जाए।</p>
+        {{install}}
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-2-approve-dark-ink.webp" alt="">
+      <div>
+        <h4>2. अपना Telegram बॉट जोड़ें</h4>
+        <p><a href="https://t.me/BotFather">@BotFather</a> से एक बॉट बनाएँ (<code>/newbot</code>) और उसका टोकन कॉपी करें। फिर <code>agcl</code> चलाएँ। पहली बार यह सेटअप विज़ार्ड अपने-आप शुरू कर देता है।</p>
+      </div>
+    </div>
+    <div class="step">
+      <img src="/brand/pictures/agentcollar-step-3-results-dark-ink.webp" alt="">
+      <div>
+        <h4>3. एजेंट को अंदर आने दें</h4>
+        <p>Claude Code को <a href="#mcp">MCP</a> से जोड़ें, या अपनी स्क्रिप्ट से <a href="#api">HTTP API</a> को कॉल करें। अब हर अनुरोध आपसे होकर गुज़रता है।</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="wizard">सेटअप विज़ार्ड, क़दम-दर-क़दम</h3>
+  <p>आपको यही दिखता है। <code>$</code> से शुरू होने वाली पंक्तियाँ आप टाइप करते हैं।</p>
+  {{setup}}
+  <p>हर पंक्ति में क्या हुआ:</p>
+  <ol>
+    <li>टाइप करते समय <strong>टोकन छिपा रहता है</strong> और Telegram से जाँचा जाता है। ग़लत टोकन पर प्रोग्राम क्रैश नहीं होता, साफ़ त्रुटि दिखती है।</li>
+    <li><strong>लिंक में एक बार इस्तेमाल होने वाला कोड है</strong> (<code>K7P2M9QX</code>)। सिर्फ़ निजी चैट में इसी कोड वाला <code>/start</code> गिना जाता है। उसी पल आपके बॉट में Start दबाने वाला कोई अजनबी आपका मंज़ूरी देने वाला नहीं बन सकता।</li>
+    <li><strong>"Is this you?"</strong> ("क्या यह आप हैं?") से आप नाम को अपनी आँखों से जाँच सकते हैं।</li>
+    <li>आपकी सेटिंग्स <code>~/.agentcollar/.env</code> में जाती हैं। इसे सिर्फ़ आपका macOS यूज़र पढ़ सकता है। बॉट भी आपको लिखता है: "AgentCollar is set up"।</li>
+  </ol>
+  <div class="note"><b class="t">Telegram नहीं है? कोई बात नहीं।</b><p>पहले सवाल का जवाब <code>n</code> दें। तब ब्रोकर सीधे टर्मिनल में <code>y</code> या <code>N</code> से मंज़ूरी माँगता है।</p></div>
+</section>
+
+<section id="concepts">
+  <h2 class="sec"><span class="mark">यह कैसे काम करता है</span></h2>
+  <p>तीन पक्ष, एक नियम: <strong>एजेंट सिर्फ़ ब्रोकर से बात करता है</strong>, और ब्रोकर सारी जाँचें पास होने के बाद ही कुछ करता है।</p>
+  {{sequence}}
+
+  <h3 id="mandate">मैंडेट</h3>
+  <p><strong>मैंडेट</strong> सिर्फ़ एक काम की अनुमति है। एजेंट उसे माँगता है, आप मंज़ूरी देते हैं, और वह अपने-आप काम करना बंद कर देता है। इसमें होता है:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>फ़ील्ड</th><th>उदाहरण</th><th>मतलब</th></tr></thead>
+    <tbody>
+      <tr><td><code>agent</code></td><td><code>claude-code</code></td><td>कौन माँग रहा है। आपको दिखाया जाता है।</td></tr>
+      <tr><td><code>task</code></td><td>"Draft replies to new mail"</td><td>क्यों, एजेंट के अपने शब्दों में। सबसे आख़िर में, उद्धरण चिह्नों में दिखाया जाता है।</td></tr>
+      <tr><td><code>allowedActions</code></td><td><code>gmail.read, gmail.draft</code></td><td>ठीक-ठीक क्या करने की अनुमति है। हमेशा <code>app.verb</code> रूप में।</td></tr>
+      <tr><td><code>expiresInSeconds</code></td><td><code>300</code></td><td>आपकी मंज़ूरी के <em>बाद</em> यह कितनी देर चलता है। ज़्यादा से ज़्यादा 1 दिन।</td></tr>
+      <tr><td><code>limit</code></td><td><code>10</code></td><td>अनुमत कामों की अधिकतम संख्या। ज़्यादा से ज़्यादा 1000।</td></tr>
+      <tr><td><code>id</code></td><td><code>8329b843</code></td><td>सार्वजनिक नाम। दिखाने और <code>agcl revoke</code> में टाइप करने के लिए सुरक्षित।</td></tr>
+      <tr><td><code>token</code></td><td>64 हेक्स अक्षर</td><td>गुप्त कुंजी। यह सिर्फ़ एजेंट (या MCP सर्वर) के पास होती है। कभी लॉग नहीं होती।</td></tr>
+    </tbody>
+  </table></div>
+  <p>मैंडेट इन अवस्थाओं से गुज़रता है:</p>
+  {{lifecycle}}
+  <p>घड़ी <strong>आपकी मंज़ूरी के समय</strong> से चलती है, एजेंट के माँगने के समय से नहीं। अगर 10 मिनट में कोई जवाब नहीं देता, तो अनुरोध अस्वीकार हो जाता है। इसे <strong>fail closed</strong> कहते हैं: शक हो, तो जवाब "नहीं" है।</p>
+
+  <h3 id="checks">6 जाँचें</h3>
+  <p>हर अनुरोध <strong>इसी क्रम में</strong> इन जाँचों से गुज़रता है। जो जाँच सबसे पहले विफल होती है, वह सब कुछ रोक देती है, और कारण ऑडिट लॉग में जाता है।</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>सवाल</th><th>अगर नहीं</th><th>HTTP</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>क्या हम इस टोकन को जानते हैं?</td><td>unknown token</td><td><span class="pill no">401</span></td></tr>
+      <tr><td class="num">2</td><td>क्या किसी इंसान ने मंज़ूरी दी?</td><td>waiting / denied</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">3</td><td>क्या यह अभी अपनी समय-सीमा में है?</td><td>expired</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">4</td><td>क्या इसे रद्द नहीं किया गया?</td><td>revoked</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">5</td><td>क्या यह काम मैंडेट में है?</td><td>action not allowed</td><td><span class="pill no">403</span></td></tr>
+      <tr><td class="num">6</td><td>क्या सीमा अभी पूरी नहीं हुई?</td><td>limit reached</td><td><span class="pill warn">429</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>यह कोड का दिल है, <code>broker/src/check.ts</code>। इसे जान-बूझकर छोटा रखा गया है:</p>
+  {{check-ts}}
+  <p>पैटर्न पर ध्यान दें: हर जाँच सिर्फ़ <strong>"नहीं"</strong> कह सकती है। "हाँ" सिर्फ़ एक बार, सबसे नीचे लिखा है। इंजीनियर इसे <strong>deny by default</strong> (डिफ़ॉल्ट रूप से इनकार) कहते हैं।</p>
+
+  <h3 id="approval">Telegram में मंज़ूरी</h3>
+  <p>जब कोई एजेंट माँगता है, तो आपके बॉट पर यह संदेश आता है:</p>
+  {{telegram}}
+  <ul>
+    <li><strong>पहले तथ्य, आख़िर में एजेंट के शब्द।</strong> "Actions" और "Lifetime" वह है जिसे ब्रोकर लागू करता है। काम सिर्फ़ एजेंट की कहानी है, एक पंक्ति में दबाई हुई, इसलिए वह कोई अतिरिक्त "Actions:" पंक्ति नहीं गढ़ सकता।</li>
+    <li>अगर एजेंट <code>*.send</code> माँगता है, तो पहले एक चेतावनी आती है: "The agent asks for the right to SEND in your name" (एजेंट आपके नाम से भेजने का अधिकार माँग रहा है)।</li>
+    <li>मंज़ूरी के बाद बटन बदलकर <span class="pill no">🛑 Revoke</span> (रद्द करें) हो जाते हैं।</li>
+    <li>सिर्फ़ <strong>आपकी</strong> Telegram यूज़र id दबा सकती है। बाक़ी सबको "No access" मिलता है।</li>
+  </ul>
+
+  <h3 id="audit">ऑडिट लॉग</h3>
+  <p>हर जाँच और हर इंसानी फ़ैसला <code>~/.agentcollar/audit.log</code> में एक पंक्ति बनता है। पंक्तियाँ सिर्फ़ जोड़ी जाती हैं, कभी बदली नहीं जातीं। यह कच्ची फ़ाइल है:</p>
+  {{audit-raw}}
+  <p>एजेंटों का टेक्स्ट उद्धरण चिह्नों में होता है (<code>JSON.stringify</code>), इसलिए कोई एजेंट अपने नाम में नई पंक्ति डालकर नकली पंक्ति नहीं बना सकता। टोकन यहाँ कभी नहीं लिखा जाता। आख़िरी कॉलम बताता है कि किस जाँच ने फ़ैसला किया। <code>agcl logs</code> इसे पढ़ने लायक बना देता है (नीचे देखें)।</p>
+</section>
+
+<section id="gmail">
+  <h2 class="sec"><span class="mark">Gmail जोड़ें</span></h2>
+  <p>शुरू में ब्रोकर एक <strong>नकली इनबॉक्स</strong> इस्तेमाल करता है, ताकि आप सब कुछ सुरक्षित रूप से आज़मा सकें। जब आप तैयार हों, अपना असली Gmail जोड़ें। यह कनेक्शन मेल <strong>पढ़</strong> सकता है और <strong>ड्राफ़्ट बना</strong> सकता है। यह कभी भेज नहीं सकता: ब्रोकर इसे रोकता है, और Google भी रोकता है, क्योंकि भेजने की अनुमति कभी माँगी ही नहीं गई।</p>
+  <ol>
+    <li>Google Cloud में <strong>Desktop app</strong> प्रकार का एक OAuth क्लाइंट बनाएँ और उसकी JSON फ़ाइल डाउनलोड करें।</li>
+    <li>नीचे वाला कमांड चलाएँ। आपका ब्राउज़र खुलेगा। "read your email" और "create drafts" की अनुमति दें।</li>
+    <li>ब्रोकर को दोबारा शुरू करें।</li>
+  </ol>
+  {{gmail-connect}}
+  <p>रिफ़्रेश टोकन <strong>macOS Keychain</strong> में जाता है, कभी फ़ाइल में नहीं। कम समय वाला ऐक्सेस टोकन सिर्फ़ मेमोरी में रहता है। कनेक्शन को कभी भी जाँचें या हटाएँ:</p>
+  {{gmail-status}}
+  <div class="note"><b class="t">टेस्टिंग मोड 7 दिन चलता है</b><p>जब तक आपका Google ऐप टेस्टिंग मोड में है, Google 7 दिन बाद साइन-इन ख़त्म कर देता है। बस <code>agcl gmail connect</code> फिर से चलाएँ।</p></div>
+</section>
+
+<section id="cli">
+  <h2 class="sec"><span class="mark"><code class="plain">agcl</code> कमांड</span></h2>
+  <p><code>agcl</code>, <code>agentcollar</code> का छोटा नाम है। दोनों एक ही प्रोग्राम हैं: <code>agcl watch</code> = <code>agentcollar watch</code>। छोटा नाम <code>npm install -g agentcollar</code> के बाद काम करता है। <code>npx</code> के साथ लंबा नाम इस्तेमाल करें: <code>npx agentcollar watch</code>।</p>
+  {{help}}
+
+  <div class="cmd"><h3 id="cmd-agcl"><code>agcl</code></h3>
+    <p>"बस इसे चला दो" वाला कमांड। इंट्रो दिखाता है, अगर Telegram अभी सेट नहीं है तो सेटअप विज़ार्ड चलाता है, फिर ब्रोकर शुरू करता है। स्क्रिप्ट में (जब टर्मिनल पर कोई इंसान न हो) यह सवाल छोड़कर सीधे ब्रोकर शुरू करता है।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-setup"><code>agcl setup</code></h3>
+    <p><strong>आपका अपना</strong> Telegram बॉट जोड़ता है। <a href="#wizard">पूरी गाइड</a> देखें। दोबारा चलाना सुरक्षित है: मौजूदा <code>.env</code> बदलने से पहले पूछता है और बाक़ी पंक्तियाँ (जैसे <code>BROKER_PORT</code>) रहने देता है।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-server"><code>agcl server</code></h3>
+    <p>ब्रोकर शुरू करता है। यह सिर्फ़ <code>127.0.0.1:8787</code> पर सुनता है: दूसरे कंप्यूटरों के प्रोग्राम इस तक नहीं पहुँच सकते। <kbd>Ctrl+C</kbd> से बंद करें।</p>
+    {{server}}
+    <dl class="opts"><dt>BROKER_PORT=9000</dt><dd>कोई दूसरा पोर्ट इस्तेमाल करें। इसे <code>~/.agentcollar/.env</code> में लिखें।</dd></dl>
+    <div class="note"><b class="t">मैंडेट मेमोरी में रहते हैं</b><p>ब्रोकर बंद करते ही सारे मैंडेट ग़ायब हो जाते हैं। एजेंट बस दोबारा माँग लेते हैं। ऑडिट लॉग बना रहता है।</p></div>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-watch"><code>agcl watch</code></h3>
+    <p>एक लाइव स्क्रीन। इसे दूसरे टर्मिनल में खोलें और हर अनुरोध को होते हुए देखें। यह ऑडिट लॉग को सिर्फ़ <strong>पढ़ता</strong> है: कुछ बदल नहीं सकता।</p>
+    {{watch}}
+    <p><code>✓ ✓ ✓ ✓ ✗ ·</code> कैसे पढ़ें: छह निशान छह जाँचें हैं। <code>✓</code> पास, <code>✗</code> वह जो विफल हुई, <code>·</code> कभी चली नहीं (अनुरोध पहले ही रुक चुका था)। पीली पंक्तियाँ इंसानी फ़ैसले हैं।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mandates"><code>agcl mandates</code></h3>
+    <p>चलता हुआ ब्रोकर इस समय क्या याद रखता है: कौन, क्या, अवस्था, बचा समय और बचे काम। यह एक स्नैपशॉट फ़ाइल पढ़ता है जिसे ब्रोकर हर बदलाव के बाद लिखता है। स्नैपशॉट में <strong>कोई टोकन नहीं</strong> होता।</p>
+    {{mandates}}
+    <p>अवस्थाएँ: <span class="pill warn">waiting</span> <span class="pill ok">active</span> <span class="pill no">denied</span> <span class="pill no">expired</span> <span class="pill no">revoked</span> <span class="pill no">limit used up</span></p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-logs"><code>agcl logs</code></h3>
+    <p>ऑडिट लॉग, छाँटा हुआ और रंगीन।</p>
+    <dl class="opts">
+      <dt>--agent &lt;name&gt;</dt><dd>सिर्फ़ यह एजेंट</dd>
+      <dt>--denied</dt><dd>सिर्फ़ इनकार (सबसे दिलचस्प हिस्सा)</dd>
+      <dt>--today</dt><dd>सिर्फ़ आज</dd>
+    </dl>
+    {{logs}}
+    <p>फ़िल्टर साथ में इस्तेमाल हो सकते हैं। कच्ची फ़ाइल चाहिए? <code>tail -f ~/.agentcollar/audit.log</code>।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-revoke"><code>agcl revoke &lt;id&gt;</code></h3>
+    <p>आपातकालीन स्विच। मैंडेट अगले ही अनुरोध से काम करना बंद कर देता है। बिना इंटरनेट के भी काम करता है। Telegram संदेश भी अपडेट हो जाता है।</p>
+    {{revoke}}
+    <p>id, Telegram संदेश में और <code>agcl mandates</code> में मिलती है। रद्द करने के लिए कभी टोकन नहीं चाहिए: यह सिर्फ़ पहुँच छीन सकता है, कभी दे नहीं सकता।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-mcp"><code>agcl mcp</code></h3>
+    <p>वह MCP सर्वर शुरू करता है जिसे Claude Code और दूसरे एजेंट इस्तेमाल करते हैं। आम तौर पर आप इसे हाथ से नहीं चलाते: एजेंट इसे शुरू करता है। <a href="#mcp">अगला हिस्सा</a> देखें।</p>
+  </div>
+
+  <div class="cmd"><h3 id="cmd-intro">इंट्रो</h3>
+    <p>घूमता हुआ पदक, ब्रेल अक्षरों (<code>⣿⡇⠟</code>) से बना लोगो है। हर अक्षर में 8 बिंदु होते हैं, इसलिए तस्वीर सामान्य अक्षरों से ज़्यादा बारीक बनती है। यह लगभग 1.7 सेकंड चलता है, कोई भी कुंजी इसे छोड़ देती है, और पाइप, CI, <code>NO_COLOR</code> या <code>--no-intro</code> में यह कभी नहीं दिखता।</p>
+  </div>
+</section>
+
+<section id="mcp">
+  <h2 class="sec"><span class="mark">Claude Code के साथ इस्तेमाल</span></h2>
+  <p><strong>MCP</strong> (Model Context Protocol) AI एजेंट और उसके टूल्स के बीच की साझा भाषा है। AgentCollar यह भाषा बोलता है, इसलिए Claude Code ब्रोकर को ख़ुद इस्तेमाल कर सकता है। एक कमांड से इसे जोड़ें:</p>
+  {{mcp-add}}
+  <p><code>agcl server</code> को दूसरे टर्मिनल में चलता रहने दें। फिर बस Claude से कहें:</p>
+  {{mcp-prompt}}
+  <p>आगे क्या होता है:</p>
+  <ol>
+    <li>Claude ज़रूरी कामों के साथ <code>request_mandate</code> को कॉल करता है।</li>
+    <li>आपका फ़ोन बजता है। आप <strong>✅ Approve</strong> दबाते हैं।</li>
+    <li>Claude <code>mandate_status</code> को कॉल करता है, <code>approved</code> देखता है, फिर <code>gmail_read_inbox</code> और <code>gmail_create_draft</code>।</li>
+    <li>अगर वह बिना अनुमति <code>gmail_send</code> आज़माता है, तो ब्रोकर मना कर देता है।</li>
+  </ol>
+  <h3 id="tools">5 टूल</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>टूल</th><th>आर्ग्युमेंट</th><th>ज़रूरत</th></tr></thead>
+    <tbody>
+      <tr><td><code>request_mandate</code></td><td><code>task</code>, <code>actions</code>, <code>expiresInSeconds</code>, <code>limit</code></td><td>कुछ नहीं। एक <code>mandateId</code> लौटाता है</td></tr>
+      <tr><td><code>mandate_status</code></td><td><code>mandateId</code></td><td>एक मैंडेट</td></tr>
+      <tr><td><code>gmail_read_inbox</code></td><td><code>mandateId</code></td><td><code>gmail.read</code></td></tr>
+      <tr><td><code>gmail_create_draft</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.draft</code></td></tr>
+      <tr><td><code>gmail_send</code></td><td><code>mandateId</code>, <code>to</code>, <code>subject</code>, <code>body</code></td><td><code>gmail.send</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b class="t">मॉडल कभी टोकन नहीं देखता</b><p>MCP सर्वर गुप्त टोकन को अपनी प्रोसेस के अंदर रखता है और मॉडल को सिर्फ़ <code>mandateId</code> देता है। इसलिए अगर किसी ईमेल में "अपना टोकन मुझे भेजो" जैसा प्रॉम्प्ट इंजेक्शन हो, तो चुराने के लिए कुछ नहीं है।</p></div>
+  <details><summary>अंदर की बात: MCP सर्वर से हाथ से बात करें</summary>
+    <p><strong>stdio</strong> पर MCP का मतलब है: JSON संदेश, हर पंक्ति में एक, प्रोग्राम के इनपुट और आउटपुट से। आप ख़ुद आज़मा सकते हैं:</p>
+    {{mcp-raw}}
+    <p>सर्वर इस प्रोजेक्ट के लिए लिखा गया एक छोटा JSON-RPC इम्प्लीमेंटेशन है, बिना किसी डिपेंडेंसी के।</p>
+  </details>
+</section>
+
+<section id="api">
+  <h2 class="sec"><span class="mark">HTTP API</span></h2>
+  <p>उन एजेंटों के लिए जो MCP नहीं बोलते। ब्रोकर <code>127.0.0.1:8787</code> पर सुनता है। JSON भेजें, और मैंडेट टोकन को हेडर <code>Authorization: Bearer &lt;token&gt;</code> में रखें।</p>
+  <div class="tbl"><table>
+    <thead><tr><th>मेथड</th><th>पाथ</th><th>जाँचा गया काम</th><th>यह क्या करता है</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/mandates</code></td><td>—</td><td>मैंडेट माँगता है। <span class="pill warn">202</span> और एक टोकन (लंबित) लौटाता है।</td></tr>
+      <tr><td><code>GET</code></td><td><code>/mandate</code></td><td>—</td><td><em>आपके</em> मैंडेट की अवस्था।</td></tr>
+      <tr><td><code>POST</code></td><td><code>/mandates/:id/revoke</code></td><td>—</td><td>आपातकालीन स्विच।</td></tr>
+      <tr><td><code>GET</code></td><td><code>/inbox</code></td><td><code>gmail.read</code></td><td>ईमेल की सूची।</td></tr>
+      <tr><td><code>POST</code></td><td><code>/drafts</code></td><td><code>gmail.draft</code></td><td>ड्राफ़्ट बनाता है: <code>to</code>, <code>subject</code>, <code>body</code>।</td></tr>
+      <tr><td><code>POST</code></td><td><code>/send</code></td><td><code>gmail.send</code></td><td>भेजता है। मैंडेट अनुमति न दे तो अस्वीकार। असली Gmail के साथ हर हाल में अस्वीकार।</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="curl">curl के साथ पूरा चक्कर</h3>
+  {{curl-ask}}
+  <p>अब इसे Telegram में मंज़ूरी दें। फिर टोकन इस्तेमाल करें:</p>
+  {{curl-use}}
+  <h3 id="codes">स्टेटस कोड</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>कोड</th><th>मतलब</th><th>क्या करें</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill ok">200</span> <span class="pill ok">201</span></td><td>हो गया (201 = कुछ बनाया गया)</td><td>—</td></tr>
+      <tr><td><span class="pill warn">202</span></td><td>स्वीकार, इंसान का इंतज़ार</td><td>हर कुछ सेकंड में <code>GET /mandate</code> देखें</td></tr>
+      <tr><td><span class="pill no">401</span></td><td>"आप कौन?" कोई वैध टोकन नहीं</td><td>पहले मैंडेट माँगें</td></tr>
+      <tr><td><span class="pill no">403</span></td><td>"मैं आपको जानता हूँ, पर नहीं"</td><td><code>error</code> पढ़ें: मंज़ूर नहीं, समय ख़त्म, रद्द, या काम की अनुमति नहीं</td></tr>
+      <tr><td><span class="pill warn">429</span></td><td>सीमा पूरी हो गई</td><td>नया मैंडेट माँगें</td></tr>
+      <tr><td><span class="pill no">400</span> <span class="pill no">413</span> <span class="pill no">415</span></td><td>ग़लत इनपुट / बहुत बड़ा (10 KB से ज़्यादा) / JSON नहीं</td><td>अनुरोध ठीक करें</td></tr>
+      <tr><td><span class="pill no">502</span></td><td>Gmail ने त्रुटि लौटाई</td><td><code>agcl gmail status</code> जाँचें</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b class="t">ब्राउज़रों को जान-बूझकर मना किया जाता है</b><p>कोई वेब पेज भी <code>localhost</code> पर अनुरोध भेज सकता है। इसलिए ब्रोकर <code>Origin</code> हेडर वाले हर अनुरोध को मना करता है, <code>Host</code> जाँचता है (DNS rebinding से बचाव), और सिर्फ़ <code>application/json</code> स्वीकार करता है। curl जैसे प्रोग्राम और एजेंट इससे प्रभावित नहीं होते।</p></div>
+</section>
+
+<section id="data">
+  <h2 class="sec"><span class="mark">आपका डेटा कहाँ रहता है</span></h2>
+  <p>सब कुछ आपकी होम डायरेक्टरी के एक फ़ोल्डर में है, कोड वाले फ़ोल्डर में नहीं: npm हर अपडेट पर उसे बदल देता है।</p>
+  {{data-tree}}
+  <dl class="opts">
+    <dt>TELEGRAM_BOT_TOKEN</dt><dd>@BotFather से। <code>agcl setup</code> लिखता है।</dd>
+    <dt>TELEGRAM_USER_ID</dt><dd>मंज़ूरी देने वाला इकलौता व्यक्ति। <code>agcl setup</code> लिखता है।</dd>
+    <dt>BROKER_PORT</dt><dd>वैकल्पिक, डिफ़ॉल्ट <code>8787</code>।</dd>
+    <dt>AGENTCOLLAR_HOME</dt><dd>पूरे फ़ोल्डर को कहीं और ले जाएँ (टेस्ट इसका इस्तेमाल करते हैं)।</dd>
+  </dl>
+  <p><code>700</code> और <code>600</code> <strong>फ़ाइल अनुमतियाँ</strong> हैं: इन्हें सिर्फ़ आपका macOS यूज़र खोल सकता है, उसी कंप्यूटर के दूसरे यूज़र नहीं।</p>
+</section>
+
+<section id="security">
+  <h2 class="sec"><span class="mark">सुरक्षा</span></h2>
+  <div class="traits">
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-1-short-lived-hourglass.webp" alt=""><div><h4>कम समय के लिए</h4><p>मैंडेट अपने-आप ख़त्म हो जाते हैं। बिना जवाब वाले अनुरोध 10 मिनट में ख़त्म।</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-2-one-task-target.webp" alt=""><div><h4>सिर्फ़ एक काम</h4><p>सिर्फ़ सूची वाले काम। ड्राफ़्ट कभी भेजा हुआ ईमेल नहीं बन सकता।</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-3-revoke-hand.webp" alt=""><div><h4>कभी भी रद्द करें</h4><p>Telegram में एक टैप या <code>agcl revoke</code>। अगले अनुरोध से असर।</p></div></div>
+    <div class="trait"><img src="/brand/pictures/agentcollar-card-4-logged-scroll.webp" alt=""><div><h4>पूरा रिकॉर्ड</h4><p>हर जाँच, हर फ़ैसला, हर एक की एक पंक्ति। टोकन कभी नहीं।</p></div></div>
+  </div>
+  <h3 id="protects">ब्रोकर किन चीज़ों से बचाता है</h3>
+  <ul>
+    <li><strong>चोरी हुआ मैंडेट टोकन:</strong> एक काम, कम समय, रद्द करने योग्य। हमेशा के लिए पूरा मेलबॉक्स नहीं।</li>
+    <li><strong>बेक़ाबू एजेंट:</strong> सीमा उसे रोक देती है, लॉग दिखाता है कि यह कब शुरू हुआ।</li>
+    <li><strong>ईमेल में प्रॉम्प्ट इंजेक्शन:</strong> एजेंट उस पर भरोसा कर सकता है, पर वह काम मैंडेट में नहीं है, और MCP के ज़रिए तो टोकन दिखता भी नहीं।</li>
+    <li><strong>नकली मंज़ूरी संदेश:</strong> कामों का रूप <code>app.verb</code> होना चाहिए, और एजेंट का टेक्स्ट एक साफ़ की गई पंक्ति है, सबसे आख़िर में।</li>
+    <li><strong>ख़ुद को मंज़ूरी देता एजेंट:</strong> HTTP या फ़ाइलों से मंज़ूरी <em>कभी</em> संभव नहीं। सिर्फ़ Telegram (आपकी id) में या ब्रोकर के अपने टर्मिनल में।</li>
+    <li><strong>localhost पर हमला करता वेब पेज:</strong> ब्राउज़र के अनुरोध मना कर दिए जाते हैं।</li>
+    <li><strong>आपके नाम से भेजना:</strong> Gmail कनेक्शन के पास सिर्फ़ पढ़ने और ड्राफ़्ट की अनुमति है। ब्रोकर की कोई ग़लती भी ईमेल नहीं भेज सकती।</li>
+    <li><strong>छेड़छाड़ किया गया npm पैकेज:</strong> रिलीज़ <strong>provenance</strong> (जाँचने योग्य स्रोत) के साथ प्रकाशित होते हैं। <code>npm audit signatures</code> से जाँचें।</li>
+  </ul>
+  <h3 id="limits">यह (अभी) किन चीज़ों से नहीं बचाता</h3>
+  <ul>
+    <li>आपके यूज़र के रूप में पहले से चल रहा मैलवेयर <code>~/.agentcollar/</code> पढ़ सकता है।</li>
+    <li>ब्रोकर रुकने पर मैंडेट खो जाते हैं।</li>
+  </ul>
+</section>
+
+<section id="trouble">
+  <h2 class="sec"><span class="mark">समस्या समाधान</span></h2>
+  <details><summary>Telegram में कुछ नहीं आता</summary><p>अपना बॉट खोलें और कम से कम एक बार <strong>Start</strong> दबाएँ: बॉट आपको पहले संदेश नहीं भेज सकते। जाँचें कि <code>agcl server</code> में <code>Approvals: Telegram</code> दिख रहा है। अगर <code>this terminal</code> दिखे, तो <code>agcl setup</code> चलाएँ।</p></details>
+  <details><summary>सेटअप कहता है "Another program is already listening to this bot"</summary><p>(कोई दूसरा प्रोग्राम पहले से इस बॉट को सुन रहा है।) आम तौर पर यह आपका अपना <code>agcl server</code> होता है। उसे <kbd>Ctrl+C</kbd> से बंद करें और <code>agcl setup</code> फिर चलाएँ।</p></details>
+  <details><summary>एजेंट कहता है कि ब्रोकर नहीं चल रहा</summary><p>इसे शुरू करें: <code>agcl server</code>। ब्रोकर और एजेंट एक ही कंप्यूटर पर चलने चाहिए।</p></details>
+  <details><summary><code>agcl mandates</code> कहता है "The broker is not running"</summary><p>मैंडेट उसकी मेमोरी में रहते हैं, इसलिए बंद होने के बाद दिखाने को कुछ नहीं होता। उसे शुरू करें और एजेंट को फिर से माँगने दें।</p></details>
+  <details><summary>एक हफ़्ते बाद Gmail ने काम करना बंद कर दिया</summary><p>आपका Google ऐप टेस्टिंग मोड में है, और Google ने साइन-इन ख़त्म कर दिया। <code>agcl gmail connect</code> फिर से चलाएँ।</p></details>
+  <details><summary><code>agcl: command not found</code></summary><p>छोटे नाम के लिए इंस्टॉल ज़रूरी है: <code>npm install -g agentcollar</code>। बिना इंस्टॉल के <code>npx agentcollar</code> इस्तेमाल करें।</p></details>
+  <details><summary>पोर्ट 8787 व्यस्त है</summary><p>शायद कोई दूसरा ब्रोकर पहले से चल रहा है (<code>agcl mandates</code> से जाँचें)। या इसे दूसरे पोर्ट पर शुरू करें: <code>BROKER_PORT=8788 agcl server</code>, और अपने एजेंट को नया पता बताएँ।</p></details>
+  <details><summary>शुरू करते समय "Unsupported engine" या सिंटैक्स त्रुटियाँ</summary><p>आपका Node.js बहुत पुराना है। AgentCollar को 22 या नया चाहिए: <code>node --version</code>।</p></details>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec"><span class="mark">रोडमैप</span></h2>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td><span class="pill ok">done</span></td><td>मैंडेट, 6 जाँचें, रद्द करना, सिर्फ़ जोड़ने वाला ऑडिट लॉग</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>लोकल HTTP ब्रोकर, Telegram या टर्मिनल में मंज़ूरी, fail closed</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td><code>agcl</code> CLI: सेटअप विज़ार्ड, watch, mandates, logs, revoke, इंट्रो</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>Claude Code और दूसरे एजेंटों के लिए MCP सर्वर</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>असली Gmail: सिर्फ़ पढ़ना और ड्राफ़्ट, रिफ़्रेश टोकन macOS Keychain में</td></tr>
+      <tr><td><span class="pill ok">done</span></td><td>npm से एक कमांड में इंस्टॉल, provenance के साथ</td></tr>
+      <tr><td><span class="pill">later</span></td><td>रिफ़्रेश टोकन को सहेजते समय एन्क्रिप्ट करना</td></tr>
+      <tr><td><span class="pill">later</span></td><td>रीस्टार्ट के बाद भी मैंडेट बने रहें</td></tr>
+      <tr><td><span class="pill">later</span></td><td>सुबह की रिपोर्ट: हर एजेंट ने रात में क्या किया</td></tr>
+    </tbody>
+  </table></div>
+</section>
