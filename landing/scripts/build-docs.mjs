@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docsDir = join(root, 'docs');
 
-// English first; the rest are the 9 most used languages for developer docs (no Russian).
+// English first; then the 9 most used languages for developer docs, and Russian.
 export const LANGS = [
   { code: 'en', name: 'English', path: '' },
   { code: 'zh', name: '简体中文', path: 'zh/', html: 'zh-Hans' },
@@ -23,6 +23,7 @@ export const LANGS = [
   { code: 'de', name: 'Deutsch', path: 'de/' },
   { code: 'ja', name: '日本語', path: 'ja/' },
   { code: 'ko', name: '한국어', path: 'ko/' },
+  { code: 'ru', name: 'Русский', path: 'ru/' },
 ];
 
 // Small interface words around the content, per language.
@@ -36,6 +37,7 @@ const UI = {
   fr: { contents: 'Sommaire', language: 'Langue', copy: 'copier', copied: 'copié', star: 'Star on GitHub', skip: 'Aller au contenu' },
   de: { contents: 'Inhalt', language: 'Sprache', copy: 'kopieren', copied: 'kopiert', star: 'Star on GitHub', skip: 'Zum Inhalt' },
   ja: { contents: '目次', language: '言語', copy: 'コピー', copied: 'コピー済み', star: 'Star on GitHub', skip: '本文へ移動' },
+  ru: { contents: 'Содержание', language: 'Язык', copy: 'копировать', copied: 'скопировано', star: 'Star on GitHub', skip: 'К содержанию' },
   ko: { contents: '목차', language: '언어', copy: '복사', copied: '복사됨', star: 'Star on GitHub', skip: '본문으로 건너뛰기' },
 };
 
@@ -100,8 +102,21 @@ function page(lang, meta, main, code) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Intel+One+Mono:ital,wght@0,400;0,600;1,400&display=swap" />
     <link rel="stylesheet" href="/docs/docs.css" />
+    <script>
+      // The same preloader as the website (no flash: it is set up before the page paints).
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('preloading');
+        setTimeout(() => document.documentElement.classList.remove('preloading'), 12000); // safety net
+      }
+    </script>
   </head>
   <body data-copied="${ui.copied}" data-copy="${ui.copy}">
+    <div class="preloader" aria-hidden="true">
+      <div class="preloader__row">
+        <img class="preloader__medallion" src="/brand/logo/agentcollar-mark-black.svg" alt="" width="120" height="120" />
+        <span class="preloader__word" data-word="AgentCollar"></span>
+      </div>
+    </div>
     <a class="skip" href="#content">${ui.skip}</a>
 
     <header class="site-header">
@@ -127,19 +142,40 @@ ${body}
     </div>
 
     <footer class="doc-foot">
-      <div class="doc-foot__sky" aria-hidden="true">
+      <!-- The landing's footer scene on paper: stars, the AC medallion spinning like a coin,
+           the Star on GitHub button, the Earth; a paper-coloured fade, then the links. -->
+      <div class="doc-foot__scene">
+        <div class="doc-foot__stars" aria-hidden="true">
+        <span class="doc-foot__star" style="left: 6%; top: 18%; width: 42px; --c: var(--sage)"></span>
+        <span class="doc-foot__star" style="left: 14%; top: 52%; width: 31px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 24%; top: 30%; width: 22px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 78%; top: 16%; width: 36px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 88%; top: 44%; width: 28px; --c: var(--sage)"></span>
+        <span class="doc-foot__star" style="left: 70%; top: 58%; width: 20px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 34%; top: 64%; width: 17px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 94%; top: 70%; width: 22px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 4%; top: 74%; width: 25px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 60%; top: 12%; width: 20px; --c: var(--sage)"></span>
+        </div>
+        <img class="doc-foot__tag" src="/brand/logo/agentcollar-tag-black.png" alt="" width="1024" height="1024" loading="lazy" />
+        <a class="doc-foot__cta" href="https://github.com/ank8dev/agentcollar">
+          <svg class="doc-foot__outline" viewBox="0 0 760 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path pathLength="1000" d="M34 14 C200 4 560 6 724 13 C752 15 757 42 755 78 C753 114 749 139 720 142 C540 151 222 148 42 141 C15 139 6 113 7 77 C8 42 12 16 50 11 C112 4 168 6 214 9" />
+          </svg>
+          <span class="star-icon" aria-hidden="true"></span>Star on GitHub
+        </a>
         <img class="doc-foot__earth" src="/brand/pictures/agentcollar-earth.webp" alt="" width="886" height="927" loading="lazy" />
       </div>
       <div class="doc-foot__bar">
-        <a class="doc-foot__brand" href="${SITE}"><img src="/brand/logo/agentcollar-mark-white.svg" alt="" width="40" height="40" />AgentCollar</a>
-        <p class="doc-foot__tagline">Let agents work. Keep the keys.</p>
         <nav class="doc-foot__links" aria-label="Links">
           <a href="${SITE}">Website</a>
+          <a href="${up || './'}">Docs</a>
           <a href="https://github.com/ank8dev/agentcollar">GitHub</a>
           <a href="https://www.npmjs.com/package/agentcollar">npm</a>
           <a href="https://x.com/ank8dev">X</a>
+          <a class="doc-foot__me" href="https://github.com/ank8dev"><img src="/images/ank-avatar.png" alt="" width="32" height="32" />@ank8dev</a>
         </nav>
-        <p class="doc-foot__legal">Code MIT · brand © ank8dev · ${new Date().getFullYear()}</p>
+        <p class="doc-foot__legal">© ${new Date().getFullYear()} AgentCollar · code MIT · brand © ank8dev</p>
       </div>
     </footer>
 

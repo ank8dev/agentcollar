@@ -19,13 +19,27 @@
     <link rel="alternate" hreflang="de" href="https://ank8dev.github.io/agentcollar/docs/de/" />
     <link rel="alternate" hreflang="ja" href="https://ank8dev.github.io/agentcollar/docs/ja/" />
     <link rel="alternate" hreflang="ko" href="https://ank8dev.github.io/agentcollar/docs/ko/" />
+    <link rel="alternate" hreflang="ru" href="https://ank8dev.github.io/agentcollar/docs/ru/" />
     <link rel="alternate" hreflang="x-default" href="https://ank8dev.github.io/agentcollar/docs/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Intel+One+Mono:ital,wght@0,400;0,600;1,400&display=swap" />
     <link rel="stylesheet" href="/docs/docs.css" />
+    <script>
+      // The same preloader as the website (no flash: it is set up before the page paints).
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('preloading');
+        setTimeout(() => document.documentElement.classList.remove('preloading'), 12000); // safety net
+      }
+    </script>
   </head>
   <body data-copied="已复制" data-copy="复制">
+    <div class="preloader" aria-hidden="true">
+      <div class="preloader__row">
+        <img class="preloader__medallion" src="/brand/logo/agentcollar-mark-black.svg" alt="" width="120" height="120" />
+        <span class="preloader__word" data-word="AgentCollar"></span>
+      </div>
+    </div>
     <a class="skip" href="#content">跳到正文</a>
 
     <header class="site-header">
@@ -37,7 +51,7 @@
     <div class="wrap">
       <aside class="toc" aria-label="目录">
         <label class="lang"><span class="visually-hidden">语言</span>
-          <select id="lang" aria-label="语言"><option value=".././" lang="en">English</option><option value="../zh/" selected lang="zh-Hans">简体中文</option><option value="../es/" lang="es">Español</option><option value="../hi/" lang="hi">हिन्दी</option><option value="../ar/" lang="ar">العربية</option><option value="../pt/" lang="pt-BR">Português</option><option value="../fr/" lang="fr">Français</option><option value="../de/" lang="de">Deutsch</option><option value="../ja/" lang="ja">日本語</option><option value="../ko/" lang="ko">한국어</option></select>
+          <select id="lang" aria-label="语言"><option value=".././" lang="en">English</option><option value="../zh/" selected lang="zh-Hans">简体中文</option><option value="../es/" lang="es">Español</option><option value="../hi/" lang="hi">हिन्दी</option><option value="../ar/" lang="ar">العربية</option><option value="../pt/" lang="pt-BR">Português</option><option value="../fr/" lang="fr">Français</option><option value="../de/" lang="de">Deutsch</option><option value="../ja/" lang="ja">日本語</option><option value="../ko/" lang="ko">한국어</option><option value="../ru/" lang="ru">Русский</option></select>
         </label>
         <h2>目录</h2>
         <ol id="toc">
@@ -530,19 +544,40 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
     </div>
 
     <footer class="doc-foot">
-      <div class="doc-foot__sky" aria-hidden="true">
+      <!-- The landing's footer scene on paper: stars, the AC medallion spinning like a coin,
+           the Star on GitHub button, the Earth; a paper-coloured fade, then the links. -->
+      <div class="doc-foot__scene">
+        <div class="doc-foot__stars" aria-hidden="true">
+        <span class="doc-foot__star" style="left: 6%; top: 18%; width: 42px; --c: var(--sage)"></span>
+        <span class="doc-foot__star" style="left: 14%; top: 52%; width: 31px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 24%; top: 30%; width: 22px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 78%; top: 16%; width: 36px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 88%; top: 44%; width: 28px; --c: var(--sage)"></span>
+        <span class="doc-foot__star" style="left: 70%; top: 58%; width: 20px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 34%; top: 64%; width: 17px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 94%; top: 70%; width: 22px; --c: var(--sand)"></span>
+        <span class="doc-foot__star" style="left: 4%; top: 74%; width: 25px; --c: var(--rose)"></span>
+        <span class="doc-foot__star" style="left: 60%; top: 12%; width: 20px; --c: var(--sage)"></span>
+        </div>
+        <img class="doc-foot__tag" src="/brand/logo/agentcollar-tag-black.png" alt="" width="1024" height="1024" loading="lazy" />
+        <a class="doc-foot__cta" href="https://github.com/ank8dev/agentcollar">
+          <svg class="doc-foot__outline" viewBox="0 0 760 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path pathLength="1000" d="M34 14 C200 4 560 6 724 13 C752 15 757 42 755 78 C753 114 749 139 720 142 C540 151 222 148 42 141 C15 139 6 113 7 77 C8 42 12 16 50 11 C112 4 168 6 214 9" />
+          </svg>
+          <span class="star-icon" aria-hidden="true"></span>Star on GitHub
+        </a>
         <img class="doc-foot__earth" src="/brand/pictures/agentcollar-earth.webp" alt="" width="886" height="927" loading="lazy" />
       </div>
       <div class="doc-foot__bar">
-        <a class="doc-foot__brand" href="https://ank8dev.github.io/agentcollar/"><img src="/brand/logo/agentcollar-mark-white.svg" alt="" width="40" height="40" />AgentCollar</a>
-        <p class="doc-foot__tagline">Let agents work. Keep the keys.</p>
         <nav class="doc-foot__links" aria-label="Links">
           <a href="https://ank8dev.github.io/agentcollar/">Website</a>
+          <a href="../">Docs</a>
           <a href="https://github.com/ank8dev/agentcollar">GitHub</a>
           <a href="https://www.npmjs.com/package/agentcollar">npm</a>
           <a href="https://x.com/ank8dev">X</a>
+          <a class="doc-foot__me" href="https://github.com/ank8dev"><img src="/images/ank-avatar.png" alt="" width="32" height="32" />@ank8dev</a>
         </nav>
-        <p class="doc-foot__legal">Code MIT · brand © ank8dev · 2026</p>
+        <p class="doc-foot__legal">© 2026 AgentCollar · code MIT · brand © ank8dev</p>
       </div>
     </footer>
 
