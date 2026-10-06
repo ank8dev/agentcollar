@@ -114,7 +114,7 @@ function page(lang, meta, main, code) {
     <div class="preloader" aria-hidden="true">
       <div class="preloader__row">
         <img class="preloader__medallion" src="/brand/logo/agentcollar-mark-black.svg" alt="" width="120" height="120" />
-        <span class="preloader__word" data-word="AgentCollar"></span>
+        <span class="preloader__word" data-word="AgClDocs"></span>
       </div>
     </div>
     <a class="skip" href="#content">${ui.skip}</a>

@@ -177,9 +177,10 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 120px 16px max(22px, env(safe-area-inset-bottom));
-  /* the darkening: clear at the top, night at the bottom, over the Earth */
-  background: linear-gradient(to top, var(--ink) 0%, var(--ink) 38%, rgb(4 8 15 / 0.75) 62%, rgb(4 8 15 / 0) 100%);
+  padding: 64px 16px max(18px, env(safe-area-inset-bottom));
+  /* the darkening: just enough shade over the Earth for the links, no solid night band */
+  background: linear-gradient(to top, rgb(4 8 15 / 0.82) 0%, rgb(4 8 15 / 0.55) 45%, rgb(4 8 15 / 0) 100%);
+  text-shadow: 0 1px 6px rgb(4 8 15 / 0.9);
   pointer-events: none;
 }
 
