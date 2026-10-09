@@ -6,8 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-**Development is paused** and may never resume. Everything below was tested end to end
-(Claude Code → Telegram approval → real Gmail drafts) before the pause.
+**Development is paused** and may never resume.
+
+## [0.2.0] - 2026-10-09
+
+The last release before the pause. Everything below was tested end to end
+(Claude Code → Telegram approval → real Gmail drafts).
 
 ### Added
 - Real Gmail: `agcl gmail connect | status | disconnect`. Desktop-app OAuth with PKCE on a
@@ -74,6 +78,7 @@ First release with code, published to npm from GitHub Actions with provenance (t
 Name placeholder published to npm by hand, with no code (only `package.json` and a README), so that
 trusted publishing could be set up for the real releases. Not tagged in git.
 
-[Unreleased]: https://github.com/ank8dev/agentcollar/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ank8dev/agentcollar/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/ank8dev/agentcollar/tree/v0.2.0
 [0.1.0]: https://github.com/ank8dev/agentcollar/tree/v0.1.0
 [0.0.1]: https://www.npmjs.com/package/agentcollar/v/0.0.1

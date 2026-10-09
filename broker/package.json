@@ -1,6 +1,6 @@
 {
   "name": "agentcollar",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A small local broker between your AI agents and your accounts: short-lived, task-scoped mandates that you approve in Telegram, instead of passwords.",
   "keywords": [
     "ai-agents",
