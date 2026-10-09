@@ -2,13 +2,15 @@
 
 ## Status
 
-AgentCollar is an **early hobby project**. Use it at your own risk and do not connect accounts you
-can't afford to lose. There is no company and no security team behind it: one maintainer, best effort.
+AgentCollar is a **hobby project, and development is paused** (it may never resume). Use it at your own
+risk and do not connect accounts you can't afford to lose. There is no company and no security team
+behind it, and **no fixes are promised**. The software is provided "as is", without warranty, under the
+[MIT license](LICENSE).
 
 ## Supported versions
 
-Only the **latest published version** of [`agentcollar`](https://www.npmjs.com/package/agentcollar)
-gets fixes. Older versions are not patched; please upgrade (`npm install -g agentcollar@latest`).
+No version is actively maintained while the project is paused. If a fix is ever released, it will be
+for the latest version of [`agentcollar`](https://www.npmjs.com/package/agentcollar) only.
 
 ## Reporting a vulnerability
 
@@ -21,9 +23,8 @@ Report it privately through GitHub:
 Helpful to include: the version (`agcl --help` header or `npm ls -g agentcollar`), your OS and Node
 version, the steps to reproduce, and what you expected instead.
 
-**Response time:** best effort — this is a hobby project. I will try to acknowledge a report within
-a week and to fix confirmed issues in scope as soon as I reasonably can. I will credit you in the
-release notes unless you prefer not to be named.
+**Response time:** none guaranteed. The project is paused, so a report may be read late or not at all,
+and a fix may never come. If you rely on AgentCollar, please fork it and fix it in your copy.
 
 ## In scope
 
