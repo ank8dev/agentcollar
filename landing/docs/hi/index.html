@@ -78,12 +78,12 @@
     <h1><span class="hl">एजेंटों को काम करने दें।</span><br><span class="hl">चाबियाँ अपने पास रखें।</span></h1>
     <p class="lead">AgentCollar एक छोटा ब्रोकर है जो आपके कंप्यूटर पर चलता है। आपका AI एजेंट उससे सिर्फ़ एक काम के लिए एक छोटा पास माँगता है। आप उसे Telegram में मंज़ूरी देते हैं। एजेंट आपका पासवर्ड कभी नहीं देखता।</p>
     <div class="install"><div class="code term"><pre><span class="p">$ </span>npx agentcollar</pre><button class="copy" data-copy="npx agentcollar">कॉपी</button></div></div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 रनटाइम डिपेंडेंसी</span><span class="chip warn">शुरुआती संस्करण · अपने जोखिम पर</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 रनटाइम डिपेंडेंसी</span><span class="chip warn">रुका हुआ · अपने जोखिम पर इस्तेमाल करें</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar लोगो: AC टैग वाला एक पट्टा" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">शौक़िया प्रोजेक्ट। अपने जोखिम पर इस्तेमाल करें।</b><p>AgentCollar अभी नया है। ऐसे खाते न जोड़ें जिन्हें खोना आप बर्दाश्त नहीं कर सकते।</p></div>
+<div class="note warn"><b class="t">प्रोजेक्ट रुका हुआ है।</b><p>इस पेज पर सब कुछ काम करता है और शुरू से अंत तक जाँचा गया है: Claude Code एक mandate माँगता है, आप उसे Telegram में मंज़ूर करते हैं, वह आपका असली Gmail पढ़ता है और एक ड्राफ़्ट छोड़ता है। लेकिन विकास रुका हुआ है, और लेखक शायद कभी इस पर वापस न आए: न नई सुविधाएँ, न सुधार का वादा। कोड MIT के तहत खुला रहता है, ज़रूरत हो तो fork कर लें। यह शौक़िया प्रोजेक्ट है: अपने जोखिम पर इस्तेमाल करें और ऐसे खाते न जोड़ें जिन्हें खोना आप नहीं झेल सकते।</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">शुरुआत करें</span></h2>
@@ -515,9 +515,10 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
   <h2 class="sec"><span class="mark">समस्या समाधान</span></h2>
   <details><summary>Telegram में कुछ नहीं आता</summary><p>अपना बॉट खोलें और कम से कम एक बार <strong>Start</strong> दबाएँ: बॉट आपको पहले संदेश नहीं भेज सकते। जाँचें कि <code>agcl server</code> में <code>Approvals: Telegram</code> दिख रहा है। अगर <code>this terminal</code> दिखे, तो <code>agcl setup</code> चलाएँ।</p></details>
   <details><summary>सेटअप कहता है "Another program is already listening to this bot"</summary><p>(कोई दूसरा प्रोग्राम पहले से इस बॉट को सुन रहा है।) आम तौर पर यह आपका अपना <code>agcl server</code> होता है। उसे <kbd>Ctrl+C</kbd> से बंद करें और <code>agcl setup</code> फिर चलाएँ।</p></details>
-  <details><summary>एजेंट कहता है कि ब्रोकर नहीं चल रहा</summary><p>इसे शुरू करें: <code>agcl server</code>। ब्रोकर और एजेंट एक ही कंप्यूटर पर चलने चाहिए।</p></details>
+  <details><summary>एजेंट कहता है कि ब्रोकर नहीं चल रहा</summary><p>broker को एक अलग टर्मिनल टैब में शुरू करें और वह टैब खुला रखें: <code>agcl server</code> (या बस <code>agcl</code>)। broker और एजेंट एक ही कंप्यूटर पर चलने चाहिए। फिर एजेंट से दोबारा कोशिश करने को कहें।</p></details>
   <details><summary><code>agcl mandates</code> कहता है "The broker is not running"</summary><p>मैंडेट उसकी मेमोरी में रहते हैं, इसलिए बंद होने के बाद दिखाने को कुछ नहीं होता। उसे शुरू करें और एजेंट को फिर से माँगने दें।</p></details>
   <details><summary>एक हफ़्ते बाद Gmail ने काम करना बंद कर दिया</summary><p>आपका Google ऐप टेस्टिंग मोड में है, और Google ने साइन-इन ख़त्म कर दिया। <code>agcl gmail connect</code> फिर से चलाएँ।</p></details>
+  <details><summary>Google कहता है “Access blocked: … has not completed the Google verification process” (Error 403: access_denied)</summary><p>आपका Google ऐप टेस्टिंग मोड में है, इसलिए Google सिर्फ़ उसके टेस्ट यूज़र्स को अंदर आने देता है। Google Cloud में <strong>Google Auth Platform → Audience → Test users</strong> खोलें, अपना Gmail पता जोड़ें, फिर <code>agcl gmail connect</code> दोबारा चलाएँ। ऐप को publish न करें।</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>छोटे नाम के लिए इंस्टॉल ज़रूरी है: <code>npm install -g agentcollar</code>। बिना इंस्टॉल के <code>npx agentcollar</code> इस्तेमाल करें।</p></details>
   <details><summary>पोर्ट 8787 व्यस्त है</summary><p>शायद कोई दूसरा ब्रोकर पहले से चल रहा है (<code>agcl mandates</code> से जाँचें)। या इसे दूसरे पोर्ट पर शुरू करें: <code>BROKER_PORT=8788 agcl server</code>, और अपने एजेंट को नया पता बताएँ।</p></details>
   <details><summary>शुरू करते समय "Unsupported engine" या सिंटैक्स त्रुटियाँ</summary><p>आपका Node.js बहुत पुराना है। AgentCollar को 22 या नया चाहिए: <code>node --version</code>।</p></details>
@@ -525,6 +526,7 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">रोडमैप</span></h2>
+  <p>विकास रुका हुआ है। जो काम पूरे नहीं हुए, उनकी कोई योजना नहीं है।</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>मैंडेट, 6 जाँचें, रद्द करना, सिर्फ़ जोड़ने वाला ऑडिट लॉग</td></tr>
@@ -533,9 +535,9 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
       <tr><td><span class="pill ok">done</span></td><td>Claude Code और दूसरे एजेंटों के लिए MCP सर्वर</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>असली Gmail: सिर्फ़ पढ़ना और ड्राफ़्ट, रिफ़्रेश टोकन macOS Keychain में</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>npm से एक कमांड में इंस्टॉल, provenance के साथ</td></tr>
-      <tr><td><span class="pill">later</span></td><td>रिफ़्रेश टोकन को सहेजते समय एन्क्रिप्ट करना</td></tr>
-      <tr><td><span class="pill">later</span></td><td>रीस्टार्ट के बाद भी मैंडेट बने रहें</td></tr>
-      <tr><td><span class="pill">later</span></td><td>सुबह की रिपोर्ट: हर एजेंट ने रात में क्या किया</td></tr>
+      <tr><td><span class="pill">योजना नहीं</span></td><td>रिफ़्रेश टोकन को सहेजते समय एन्क्रिप्ट करना</td></tr>
+      <tr><td><span class="pill">योजना नहीं</span></td><td>रीस्टार्ट के बाद भी मैंडेट बने रहें</td></tr>
+      <tr><td><span class="pill">योजना नहीं</span></td><td>सुबह की रिपोर्ट: हर एजेंट ने रात में क्या किया</td></tr>
     </tbody>
   </table></div>
 </section>

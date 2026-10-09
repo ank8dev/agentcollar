@@ -23,8 +23,10 @@
   <a href="#roadmap">Roadmap</a>
 </p>
 
-> **Status: early, building in public.** The broker works end to end with a **fake Gmail inbox**,
-> a terminal CLI (`agcl`) and an MCP server for Claude Code. Real Gmail is next. Do not connect real accounts yet.
+> **Status: paused.** Everything described here works and was tested end to end: Claude Code asks
+> for a mandate, you approve it in Telegram, it reads your real Gmail and leaves a draft. But development
+> is paused and may never resume: no new features, no promised fixes. The code stays open (MIT), so fork it
+> if you need it.
 >
 > **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
 

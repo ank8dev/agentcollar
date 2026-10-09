@@ -7,12 +7,12 @@ description: How to install and use AgentCollar: a small local broker that gives
     <h1><span class="hl">Let agents work.</span><br><span class="hl">Keep the keys.</span></h1>
     <p class="lead">AgentCollar is a small broker that runs on your computer. Your AI agent asks it for a short pass for one task. You approve it in Telegram. The agent never sees your password.</p>
     <div class="install">{{hero-install}}</div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 runtime dependencies</span><span class="chip warn">early · use at your own risk</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 runtime dependencies</span><span class="chip warn">paused · use at your own risk</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar logo: a collar with an AC tag" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">Hobby project. Use at your own risk.</b><p>AgentCollar is young. Do not connect accounts you can't afford to lose.</p></div>
+<div class="note warn"><b class="t">Project paused.</b><p>Everything on this page works and was tested end to end: Claude Code asks for a mandate, you approve it in Telegram, it reads your real Gmail and leaves a draft. But development is paused, and I may never come back to it: no new features and no promised fixes. The code stays open under MIT, so fork it if you need it. Hobby project: use it at your own risk and do not connect accounts you can't afford to lose.</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">Get started</span></h2>
@@ -294,9 +294,10 @@ description: How to install and use AgentCollar: a small local broker that gives
   <h2 class="sec"><span class="mark">Troubleshooting</span></h2>
   <details><summary>Nothing arrives in Telegram</summary><p>Open your bot and press <strong>Start</strong> at least once: bots cannot write to you first. Check that <code>agcl server</code> says <code>Approvals: Telegram</code>. If it says <code>this terminal</code>, run <code>agcl setup</code>.</p></details>
   <details><summary>Setup says "Another program is already listening to this bot"</summary><p>Usually it is your own <code>agcl server</code>. Stop it with <kbd>Ctrl+C</kbd> and run <code>agcl setup</code> again.</p></details>
-  <details><summary>The agent says the broker is not running</summary><p>Start it: <code>agcl server</code>. The broker and the agent must run on the same computer.</p></details>
+  <details><summary>The agent says the broker is not running</summary><p>Start the broker in a separate terminal tab and keep that tab open: <code>agcl server</code> (or just <code>agcl</code>). The broker and the agent must run on the same computer. Then ask the agent to try again.</p></details>
   <details><summary><code>agcl mandates</code> says "The broker is not running"</summary><p>Mandates live in its memory, so after it stops there is nothing to show. Start it and let the agent ask again.</p></details>
   <details><summary>Gmail stopped working after a week</summary><p>Your Google app is in testing mode, and Google ended the sign-in. Run <code>agcl gmail connect</code> again.</p></details>
+  <details><summary>Google says “Access blocked: … has not completed the Google verification process” (Error 403: access_denied)</summary><p>Your Google app is in testing mode, so Google only lets in its test users. In Google Cloud open <strong>Google Auth Platform → Audience → Test users</strong>, add your Gmail address, then run <code>agcl gmail connect</code> again. Do not publish the app.</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>The short name needs installation: <code>npm install -g agentcollar</code>. Without installing, use <code>npx agentcollar</code>.</p></details>
   <details><summary>Port 8787 is busy</summary><p>Maybe another broker is already running (check with <code>agcl mandates</code>). Or start this one on another port: <code>BROKER_PORT=8788 agcl server</code>, and tell your agent the new address.</p></details>
   <details><summary>"Unsupported engine" or syntax errors on start</summary><p>Your Node.js is too old. AgentCollar needs 22 or newer: <code>node --version</code>.</p></details>
@@ -304,6 +305,7 @@ description: How to install and use AgentCollar: a small local broker that gives
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">Roadmap</span></h2>
+  <p>Development is paused. The items that are not done are not planned.</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>Mandates, the 6 checks, revoke, append-only audit log</td></tr>
@@ -312,9 +314,9 @@ description: How to install and use AgentCollar: a small local broker that gives
       <tr><td><span class="pill ok">done</span></td><td>MCP server for Claude Code and other agents</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>Real Gmail: read and drafts only, refresh token in the macOS Keychain</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>One-command install from npm, with provenance</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Refresh token encrypted at rest</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Mandates survive a restart</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Morning report: what every agent did tonight</td></tr>
+      <tr><td><span class="pill">not planned</span></td><td>Refresh token encrypted at rest</td></tr>
+      <tr><td><span class="pill">not planned</span></td><td>Mandates survive a restart</td></tr>
+      <tr><td><span class="pill">not planned</span></td><td>Morning report: what every agent did tonight</td></tr>
     </tbody>
   </table></div>
 </section>

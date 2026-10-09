@@ -7,12 +7,12 @@ description: كيف تثبّت AgentCollar وتستخدمه: وسيط صغير �
     <h1><span class="hl">دع الوكلاء يعملون.</span><br><span class="hl">واحتفظ أنت بالمفاتيح.</span></h1>
     <p class="lead">AgentCollar وسيط صغير يعمل على حاسوبك. يطلب منه وكيل الذكاء الاصطناعي تصريحًا قصيرًا لمهمة واحدة. وأنت توافق عليه في Telegram. ولا يرى الوكيل كلمة مرورك أبدًا.</p>
     <div class="install">{{hero-install}}</div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 اعتماديات وقت التشغيل</span><span class="chip warn">إصدار مبكر · على مسؤوليتك</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 اعتماديات وقت التشغيل</span><span class="chip warn">متوقف مؤقتًا · الاستخدام على مسؤوليتك</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="شعار AgentCollar: طوق عليه بطاقة AC" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">مشروع هواية. الاستخدام على مسؤوليتك.</b><p>AgentCollar ما زال جديدًا. لا تربط حسابات لا تحتمل خسارتها.</p></div>
+<div class="note warn"><b class="t">المشروع متوقف مؤقتًا.</b><p>كل ما في هذه الصفحة يعمل وتم اختباره من البداية إلى النهاية: يطلب Claude Code تفويضًا (mandate)، فتوافق عليه في Telegram، فيقرأ بريدك الحقيقي في Gmail ويترك مسودة. لكن التطوير متوقف، وقد لا يعود إليه المؤلف أبدًا: لا ميزات جديدة ولا إصلاحات موعودة. يبقى الكود مفتوحًا بترخيص MIT، فاعمل له fork إن احتجت إليه. مشروع هواية: استخدمه على مسؤوليتك ولا تربط حسابات لا تتحمل خسارتها.</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">البداية</span></h2>
@@ -294,9 +294,10 @@ description: كيف تثبّت AgentCollar وتستخدمه: وسيط صغير �
   <h2 class="sec"><span class="mark">حل المشكلات</span></h2>
   <details><summary>لا يصل شيء إلى Telegram</summary><p>افتح بوتك واضغط <strong>Start</strong> مرة واحدة على الأقل: البوتات لا تستطيع أن تبدأ مراسلتك. تحقّق من أن <code>agcl server</code> يعرض <code>Approvals: Telegram</code>. إن عرض <code>this terminal</code>، فشغّل <code>agcl setup</code>.</p></details>
   <details><summary>يقول الإعداد "Another program is already listening to this bot"</summary><p>(برنامج آخر يستمع بالفعل إلى هذا البوت.) غالبًا هو <code>agcl server</code> الخاص بك. أوقفه بـ <kbd>Ctrl+C</kbd> وشغّل <code>agcl setup</code> مرة أخرى.</p></details>
-  <details><summary>يقول الوكيل إن الوسيط لا يعمل</summary><p>شغّله: <code>agcl server</code>. يجب أن يعمل الوسيط والوكيل على الحاسوب نفسه.</p></details>
+  <details><summary>يقول الوكيل إن الوسيط لا يعمل</summary><p>شغّل الـ broker في تبويب طرفية منفصل وأبقِ ذلك التبويب مفتوحًا: <code>agcl server</code> (أو <code>agcl</code> فقط). يجب أن يعمل الـ broker والوكيل على الحاسوب نفسه. ثم اطلب من الوكيل أن يحاول مرة أخرى.</p></details>
   <details><summary>يقول <code>agcl mandates</code> "The broker is not running"</summary><p>التفويضات تعيش في ذاكرته، فبعد توقفه لا يوجد ما يُعرض. شغّله ودع الوكيل يطلب من جديد.</p></details>
   <details><summary>توقف Gmail عن العمل بعد أسبوع</summary><p>تطبيقك في Google في وضع الاختبار، وقد أنهت Google تسجيل الدخول. شغّل <code>agcl gmail connect</code> مرة أخرى.</p></details>
+  <details><summary>يقول Google “Access blocked: … has not completed the Google verification process” (Error 403: access_denied)</summary><p>تطبيقك في Google في وضع الاختبار، لذا يسمح Google بالدخول لمستخدمي الاختبار فقط. في Google Cloud افتح <strong>Google Auth Platform → Audience → Test users</strong>، وأضف عنوان Gmail الخاص بك، ثم شغّل <code>agcl gmail connect</code> مرة أخرى. لا تنشر التطبيق.</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>الاسم القصير يحتاج إلى تثبيت: <code>npm install -g agentcollar</code>. ودون تثبيت، استخدم <code>npx agentcollar</code>.</p></details>
   <details><summary>المنفذ 8787 مشغول</summary><p>ربما يعمل وسيط آخر بالفعل (تحقّق بـ <code>agcl mandates</code>). أو شغّل هذا على منفذ آخر: <code>BROKER_PORT=8788 agcl server</code>، وأخبر وكيلك بالعنوان الجديد.</p></details>
   <details><summary>"Unsupported engine" أو أخطاء صياغة عند التشغيل</summary><p>إصدار Node.js لديك قديم جدًا. يحتاج AgentCollar إلى الإصدار 22 أو أحدث: <code>node --version</code>.</p></details>
@@ -304,6 +305,7 @@ description: كيف تثبّت AgentCollar وتستخدمه: وسيط صغير �
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">خريطة الطريق</span></h2>
+  <p>التطوير متوقف. البنود غير المنجزة لم تعد ضمن الخطة.</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>التفويضات، والفحوص الستة، والإلغاء، وسجل تدقيق للإضافة فقط</td></tr>
@@ -312,9 +314,9 @@ description: كيف تثبّت AgentCollar وتستخدمه: وسيط صغير �
       <tr><td><span class="pill ok">done</span></td><td>خادم MCP لـ Claude Code والوكلاء الآخرين</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>Gmail حقيقي: قراءة ومسودات فقط، ورمز التحديث في سلسلة مفاتيح macOS</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>تثبيت من npm بأمر واحد، مع provenance</td></tr>
-      <tr><td><span class="pill">later</span></td><td>تشفير رمز التحديث عند التخزين</td></tr>
-      <tr><td><span class="pill">later</span></td><td>بقاء التفويضات بعد إعادة التشغيل</td></tr>
-      <tr><td><span class="pill">later</span></td><td>تقرير الصباح: ما فعله كل وكيل الليلة الماضية</td></tr>
+      <tr><td><span class="pill">غير مخطط</span></td><td>تشفير رمز التحديث عند التخزين</td></tr>
+      <tr><td><span class="pill">غير مخطط</span></td><td>بقاء التفويضات بعد إعادة التشغيل</td></tr>
+      <tr><td><span class="pill">غير مخطط</span></td><td>تقرير الصباح: ما فعله كل وكيل الليلة الماضية</td></tr>
     </tbody>
   </table></div>
 </section>

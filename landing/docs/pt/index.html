@@ -78,12 +78,12 @@
     <h1><span class="hl">Deixe os agentes trabalharem.</span><br><span class="hl">Fique com as chaves.</span></h1>
     <p class="lead">O AgentCollar é um pequeno broker que roda no seu computador. Seu agente de IA pede a ele um passe curto para uma única tarefa. Você aprova no Telegram. O agente nunca vê a sua senha.</p>
     <div class="install"><div class="code term"><pre><span class="p">$ </span>npx agentcollar</pre><button class="copy" data-copy="npx agentcollar">copiar</button></div></div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 dependências em tempo de execução</span><span class="chip warn">versão inicial · use por sua conta e risco</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 dependências em tempo de execução</span><span class="chip warn">pausado · use por sua conta e risco</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="Logo do AgentCollar: uma coleira com uma plaquinha AC" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">Projeto pessoal. Use por sua conta e risco.</b><p>O AgentCollar é jovem. Não conecte contas que você não pode se dar ao luxo de perder.</p></div>
+<div class="note warn"><b class="t">Projeto pausado.</b><p>Tudo nesta página funciona e foi testado de ponta a ponta: o Claude Code pede um mandato, você aprova no Telegram, ele lê o seu Gmail de verdade e deixa um rascunho. Mas o desenvolvimento está pausado, e talvez eu nunca volte a ele: sem recursos novos e sem correções prometidas. O código continua aberto sob MIT, então faça um fork se precisar. Projeto pessoal: use por sua conta e risco e não conecte contas que você não pode se dar ao luxo de perder.</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">Primeiros passos</span></h2>
@@ -515,9 +515,10 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
   <h2 class="sec"><span class="mark">Solução de problemas</span></h2>
   <details><summary>Nada chega no Telegram</summary><p>Abra seu bot e aperte <strong>Start</strong> pelo menos uma vez: bots não podem escrever para você primeiro. Confira se o <code>agcl server</code> mostra <code>Approvals: Telegram</code>. Se mostrar <code>this terminal</code>, rode <code>agcl setup</code>.</p></details>
   <details><summary>O assistente diz "Another program is already listening to this bot"</summary><p>(Outro programa já está escutando este bot.) Geralmente é o seu próprio <code>agcl server</code>. Pare com <kbd>Ctrl+C</kbd> e rode <code>agcl setup</code> de novo.</p></details>
-  <details><summary>O agente diz que o broker não está rodando</summary><p>Inicie: <code>agcl server</code>. O broker e o agente precisam rodar no mesmo computador.</p></details>
+  <details><summary>O agente diz que o broker não está rodando</summary><p>Inicie o broker em uma aba de terminal separada e deixe essa aba aberta: <code>agcl server</code> (ou só <code>agcl</code>). O broker e o agente precisam rodar no mesmo computador. Depois peça ao agente para tentar de novo.</p></details>
   <details><summary><code>agcl mandates</code> diz "The broker is not running"</summary><p>Os mandatos vivem na memória dele, então depois que ele para não há nada para mostrar. Inicie e deixe o agente pedir de novo.</p></details>
   <details><summary>O Gmail parou de funcionar depois de uma semana</summary><p>Seu app do Google está em modo de teste, e o Google encerrou o login. Rode <code>agcl gmail connect</code> de novo.</p></details>
+  <details><summary>O Google diz “Access blocked: … has not completed the Google verification process” (Error 403: access_denied)</summary><p>Seu app do Google está em modo de teste, então o Google só deixa entrar os usuários de teste. No Google Cloud abra <strong>Google Auth Platform → Audience → Test users</strong>, adicione seu endereço do Gmail e rode <code>agcl gmail connect</code> de novo. Não publique o app.</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>O nome curto precisa de instalação: <code>npm install -g agentcollar</code>. Sem instalar, use <code>npx agentcollar</code>.</p></details>
   <details><summary>A porta 8787 está ocupada</summary><p>Talvez outro broker já esteja rodando (confira com <code>agcl mandates</code>). Ou inicie este em outra porta: <code>BROKER_PORT=8788 agcl server</code>, e informe o novo endereço ao seu agente.</p></details>
   <details><summary>"Unsupported engine" ou erros de sintaxe ao iniciar</summary><p>Seu Node.js é antigo demais. O AgentCollar precisa da versão 22 ou mais recente: <code>node --version</code>.</p></details>
@@ -525,6 +526,7 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">Roteiro</span></h2>
+  <p>O desenvolvimento está pausado. O que não está feito não está planejado.</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>Mandatos, as 6 verificações, revogação, log de auditoria só de acréscimo</td></tr>
@@ -533,9 +535,9 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
       <tr><td><span class="pill ok">done</span></td><td>Servidor MCP para o Claude Code e outros agentes</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>Gmail real: só leitura e rascunhos, refresh token nas Chaves do macOS</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>Instalação pelo npm com um único comando, com provenance</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Refresh token criptografado em repouso</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Mandatos sobrevivem a uma reinicialização</td></tr>
-      <tr><td><span class="pill">later</span></td><td>Relatório da manhã: o que cada agente fez durante a noite</td></tr>
+      <tr><td><span class="pill">não planejado</span></td><td>Refresh token criptografado em repouso</td></tr>
+      <tr><td><span class="pill">não planejado</span></td><td>Mandatos sobrevivem a uma reinicialização</td></tr>
+      <tr><td><span class="pill">não planejado</span></td><td>Relatório da manhã: o que cada agente fez durante a noite</td></tr>
     </tbody>
   </table></div>
 </section>

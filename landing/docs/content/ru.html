@@ -7,12 +7,12 @@ description: Как установить и использовать AgentCollar
     <h1><span class="hl">Пусть агенты работают.</span><br><span class="hl">Ключи — у вас.</span></h1>
     <p class="lead">AgentCollar — маленький брокер, который работает на вашем компьютере. ИИ-агент просит у него короткий пропуск на одну задачу. Вы одобряете его в Telegram. Ваш пароль агент не видит никогда.</p>
     <div class="install">{{hero-install}}</div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 зависимостей</span><span class="chip warn">ранняя версия · на свой риск</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 зависимостей</span><span class="chip warn">на паузе · на свой страх и риск</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="Логотип AgentCollar: ошейник с жетоном AC" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">Хобби-проект. Используйте на свой риск.</b><p>AgentCollar ещё молод. Не подключайте аккаунты, которые жалко потерять.</p></div>
+<div class="note warn"><b class="t">Проект на паузе.</b><p>Всё, что описано на этой странице, работает и проверено от начала до конца: Claude Code просит mandate, вы одобряете его в Telegram, он читает ваш настоящий Gmail и оставляет черновик. Но разработка приостановлена, и, возможно, автор к ней больше не вернётся: ни новых функций, ни обещанных исправлений. Код остаётся открытым под MIT — делайте fork, если он вам нужен. Хобби-проект: используйте на свой страх и риск и не подключайте аккаунты, потерю которых не можете себе позволить.</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">Начало работы</span></h2>
@@ -294,9 +294,10 @@ description: Как установить и использовать AgentCollar
   <h2 class="sec"><span class="mark">Решение проблем</span></h2>
   <details><summary>В Telegram ничего не приходит</summary><p>Откройте своего бота и хотя бы раз нажмите <strong>Start</strong>: боты не могут написать вам первыми. Проверьте, что <code>agcl server</code> пишет <code>Approvals: Telegram</code>. Если там <code>this terminal</code>, запустите <code>agcl setup</code>.</p></details>
   <details><summary>Настройка пишет «Another program is already listening to this bot»</summary><p>Обычно это ваш же <code>agcl server</code>. Остановите его через <kbd>Ctrl+C</kbd> и снова запустите <code>agcl setup</code>.</p></details>
-  <details><summary>Агент говорит, что брокер не запущен</summary><p>Запустите его: <code>agcl server</code>. Брокер и агент должны работать на одном компьютере.</p></details>
+  <details><summary>Агент говорит, что брокер не запущен</summary><p>Запустите брокер в отдельной вкладке терминала и не закрывайте её: <code>agcl server</code> (или просто <code>agcl</code>). Брокер и агент должны работать на одном компьютере. Потом попросите агента попробовать снова.</p></details>
   <details><summary><code>agcl mandates</code> пишет «The broker is not running»</summary><p>Мандаты живут в его памяти, поэтому после остановки показывать нечего. Запустите брокер и дайте агенту попросить снова.</p></details>
   <details><summary>Gmail перестал работать через неделю</summary><p>Ваше приложение в Google в тестовом режиме, и Google завершил вход. Снова запустите <code>agcl gmail connect</code>.</p></details>
+  <details><summary>Google пишет «Access blocked: … has not completed the Google verification process» (Error 403: access_denied)</summary><p>Ваше приложение Google в тестовом режиме, поэтому Google пускает только тестовых пользователей. В Google Cloud откройте <strong>Google Auth Platform → Audience → Test users</strong>, добавьте свой адрес Gmail и снова запустите <code>agcl gmail connect</code>. Публиковать приложение не нужно.</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>Для короткого имени нужна установка: <code>npm install -g agentcollar</code>. Без установки используйте <code>npx agentcollar</code>.</p></details>
   <details><summary>Порт 8787 занят</summary><p>Возможно, другой брокер уже запущен (проверьте через <code>agcl mandates</code>). Или запустите этот на другом порту: <code>BROKER_PORT=8788 agcl server</code> — и сообщите агенту новый адрес.</p></details>
   <details><summary>«Unsupported engine» или синтаксические ошибки при запуске</summary><p>Ваш Node.js слишком старый. AgentCollar нужен 22 или новее: <code>node --version</code>.</p></details>
@@ -304,6 +305,7 @@ description: Как установить и использовать AgentCollar
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">Планы</span></h2>
+  <p>Разработка приостановлена. То, что не сделано, не запланировано.</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">готово</span></td><td>Мандаты, 6 проверок, отзыв, журнал аудита только на дозапись</td></tr>
@@ -312,9 +314,9 @@ description: Как установить и использовать AgentCollar
       <tr><td><span class="pill ok">готово</span></td><td>MCP-сервер для Claude Code и других агентов</td></tr>
       <tr><td><span class="pill ok">готово</span></td><td>Настоящий Gmail: только чтение и черновики, refresh-токен в связке ключей macOS</td></tr>
       <tr><td><span class="pill ok">готово</span></td><td>Установка одной командой из npm, с provenance</td></tr>
-      <tr><td><span class="pill">позже</span></td><td>Refresh-токен зашифрован на диске</td></tr>
-      <tr><td><span class="pill">позже</span></td><td>Мандаты переживают перезапуск</td></tr>
-      <tr><td><span class="pill">позже</span></td><td>Утренний отчёт: что каждый агент делал ночью</td></tr>
+      <tr><td><span class="pill">не планируется</span></td><td>Refresh-токен зашифрован на диске</td></tr>
+      <tr><td><span class="pill">не планируется</span></td><td>Мандаты переживают перезапуск</td></tr>
+      <tr><td><span class="pill">не планируется</span></td><td>Утренний отчёт: что каждый агент делал ночью</td></tr>
     </tbody>
   </table></div>
 </section>

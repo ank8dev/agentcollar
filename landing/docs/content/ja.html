@@ -7,12 +7,12 @@ description: AgentCollar のインストールと使い方。AI エージェン�
     <h1><span class="hl">エージェントには働いてもらう。</span><br><span class="hl">鍵は自分で持つ。</span></h1>
     <p class="lead">AgentCollar は、あなたのコンピューターで動く小さなブローカーです。AI エージェントは、1 つのタスクのための短い通行証をブローカーに求めます。あなたはそれを Telegram で承認します。エージェントがあなたのパスワードを見ることはありません。</p>
     <div class="install">{{hero-install}}</div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">実行時の依存関係 0</span><span class="chip warn">初期版 · 自己責任で</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">実行時の依存関係 0</span><span class="chip warn">一時停止中 · 自己責任でご利用ください</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar のロゴ：AC のタグが付いた首輪" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">個人の趣味プロジェクトです。自己責任でお使いください。</b><p>AgentCollar はまだ若いプロジェクトです。失って困るアカウントは接続しないでください。</p></div>
+<div class="note warn"><b class="t">プロジェクトは一時停止中です。</b><p>このページの機能はすべて動作し、最初から最後まで通してテスト済みです。Claude Code が mandate を求め、あなたが Telegram で承認すると、本物の Gmail を読んで下書きを残します。ただし開発は一時停止中で、作者が再開しない可能性もあります。新機能も、修正の約束もありません。コードは MIT ライセンスで公開されたままなので、必要なら fork してください。趣味のプロジェクトです。自己責任で使い、失って困るアカウントは接続しないでください。</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">はじめに</span></h2>
@@ -294,9 +294,10 @@ description: AgentCollar のインストールと使い方。AI エージェン�
   <h2 class="sec"><span class="mark">トラブルシューティング</span></h2>
   <details><summary>Telegram に何も届かない</summary><p>ボットを開いて、少なくとも一度は <strong>Start</strong> を押してください。ボットからあなたに先にメッセージを送ることはできません。<code>agcl server</code> に <code>Approvals: Telegram</code> と表示されているか確認します。<code>this terminal</code> と出ているなら、<code>agcl setup</code> を実行してください。</p></details>
   <details><summary>セットアップで「Another program is already listening to this bot」と出る</summary><p>（別のプログラムがすでにこのボットを待ち受けています。）たいていは自分の <code>agcl server</code> です。<kbd>Ctrl+C</kbd> で止めて、もう一度 <code>agcl setup</code> を実行してください。</p></details>
-  <details><summary>エージェントがブローカーは動いていないと言う</summary><p>起動してください：<code>agcl server</code>。ブローカーとエージェントは同じコンピューターで動いている必要があります。</p></details>
+  <details><summary>エージェントがブローカーは動いていないと言う</summary><p>別のターミナルタブで broker を起動し、そのタブを開いたままにしてください：<code>agcl server</code>（または単に <code>agcl</code>）。broker とエージェントは同じコンピューターで動かす必要があります。そのうえでエージェントにもう一度試すよう頼んでください。</p></details>
   <details><summary><code>agcl mandates</code> が「The broker is not running」と言う</summary><p>マンデートはブローカーのメモリ上にあるので、止まった後は表示するものがありません。起動して、エージェントにもう一度求めさせてください。</p></details>
   <details><summary>1 週間後に Gmail が使えなくなった</summary><p>Google アプリがテストモードで、Google がサインインを終了しました。もう一度 <code>agcl gmail connect</code> を実行してください。</p></details>
+  <details><summary>Google に「Access blocked: … has not completed the Google verification process」(Error 403: access_denied) と表示される</summary><p>Google アプリがテストモードなので、Google はテストユーザーしか入れません。Google Cloud で <strong>Google Auth Platform → Audience → Test users</strong> を開き、自分の Gmail アドレスを追加してから、もう一度 <code>agcl gmail connect</code> を実行してください。アプリは公開しないでください。</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>短い名前にはインストールが必要です：<code>npm install -g agentcollar</code>。インストールしない場合は <code>npx agentcollar</code> を使ってください。</p></details>
   <details><summary>ポート 8787 が使用中</summary><p>別のブローカーがすでに動いているかもしれません（<code>agcl mandates</code> で確認）。または別のポートで起動します：<code>BROKER_PORT=8788 agcl server</code>。新しいアドレスをエージェントに伝えてください。</p></details>
   <details><summary>起動時に「Unsupported engine」や構文エラーが出る</summary><p>Node.js が古すぎます。AgentCollar には 22 以降が必要です：<code>node --version</code>。</p></details>
@@ -304,6 +305,7 @@ description: AgentCollar のインストールと使い方。AI エージェン�
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">ロードマップ</span></h2>
+  <p>開発は一時停止中です。未完了の項目は予定にありません。</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>マンデート、6 つのチェック、取り消し、追記のみの監査ログ</td></tr>
@@ -312,9 +314,9 @@ description: AgentCollar のインストールと使い方。AI エージェン�
       <tr><td><span class="pill ok">done</span></td><td>Claude Code などのエージェント向け MCP サーバー</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>本物の Gmail：読み取りと下書きのみ、リフレッシュトークンは macOS のキーチェーン</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>npm からコマンド 1 つでインストール、provenance 付き</td></tr>
-      <tr><td><span class="pill">later</span></td><td>リフレッシュトークンの保存時暗号化</td></tr>
-      <tr><td><span class="pill">later</span></td><td>再起動してもマンデートが残る</td></tr>
-      <tr><td><span class="pill">later</span></td><td>朝のレポート：各エージェントが昨夜何をしたか</td></tr>
+      <tr><td><span class="pill">予定なし</span></td><td>リフレッシュトークンの保存時暗号化</td></tr>
+      <tr><td><span class="pill">予定なし</span></td><td>再起動してもマンデートが残る</td></tr>
+      <tr><td><span class="pill">予定なし</span></td><td>朝のレポート：各エージェントが昨夜何をしたか</td></tr>
     </tbody>
   </table></div>
 </section>

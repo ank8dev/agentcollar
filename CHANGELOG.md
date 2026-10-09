@@ -6,6 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+**Development is paused** and may never resume. Everything below was tested end to end
+(Claude Code → Telegram approval → real Gmail drafts) before the pause.
+
 ### Added
 - Real Gmail: `agcl gmail connect | status | disconnect`. Desktop-app OAuth with PKCE on a
   `127.0.0.1` loopback; the refresh token is stored in the macOS Keychain, the access token only in

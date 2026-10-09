@@ -5,7 +5,8 @@ agents and your accounts. Agents get a short-lived, task-scoped *mandate* that y
 Telegram — never your password or tokens.
 
 > **Hobby project. Use at your own risk. Do not connect accounts you can't afford to lose.**
-> Status: early. Gmail is still **fake** (an in-memory inbox); real Gmail is next.
+> **Status: paused.** It works end to end (Claude Code → Telegram approval → real Gmail drafts), but
+> development is paused and may never resume. The code stays open (MIT): fork it if you need it.
 
 ## Install
 

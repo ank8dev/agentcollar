@@ -78,12 +78,12 @@
     <h1><span class="hl">让智能体干活。</span><br><span class="hl">钥匙留在你手里。</span></h1>
     <p class="lead">AgentCollar 是一个在你电脑上运行的小型代理（broker）。你的 AI 智能体向它申请一张只用于一项任务的短期通行证，你在 Telegram 中批准。智能体永远看不到你的密码。</p>
     <div class="install"><div class="code term"><pre><span class="p">$ </span>npx agentcollar</pre><button class="copy" data-copy="npx agentcollar">复制</button></div></div>
-    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 个运行时依赖</span><span class="chip warn">早期版本 · 风险自负</span></div>
+    <div class="status"><span class="chip">Node.js 22+</span><span class="chip">0 个运行时依赖</span><span class="chip warn">已暂停 · 风险自负</span></div>
   </div>
   <img class="hero-art" src="/brand/logo/agentcollar-logo-black.webp" alt="AgentCollar 标志：带 AC 吊牌的项圈" width="220" height="220">
 </div>
 
-<div class="note warn"><b class="t">个人业余项目，风险自负。</b><p>AgentCollar 还很年轻。不要连接你输不起的账户。</p></div>
+<div class="note warn"><b class="t">项目已暂停。</b><p>本页的所有功能都能正常工作，并经过了端到端测试：Claude Code 申请授权（mandate），你在 Telegram 中批准，它读取你真实的 Gmail 并留下一封草稿。但开发已经暂停，作者可能再也不会回来继续：没有新功能，也不承诺修复。代码以 MIT 许可证保持开源，需要的话可以 fork。这是业余项目：使用风险自负，不要连接你承受不起损失的账户。</p></div>
 
 <section id="start">
   <h2 class="sec"><span class="mark">快速开始</span></h2>
@@ -515,9 +515,10 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
   <h2 class="sec"><span class="mark">故障排除</span></h2>
   <details><summary>Telegram 里什么都没收到</summary><p>打开你的机器人，至少按一次 <strong>Start</strong>：机器人不能先给你发消息。检查 <code>agcl server</code> 是否显示 <code>Approvals: Telegram</code>。如果显示 <code>this terminal</code>，请运行 <code>agcl setup</code>。</p></details>
   <details><summary>设置提示"Another program is already listening to this bot"</summary><p>（另一个程序已经在监听这个机器人。）通常就是你自己的 <code>agcl server</code>。用 <kbd>Ctrl+C</kbd> 停止它，再运行 <code>agcl setup</code>。</p></details>
-  <details><summary>智能体说代理没有运行</summary><p>启动它：<code>agcl server</code>。代理和智能体必须在同一台电脑上运行。</p></details>
+  <details><summary>智能体说代理没有运行</summary><p>在单独的终端标签页中启动 broker 并保持该标签页打开：<code>agcl server</code>（或直接 <code>agcl</code>）。broker 和智能体必须运行在同一台电脑上。然后让智能体重试。</p></details>
   <details><summary><code>agcl mandates</code> 提示"The broker is not running"</summary><p>授权保存在代理的内存中，所以它停止后就没有可显示的内容。启动它，让智能体重新申请。</p></details>
   <details><summary>一周后 Gmail 不能用了</summary><p>你的 Google 应用处于测试模式，Google 结束了登录。重新运行 <code>agcl gmail connect</code>。</p></details>
+  <details><summary>Google 提示 “Access blocked: … has not completed the Google verification process”（Error 403: access_denied）</summary><p>你的 Google 应用处于测试模式，Google 只允许测试用户登录。在 Google Cloud 中打开 <strong>Google Auth Platform → Audience → Test users</strong>，添加你的 Gmail 地址，然后再次运行 <code>agcl gmail connect</code>。不要发布该应用。</p></details>
   <details><summary><code>agcl: command not found</code></summary><p>短名称需要安装：<code>npm install -g agentcollar</code>。不安装的话，请使用 <code>npx agentcollar</code>。</p></details>
   <details><summary>端口 8787 被占用</summary><p>可能已有另一个代理在运行（用 <code>agcl mandates</code> 检查）。或者换个端口启动：<code>BROKER_PORT=8788 agcl server</code>，并把新地址告诉你的智能体。</p></details>
   <details><summary>启动时出现"Unsupported engine"或语法错误</summary><p>你的 Node.js 太旧了。AgentCollar 需要 22 或更高版本：<code>node --version</code>。</p></details>
@@ -525,6 +526,7 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
 
 <section id="roadmap">
   <h2 class="sec"><span class="mark">路线图</span></h2>
+  <p>开发已暂停。尚未完成的项目不再计划。</p>
   <div class="tbl"><table>
     <tbody>
       <tr><td><span class="pill ok">done</span></td><td>授权、6 项检查、撤销、只追加的审计日志</td></tr>
@@ -533,9 +535,9 @@ macOS Keychain          <span class="c"># Gmail refresh token (never in a file)<
       <tr><td><span class="pill ok">done</span></td><td>供 Claude Code 和其他智能体使用的 MCP 服务器</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>真实 Gmail：只能读取和创建草稿，刷新 token 存在 macOS 钥匙串</td></tr>
       <tr><td><span class="pill ok">done</span></td><td>从 npm 一条命令安装，带 provenance</td></tr>
-      <tr><td><span class="pill">later</span></td><td>刷新 token 静态加密</td></tr>
-      <tr><td><span class="pill">later</span></td><td>授权在重启后仍然保留</td></tr>
-      <tr><td><span class="pill">later</span></td><td>晨报：每个智能体昨晚做了什么</td></tr>
+      <tr><td><span class="pill">不再计划</span></td><td>刷新 token 静态加密</td></tr>
+      <tr><td><span class="pill">不再计划</span></td><td>授权在重启后仍然保留</td></tr>
+      <tr><td><span class="pill">不再计划</span></td><td>晨报：每个智能体昨晚做了什么</td></tr>
     </tbody>
   </table></div>
 </section>
