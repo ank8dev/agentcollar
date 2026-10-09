@@ -124,10 +124,14 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
       return Math.max(end, flightStart() + 160);
     };
 
-    // The button becomes clickable only once it is fully built (outline drawn).
+    // The button becomes clickable only once it is fully built (outline drawn), and at that
+    // moment the "PROJECT PAUSED" neon sign under it lights up (flicker: footer.css).
     const link = footer.querySelector('.footer-cta');
+    const sign = footer.querySelector('.footer-paused');
     const arm = (p) => {
-      if (link) link.dataset.armed = p >= 0.97 ? 'true' : 'false';
+      const built = p >= 0.97 ? 'true' : 'false';
+      if (link) link.dataset.armed = built;
+      if (sign) sign.dataset.lit = built;
     };
     arm(0);
 
@@ -176,6 +180,7 @@ export function init({ gsap, ScrollTrigger, reducedMotion }) {
     return () => {
       delete footer.dataset.motion;
       if (link) delete link.dataset.armed;
+      if (sign) delete sign.dataset.lit;
     };
   });
 }
